@@ -22,9 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Core\Screen\" />
+    <Folder Include="Application\Core\" />
     <Folder Include="Application\Inventory\Creative\" />
     <Folder Include="Shared\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
   </ItemGroup>
 
 </Project>

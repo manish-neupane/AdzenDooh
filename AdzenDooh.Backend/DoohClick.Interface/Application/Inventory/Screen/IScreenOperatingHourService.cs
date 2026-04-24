@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AdzenDooh.Interface.Application.Inventory.Screen
 {
-    internal interface IScreenOperatingHour
+    public interface IScreenOperatingHourService
     {
+
     }
 }

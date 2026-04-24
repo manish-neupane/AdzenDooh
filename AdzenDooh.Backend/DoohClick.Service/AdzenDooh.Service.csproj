@@ -22,9 +22,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Core\Screen\" />
+    <Folder Include="Application\Core\" />
     <Folder Include="Application\Inventory\Creative\" />
+	  
     <Folder Include="Shared\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccessService\AdzenDooh.DataAccess.csproj" />
+    <ProjectReference Include="..\DoohClick.Interface\AdzenDooh.Interface.csproj" />
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
 
 </Project>

@@ -1,0 +1,6 @@
+@DoohClickBackend_HostAddress = http://localhost:5191
+
+GET {{DoohClickBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

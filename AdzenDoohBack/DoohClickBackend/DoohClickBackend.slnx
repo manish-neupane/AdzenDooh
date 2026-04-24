@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="DataAccessService/AdzenDooh.DataAccess.csproj" />
+  <Project Path="DoohClick.Interface/AdzenDooh.Interface.csproj" />
+  <Project Path="DoohClick.Model/AdzenDooh.Model.csproj" />
+  <Project Path="DoohClick.Service/AdzenDooh.Service.csproj" />
+  <Project Path="DoohClickBackend/AdzenDooh.Api.csproj" />
+</Solution>

@@ -1,0 +1,72 @@
+# =========================
+# OS / SYSTEM
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / EDITOR
+# =========================
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# =========================
+# ENV / SECRETS
+# =========================
+.env
+.env.*
+appsettings.Development.json
+
+# =========================
+# ANGULAR / NODE
+# =========================
+node_modules/
+dist/
+build/
+.angular/
+.cache/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# .NET
+# =========================
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# Rider / VS
+_ReSharper*/
+*.DotSettings.user
+
+# =========================
+# SQL SERVER
+# =========================
+*.mdf
+*.ldf
+*.ndf
+
+# =========================
+# DATABASE / LOCAL FILES
+# =========================
+*.bak
+*.trn
+
+# =========================
+# MISC
+# =========================
+logs/
+temp/
+tmp/
+*.tmp

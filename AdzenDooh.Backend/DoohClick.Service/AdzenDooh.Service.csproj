@@ -7,10 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Asset\" />
-    <Folder Include="Application\Auth\" />
-    <Folder Include="Application\Campaign\" />
-    <Folder Include="Application\Playback\" />
+    <Compile Remove="Application\Asset\**" />
+    <Compile Remove="Application\Auth\**" />
+    <Compile Remove="Application\Campaign\**" />
+    <Compile Remove="Application\Playback\**" />
+    <EmbeddedResource Remove="Application\Asset\**" />
+    <EmbeddedResource Remove="Application\Auth\**" />
+    <EmbeddedResource Remove="Application\Campaign\**" />
+    <EmbeddedResource Remove="Application\Playback\**" />
+    <None Remove="Application\Asset\**" />
+    <None Remove="Application\Auth\**" />
+    <None Remove="Application\Campaign\**" />
+    <None Remove="Application\Playback\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Core\Screen\" />
+    <Folder Include="Application\Inventory\Creative\" />
     <Folder Include="Shared\" />
   </ItemGroup>
 

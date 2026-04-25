@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { mvScreen, PostScreen, UpdateScreen, DeleteScreen,ScreenSearchFilter } from '../model/screenModel';
+import { mvScreen, mvUpsertScreen, mvDeleteScreen,mvScreenFilter } from '../model/screenModel';
 import { ApiResponse } from '../../../shared/model/sharedModel';
 import { environment } from '../../../../environments/environment';
 
@@ -19,24 +19,24 @@ export class ScreenService {
   // ─── Endpoints ───────────────────────────────────────────────────────────────
 
   // GET /Screen/GetScreenList
-  getScreens(filter: ScreenSearchFilter = {}): Observable<ApiResponse<mvScreen[]>> {
-    return this.http.get<ApiResponse<mvScreen[]>>(`${this.base}/GetScreenList`, {
+  getScreens(filter: mvScreenFilter = {}): Observable<ApiResponse<mvScreen[]>> {
+    return this.http.get<ApiResponse<mvScreen[]>>(`${this.base}/ScreenGrid`, {
       params: new HttpParams({ fromObject: { ...filter } }),
     });
   }
 
   // POST /Screen/PostScreen
-  addScreen(payload: PostScreen): Observable<ApiResponse<mvScreen[]>> {
+  upsertScreen(payload: mvUpsertScreen): Observable<ApiResponse<mvScreen[]>> {
     return this.http.post<ApiResponse<mvScreen[]>>(`${this.base}/PostScreen`, payload);
   }
 
   // PUT /Screen/PutScreen
-  updateScreen(payload: UpdateScreen): Observable<ApiResponse<mvScreen[]>> {
-    return this.http.put<ApiResponse<mvScreen[]>>(`${this.base}/PutScreen`, payload);
-  }
+  // updateScreen(payload: UpdateScreen): Observable<ApiResponse<mvScreen[]>> {
+  //   return this.http.put<ApiResponse<mvScreen[]>>(`${this.base}/PutScreen`, payload);
+  // }
 
   // DELETE /Screen/DeleteScreen
-  deleteScreen(payload: DeleteScreen): Observable<ApiResponse<mvScreen>> {
+  deleteScreen(payload: mvDeleteScreen): Observable<ApiResponse<mvScreen>> {
     return this.http.delete<ApiResponse<mvScreen>>(`${this.base}/DeleteScreen`, {
       body: payload,
     });

@@ -8,13 +8,7 @@ namespace AdzenDooh.Model.Shared.Response
 {
 
 
-     public class ResponseModel<T>
-         {
-            public required string Type { get; set; }
-            public required string Message { get; set; }
-            public T? Data { get; set; }
-            
-           }
+  
 
     public class GridResponse<T>
         {
@@ -30,5 +24,7 @@ namespace AdzenDooh.Model.Shared.Response
             public required string Name { get; set; }
         }
     
+
+
 }
 

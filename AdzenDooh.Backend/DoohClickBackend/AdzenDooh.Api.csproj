@@ -12,9 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Application\Core\" />
-    <Folder Include="Controllers\Application\Inventory\Screen\" />
     <Folder Include="Controllers\Application\Inventory\Creative\" />
-    <Folder Include="Controllers\Shared\Base\" />
     <Folder Include="Controllers\Shared\Util\" />
   </ItemGroup>
 

@@ -6,16 +6,18 @@ import {
   Injector,
 } from "@angular/core";
 import { Subject, takeUntil, finalize } from "rxjs";
-import {sharedImports} from "../../../../shared/primeng.import";
-import { mvScreen, ScreenSearchFilter } from "../../model/screenModel";
+import {sharedImports} from "../../../../shared/component/primeng.import";
+import { mvScreen, mvScreenFilter,mvDeleteScreen } from "../../model/screenModel";
 import { ApiResponse } from "../../../../shared/model/sharedModel";
 import { gridConfig } from "../../../../shared/model/grid-config.model";
 import { screenColumns } from "./screen-list-columns";
 import { ScreenService } from "../../service/screen.service";
 import { GridComponent } from "../../../../shared/component/grid/grid.component";
-import { ScreenCreateEditComponent } from "../screen-create-edit/screen-create-edit.component";
-import { ScreenDetailsComponent } from "../screen-details/screen-details.component";
 import { AppComponent } from "../../../../app.component";
+
+// import { ScreenCreateEditComponent } from "../screen-create-edit/screen-create-edit.component";
+// import { ScreenDetailsComponent } from "../screen-details/screen-details.component";
+
 
 @Component({
   selector: "screen-list",
@@ -23,14 +25,12 @@ import { AppComponent } from "../../../../app.component";
   imports: [
     ...sharedImports,
     GridComponent,
-    ScreenCreateEditComponent,
-    ScreenDetailsComponent,
   ],
   templateUrl: "./screen-list.component.html",
-  styleUrl: "./screen-list.component.css",
+  styleUrl: "./screen-list.component.scss",
 })
 export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
-  @ViewChild("screenCreateEdit") screenCreateEdit!: ScreenCreateEditComponent;
+  // @ViewChild("screenCreateEdit") screenCreateEdit!: ScreenCreateEditComponent;
 
   screenConfig: gridConfig<mvScreen> = {
     columns: screenColumns,
@@ -40,7 +40,7 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
   currentScreen = {} as mvScreen;
   isLoading = false;
   errorMessage = "";
-  filter: ScreenSearchFilter = {};
+  filter: mvScreenFilter = {};
 
   private _unSubscribeAll$ = new Subject<void>();
 
@@ -49,7 +49,7 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
     private screenService: ScreenService,
   ) {
     super(injector);
-  }
+  } 
 
   ngOnInit(): void {
     this.getScreens();
@@ -79,15 +79,15 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
       });
   }
 
-  addScreen(): void {
-    this.currentScreen = { id: 0 } as mvScreen;
-    this.screenCreateEdit.open();
-  }
+  // addScreen(): void {
+  //   this.currentScreen = { id: 0 } as mvScreen;
+  //   this.screenCreateEdit.open();
+  // }
 
-  editScreen(screen: mvScreen): void {
-    this.currentScreen = { ...screen };
-    this.screenCreateEdit.open();
-  }
+  // editScreen(screen: mvScreen): void {
+  //   this.currentScreen = { ...screen };
+  //   this.screenCreateEdit.open();
+  // }
 
 
 
@@ -109,42 +109,47 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
     this.currentScreen = {} as mvScreen;
   }
 
-  deleteScreen(screen: mvScreen): void {
-    this.confirmDialog(
-      `Are you sure you want to delete ${screen.screenName}?`,
-      "Confirm Delete",
-      "pi pi-exclamation-triangle",
-      () => this.executeDelete(screen),
-    );
-  }
+ 
+ 
+ 
+ deleteScreen(screen: mvScreen): void {
+  this.confirmDialog(
+    `Are you sure you want to delete ${screen.name}?`,
+    "Confirm Delete",
+    "pi pi-exclamation-triangle",
+    () => this.executeDelete({ id: screen.id, deletedBy: 1 }), // map to mvDeleteScreen
+  );
+}
 
-  private executeDelete(screen: mvScreen): void {
-    this.isLoading = true;
-    this.screenService
-      .deleteScreen({ id: screen.id, updatedBy: 1 })
-      .pipe(
-        takeUntil(this._unSubscribeAll$),
-        finalize(() => (this.isLoading = false)),
-      )
-      .subscribe({
-        next: () => {
-          this.showMessage(
-            "success",
-            "Deleted",
-            `${screen.screenName} removed successfully`,
-          );
-          this.screenConfig.dataSource.data =
-            this.screenConfig.dataSource.data.filter((s) => s.id !== screen.id);
-          this.screenConfig = { ...this.screenConfig };
-        },
-        error: () => {
-          this.showMessage(
-            "error",
-            "Error",
-            `Failed to delete ${screen.screenName}`,
-          );
-        },
-      });
+private executeDelete(screen: mvDeleteScreen): void {
+  this.isLoading = true;
+  this.screenService
+    .deleteScreen(screen) // backend only needs id + deletedBy
+    .pipe(
+      takeUntil(this._unSubscribeAll$),
+      finalize(() => (this.isLoading = false)),
+    )
+    .subscribe({
+      next: () => {
+        this.showMessage(
+          "success",
+          "Deleted",
+          `Screen ${screen.id} removed successfully`,
+        );
+        this.screenConfig.dataSource.data =
+          this.screenConfig.dataSource.data.filter((s) => s.id !== screen.id);
+        this.screenConfig = { ...this.screenConfig };
+      },
+      error: () => {
+        this.showMessage(
+          "error",
+          "Error",
+          `Failed to delete screen ${screen.id}`,
+        );
+      },
+    });
+
+
   }
 
   ngOnDestroy(): void {

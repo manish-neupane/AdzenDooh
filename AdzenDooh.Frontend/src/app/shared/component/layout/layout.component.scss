@@ -1,0 +1,256 @@
+.app-shell {
+  display: flex;
+  height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+// ── Sidebar ────────────────────────────────────────────────
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.22s ease;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+// ── Logo ───────────────────────────────────────────────────
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 14px;
+  border-bottom: 0.5px solid #1e293b;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    color: #fff;
+    font-size: 16px;
+  }
+}
+
+.logo-text-block {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, max-width 0.22s ease;
+  max-width: 200px;
+}
+
+.logo-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.logo-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+// ── Toggle button — always visible ─────────────────────────
+.toggle-btn {
+  width: 100%;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid #1e293b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 14px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  i {
+    color: #64748b;
+    font-size: 13px;
+    transition: transform 0.22s ease;
+  }
+
+  &:hover {
+    background: #1e293b;
+  }
+}
+
+// ── Nav ────────────────────────────────────────────────────
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+}
+
+.nav-section {
+  margin-bottom: 2px;
+}
+
+.nav-section-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 8px 14px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.15s ease, max-height 0.22s ease;
+  max-height: 40px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: #1e293b;
+    color: #e2e8f0;
+  }
+
+  &.active {
+    background: #1e293b;
+    color: #ffffff;
+    border-left-color: #3b82f6;
+  }
+}
+
+.nav-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-item-label {
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, max-width 0.22s ease;
+  max-width: 200px;
+}
+
+.nav-divider {
+  height: 0.5px;
+  background: #1e293b;
+  margin: 6px 12px;
+}
+
+// ── Footer ─────────────────────────────────────────────────
+.sidebar-footer {
+  padding: 14px;
+  border-top: 0.5px solid #1e293b;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1e3a5f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #93c5fd;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.15s ease, max-width 0.22s ease;
+  max-width: 200px;
+}
+
+// ── Collapsed state ────────────────────────────────────────
+.sidebar.collapsed {
+  width: 52px;
+
+  .logo-text-block {
+    opacity: 0;
+    max-width: 0;
+  }
+
+  .toggle-btn {
+    justify-content: center;
+    padding-right: 0;
+
+    i {
+      transform: rotate(180deg);
+    }
+  }
+
+  .nav-section-label {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 10px 0;
+    border-left-color: transparent;
+
+    &.active {
+      border-left-color: transparent;
+      // use background only when collapsed
+    }
+  }
+
+  .nav-item-label {
+    opacity: 0;
+    max-width: 0;
+  }
+
+  .user-name {
+    opacity: 0;
+    max-width: 0;
+  }
+}
+
+// ── Content ────────────────────────────────────────────────
+.content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: #f8fafc;
+}

@@ -20,7 +20,7 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
        
             try
             {
-                string result = await ds.RetrievalProcedure("Inv.SpScreenSel", JsonConvert.SerializeObject(param));
+                string result = await ds.RetrievalProcedure("inv.SpScreenSel", JsonConvert.SerializeObject(param));
                 return JsonConvert.DeserializeObject<GridResponse<MvScreen>>(result);
             }
             catch (Exception)

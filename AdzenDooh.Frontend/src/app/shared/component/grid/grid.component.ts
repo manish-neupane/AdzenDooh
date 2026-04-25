@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
-  selector: 'table-grid',
+  selector: 'grid-table',
   standalone: true,
   imports: [CommonModule, TableModule, InputTextModule, ButtonModule, TooltipModule],
   templateUrl: './grid.component.html',

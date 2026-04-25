@@ -1,0 +1,50 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.collapsed]="isCollapsed">
+
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="pi pi-desktop"></i>
+      </div>
+      <div class="logo-text-block">
+        <span class="logo-title">DOOH Manager</span>
+        <span class="logo-sub">Ad Operations</span>
+      </div>
+    </div>
+
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <nav class="nav">
+      @for (group of navGroups; track group) {
+        <div class="nav-section">
+          <span class="nav-section-label">{{ group }}</span>
+          @for (item of itemsByGroup(group); track item.route) {
+            <a class="nav-item"
+               [routerLink]="item.route"
+               routerLinkActive="active"
+               [title]="isCollapsed ? item.label : ''">
+              <i [class]="item.icon + ' nav-icon'"></i>
+              <span class="nav-item-label">{{ item.label }}</span>
+            </a>
+          }
+        </div>
+        @if (!$last) {
+          <div class="nav-divider"></div>
+        }
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">M</div>
+        <span class="user-name">Manish</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

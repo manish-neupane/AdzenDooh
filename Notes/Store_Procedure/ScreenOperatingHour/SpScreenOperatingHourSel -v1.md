@@ -48,7 +48,7 @@
                     soh.AverageAudienceCount,
                     soh.CreatedAt,
                     soh.CreatedBy
-                FROM inv.ScreenOperatingHour soh
+                FROM inv.ScreenOperatingHour AS soh
                 WHERE soh.ScreenId  = @ScreenId
                   AND soh.IsDeleted = 0
                 ORDER BY

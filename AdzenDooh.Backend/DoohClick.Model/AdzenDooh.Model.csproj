@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Application\Core\" />
-    <Folder Include="Application\Inventory\Creative\" />
     <Folder Include="Application\Campaign\" />
   </ItemGroup>
 

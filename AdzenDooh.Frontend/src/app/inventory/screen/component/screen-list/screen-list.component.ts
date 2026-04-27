@@ -7,8 +7,8 @@ import {
 } from "@angular/core";
 import { Subject, takeUntil, finalize } from "rxjs";
 import {sharedImports} from "../../../../shared/component/primeng.import";
-import { mvScreen, mvScreenFilter,mvDeleteScreen } from "../../model/screenModel";
-import { ApiResponse } from "../../../../shared/model/sharedModel";
+import { mvScreen, mvScreenFilter,mvDeleteScreen } from "../../model/screen.model";
+import { ApiResponse, GridResponse } from "../../../../shared/model/sharedModel";
 import { gridConfig } from "../../../../shared/model/grid-config.model";
 import { screenColumns } from "./screen-list-columns";
 import { ScreenService } from "../../service/screen.service";
@@ -52,14 +52,14 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
   } 
 
   ngOnInit(): void {
-    this.getScreens();
+    this.loadScreenGrid();
   }
 
-  getScreens(): void {
+  loadScreenGrid(): void {
     this.isLoading = true;
     this.errorMessage = "";
     this.screenService
-      .getScreens(this.filter)
+      .screenGrid(this.filter)
 
       
       .pipe(
@@ -67,9 +67,9 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
         finalize(() => (this.isLoading = false)),
       )
       .subscribe({
-        next: (response: ApiResponse<mvScreen[]>) => {
+        next: (response: ApiResponse<GridResponse<mvScreen>>) => {
           if (response.success && response.data) {
-            this.screenConfig.dataSource.data = response.data;
+            this.screenConfig.dataSource.data = response.data.data;
             this.screenConfig = { ...this.screenConfig };
           }
         },

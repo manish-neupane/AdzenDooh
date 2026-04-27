@@ -24,5 +24,22 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
                 return BadRequest(ApiResult.Fail<object>(ex.Message));
             }
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> PostScreen([FromBody] MvUpsertScreen param)
+        {
+            try
+            {
+                var response = await screenService.UpsertScreen(param);
+                return Ok(ApiResult.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
     }
+
+
 }

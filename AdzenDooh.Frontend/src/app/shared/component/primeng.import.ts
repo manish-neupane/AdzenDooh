@@ -5,9 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
-import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog'; // ← was ConfirmDialog
 import { ToastModule } from 'primeng/toast';
-import { TextareaModule } from 'primeng/textarea';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { SelectButtonModule } from 'primeng/selectbutton';
 
 export { MessageService, ConfirmationService } from 'primeng/api';
@@ -21,8 +21,8 @@ export const sharedImports = [
   InputTextModule,
   InputNumberModule,
   DropdownModule,
-  ConfirmDialog,
+  ConfirmDialogModule, 
   ToastModule,
-  TextareaModule,
+  InputTextareaModule,
   SelectButtonModule,
 ];

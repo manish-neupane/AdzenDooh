@@ -62,5 +62,12 @@ namespace AdzenDooh.Model.Application.Inventory.Screen
         public int DeletedBy { get; set; }
     }
 
+
+
+    //public class MvScreenOprtHour {
+
+
+    //    public int Id;
+    //}
 }
 

@@ -1,3 +1,5 @@
+import { ApiResponse, GridResponse } from "./sharedModel";
+
 export interface gridColumn {
   name:        string;
   columnName:  string;
@@ -19,15 +21,20 @@ export interface gridDataSource<T> {
 export interface gridAction<T> {
   type: 'view' | 'edit' | 'delete' | string;
   icon: string;
-  severity: 'info' | 'warn' | 'danger';
+  severity: 'info' | 'warning' | 'danger';
   tooltip: string;
   handler: (row: T) => void;
 }
 
 export interface gridConfig<T> {
-  columns:    gridColumn[];
-  dataSource: gridDataSource<T>;
-  rows?:      number;
-  showActions?: boolean;       //  controls whether actions column appears
-  actions?: gridAction<T>[];   // defines which actions to show
+  columns: gridColumn[];
+
+  dataSource: {
+    data: T[];
+    totalCount?: number;
+  };
+
+  rows?: number;
+  showActions?: boolean;
+  actions?: gridAction<T>[];
 }

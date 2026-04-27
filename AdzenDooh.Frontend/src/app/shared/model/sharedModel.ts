@@ -3,3 +3,8 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export interface GridResponse<T> {
+  data: T[];
+  totalCount: number;
+}

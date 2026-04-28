@@ -1,0 +1,47 @@
+// screen-create-edit.component.scss
+
+:host {
+  // Form layout
+  form {
+    padding: 0.5rem 0;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      font-size: 0.95rem;
+
+      &.ng-invalid.ng-touched {
+        border-color: var(--red-500);
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .p-error {
+      font-size: 0.775rem;
+      color: var(--red-500);
+    }
+  }
+
+  // Footer buttons
+  .field.flex {
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--surface-border);
+    margin-top: 0.5rem;
+  }
+}

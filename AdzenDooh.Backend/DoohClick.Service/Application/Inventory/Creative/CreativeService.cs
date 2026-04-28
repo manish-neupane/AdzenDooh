@@ -9,24 +9,20 @@ using Newtonsoft.Json;
 
 namespace AdzenDooh.Service.Application.Inventory.Creative
 {
-    public class CreativeService(
-        IDataAccessService _DataAccessService,
-        IFileMetadataService _MetadataService
-    ) : ICreativeService
+    public class CreativeService( IDataAccessService _DataAccessService,IFileMetadataService _MetadataService) : ICreativeService
     {
-        // ── UPLOAD & INSERT ────────────────────────────────────────────────────
-        public async Task<List<MvCreative>?> UploadAndAddCreative(
+        public async Task<List<MvCreative>?> SaveCreative(
             IFormFile file,
             MvCreativeUpload upload,
-            string wwwRootPath)                                         // ← added
+            string wwwRootPath)                                         
         {
-            // 1. Determine folder
+            //  Determine folder
             string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             bool isVideo = new[] { ".mp4", ".mov", ".avi", ".mkv", ".webm", ".wmv" }
                                     .Contains(ext);
             string subFolder = isVideo ? "videos" : "images";
 
-            // 2. Save file to wwwroot
+            //  Save file to wwwroot
             string folderPath = Path.Combine(wwwRootPath, subFolder);  // ← fixed
             Directory.CreateDirectory(folderPath);
 
@@ -37,10 +33,10 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             await using (var stream = new FileStream(fullPath, FileMode.Create))
                 await file.CopyToAsync(stream);
 
-            // 3. Extract metadata
+            //  Extract metadata
             var meta = await _MetadataService.ExtractAsync(fullPath, ext);
 
-            // 4. Build param and call SP
+            // Build param and call SP
             var param = new MvAddCreative
             {
                 TenantId = upload.TenantId,
@@ -57,8 +53,8 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             return await AddCreative(param);
         }
 
-        // ── INSERT via SP ──────────────────────────────────────────────────────
-        public async Task<List<MvCreative>?> AddCreative(MvAddCreative param)
+       
+        private async Task<List<MvCreative>?> AddCreative(MvAddCreative param)
         {
             try
             {
@@ -75,8 +71,8 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             catch { throw; }
         }
 
-        // ── GRID ──────────────────────────────────────────────────────────────
-        public async Task<GridResponse<MvCreative>?> CreativeGrid(
+      
+        public async Task<GridResponse<MvCreative>?> GetGrid(
             MvParamOption<MvCreativeFilter> param)
         {
             try
@@ -88,7 +84,7 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             catch { throw; }
         }
 
-        // ── DDL ───────────────────────────────────────────────────────────────
+      
         public async Task<List<MvDropdown>?> CreativeDdl(MvDropdown param)
         {
             try
@@ -100,7 +96,7 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             catch { throw; }
         }
 
-        // ── DELETE ────────────────────────────────────────────────────────────
+      
         public Task<List<MvCreative>?> DeleteCreative(MvDeleteCreative param)
             => throw new NotImplementedException();
     }

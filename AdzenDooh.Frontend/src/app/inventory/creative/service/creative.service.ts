@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../shared/service/api.service';
-import { mvCreative, mvAddCreative, mvDeleteCreative, mvCreativeFilter } from '../model/creative.model';
-import { ApiResponse, GridResponse } from '../../../shared/model/sharedModel';
+import { MvCreative, MvDeleteCreative, MvCreativeFilter, MvCreativeUpload } from '../model/creative.model';
+import { ApiResponse, GridResponse, ParamOption} from '../../../shared/model/sharedModel';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -16,18 +16,22 @@ export class CreativeService {
   constructor(private api: ApiService) {}
 
 
-  creativeGrid(filter: mvCreativeFilter = {}): Observable<ApiResponse<GridResponse<mvCreative>>> {
-    return this.api.get<ApiResponse<GridResponse<mvCreative>>>(`${this.base}/CreativeGrid`, filter);
+  creativeGrid(filter: ParamOption<MvCreativeFilter>): Observable<ApiResponse<GridResponse<MvCreative>>> {
+    return this.api.get<ApiResponse<GridResponse<MvCreative>>>(`${this.base}/CreativeGrid`, filter);
   }
 
- 
-  addCreative(payload: mvAddCreative): Observable<ApiResponse<mvCreative[]>> {
-    return this.api.post<ApiResponse<mvCreative[]>>(`${this.base}/PostCreative`, payload);
-  }
+  uploadCreative(file: File, payload: MvCreativeUpload): Observable<ApiResponse<MvCreative[]>> {
+    const form = new FormData();
+    form.append('file',      file);
+    form.append('tenantId',  payload.tenantId.toString());
+    form.append('name',      payload.name);
+    form.append('createdBy', payload.createdBy.toString());
 
+    return this.api.post<ApiResponse<MvCreative[]>>(`${this.base}/upload`, form);
+  }
  
-  deleteCreative(payload: mvDeleteCreative): Observable<ApiResponse<mvCreative>> {
-    return this.api.delete<ApiResponse<mvCreative>>(`${this.base}/DeleteCreative`, payload);
+  deleteCreative(payload: MvDeleteCreative): Observable<ApiResponse<MvCreative>> {
+    return this.api.delete<ApiResponse<MvCreative>>(`${this.base}/DeleteCreative`, payload);
   }
 
 }

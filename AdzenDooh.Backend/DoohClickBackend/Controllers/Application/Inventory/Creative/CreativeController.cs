@@ -14,9 +14,8 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
         IWebHostEnvironment _Env
     ) : BaseController
     {
-        private readonly IWebHostEnvironment _env = _Env;  // ← capture for use in methods
+        private readonly IWebHostEnvironment _env = _Env;  
 
-        // ── UPLOAD ────────────────────────────────────────────────────────────
         [HttpPost("upload")]
         [RequestSizeLimit(500_000_000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 500_000_000)]
@@ -32,7 +31,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
                 string wwwRoot = _env.WebRootPath
                                  ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-                var response = await _CreativeService.UploadAndAddCreative(file, upload, wwwRoot);
+                var response = await _CreativeService.SaveCreative(file, upload, wwwRoot);
                 return Ok(ApiResult.Success(response));
             }
             catch (Exception ex)
@@ -41,13 +40,13 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
             }
         }
 
-        // ── GRID ──────────────────────────────────────────────────────────────
+
         [HttpGet]
-        public async Task<IActionResult> CreativeGrid([FromQuery] MvParamOption<MvCreativeFilter> param)
+        public async Task<IActionResult> GetGrid([FromQuery] MvParamOption<MvCreativeFilter> param)
         {
             try
             {
-                var response = await _CreativeService.CreativeGrid(param);
+                var response = await _CreativeService.GetGrid(param);
                 return Ok(ApiResult.Success(response));
             }
             catch (Exception ex)
@@ -56,19 +55,6 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
             }
         }
 
-        // ── ADD ───────────────────────────────────────────────────────────────
-        [HttpPost]
-        public async Task<IActionResult> AddCreative([FromBody] MvAddCreative param)
-        {
-            try
-            {
-                var response = await _CreativeService.AddCreative(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
-        }
+        
     }
 }

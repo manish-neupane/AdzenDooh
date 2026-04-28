@@ -1,24 +1,17 @@
-import { ApiResponse, GridResponse } from "./sharedModel";
-
-export interface gridColumn {
-  name:        string;
-  columnName:  string;
-  type:        string;
-  sortable?:   boolean;
+export interface GridColumn {
+  name: string;
+  columnName: string;
+  type: 'text' | 'number' | 'date' | 'boolean' | 'custom';
+  sortable?: boolean;
   filterable?: boolean;
 }
 
-export interface gridDataSource<T> {
+export interface GridDataSource<T> {
   data: T[];
+  totalCount: number;
 }
 
-// export interface gridConfig<T> {
-//   columns:    gridColumn[];
-//   dataSource: gridDataSource<T>;
-//   rows?:      number;
-// }
-
-export interface gridAction<T> {
+export interface GridAction<T> {
   type: 'view' | 'edit' | 'delete' | string;
   icon: string;
   severity: 'info' | 'warning' | 'danger';
@@ -26,15 +19,10 @@ export interface gridAction<T> {
   handler: (row: T) => void;
 }
 
-export interface gridConfig<T> {
-  columns: gridColumn[];
-
-  dataSource: {
-    data: T[];
-    totalCount?: number;
-  };
-
+export interface GridConfig<T> {
+  columns: GridColumn[];
+  dataSource: GridDataSource<T>;
   rows?: number;
   showActions?: boolean;
-  actions?: gridAction<T>[];
+  actions?: GridAction<T>[];
 }

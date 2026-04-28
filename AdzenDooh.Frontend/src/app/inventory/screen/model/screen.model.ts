@@ -1,5 +1,5 @@
 // screen.model.ts
-export interface mvScreen {
+export interface MvScreen {
   screenName: any;
   id: number;
   tenantId: number;
@@ -17,14 +17,14 @@ export interface mvScreen {
 }
 
 // Filter model
-export interface mvScreenFilter {
+export interface MvScreenFilter {
   status?: string;
   orientation?: string;
   searchText?: string;
 }
 
 // DTO for create/update
-export interface mvUpsertScreen {
+export interface MvUpsertScreen {
   id?: number;
   tenantId: number;
   name: string;
@@ -39,7 +39,7 @@ export interface mvUpsertScreen {
 }
 
 // DTO for delete
-export interface mvDeleteScreen {
+export interface MvDeleteScreen {
   id: number;
   deletedBy: number;
 }

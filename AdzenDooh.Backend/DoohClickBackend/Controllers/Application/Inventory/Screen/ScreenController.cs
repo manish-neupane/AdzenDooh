@@ -9,14 +9,12 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
 {
     public class ScreenController(IScreenService screenService) : BaseController
     {
-    
-
         [HttpGet]
-        public async Task<IActionResult> ScreenGrid([FromQuery] MvParamOption<MvScreenFilter> param)
+        public async Task<IActionResult> GetGrid([FromQuery] MvParamOption<MvScreenFilter> param)
         {
             try
             {
-                var response = await screenService.ScreenGrid(param);
+                var response = await screenService.GetGrid(param);
                 return Ok(ApiResult.Success(response));
             }
             catch (Exception ex)
@@ -25,14 +23,27 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
             }
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> PostScreen([FromBody] MvUpsertScreen param)
+        public async Task<IActionResult> SaveScreen([FromBody] MvUpsertScreen param)
         {
             try
             {
-                var response = await screenService.UpsertScreen(param);
+                var response = await screenService.SaveScreen(param);
                 return Ok(ApiResult.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteScreen([FromBody] MvDeleteScreen param)
+        {
+            try
+            {
+                await screenService.DeleteScreen(param);
+                return Ok(ApiResult.Success("Screen and its operating hours deleted successfully"));
             }
             catch (Exception ex)
             {
@@ -40,6 +51,4 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
             }
         }
     }
-
-
 }

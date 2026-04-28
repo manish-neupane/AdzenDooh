@@ -1,0 +1,63 @@
+<p-dialog
+  [(visible)]="isOpen"
+  [header]="isNewScreen ? 'Create Screen' : 'Edit Screen'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{width: '40rem'}"
+  (onHide)="close()">
+
+  <ng-template pTemplate="content">
+    <form [formGroup]="formGroup" class="flex flex-column gap-3 p-fluid">
+
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" pInputText formControlName="name" />
+        <small *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched" class="p-error">
+          Name is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="resolution">Resolution</label>
+        <input id="resolution" type="text" pInputText formControlName="resolution" />
+        <small *ngIf="formGroup.get('resolution')?.invalid && formGroup.get('resolution')?.touched" class="p-error">
+          Resolution is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="orientation">Orientation</label>
+        <input id="orientation" type="text" pInputText formControlName="orientation" />
+      </div>
+
+      <div class="field">
+        <label for="macAddress">MAC Address</label>
+        <input id="macAddress" type="text" pInputText formControlName="macAddress" />
+        <small *ngIf="formGroup.get('macAddress')?.invalid && formGroup.get('macAddress')?.touched" class="p-error">
+          MAC Address is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="location">Location</label>
+        <input id="location" type="text" pInputText formControlName="location" />
+        <small *ngIf="formGroup.get('location')?.invalid && formGroup.get('location')?.touched" class="p-error">
+          Location is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="address">Address</label>
+        <input id="address" type="text" pInputText formControlName="address" />
+      </div>
+
+      <div class="field flex justify-content-end gap-2 mt-4">
+        <p-button label="Cancel" severity="secondary" (onClick)="close()" />
+        <p-button label="Save" (onClick)="onSubmit()" [disabled]="formGroup.invalid" [loading]="isLoading" />
+      </div>
+
+    </form>
+  </ng-template>
+
+</p-dialog>

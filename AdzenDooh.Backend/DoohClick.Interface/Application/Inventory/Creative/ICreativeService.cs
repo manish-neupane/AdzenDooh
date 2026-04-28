@@ -7,10 +7,9 @@ namespace AdzenDooh.Interface.Application.Inventory.Creative
 {
     public interface ICreativeService
     {
-        Task<GridResponse<MvCreative>?> CreativeGrid(MvParamOption<MvCreativeFilter> param);
-        Task<List<MvCreative>?> AddCreative(MvAddCreative param);
+        Task<GridResponse<MvCreative>?> GetGrid(MvParamOption<MvCreativeFilter> param);
         Task<List<MvDropdown>?> CreativeDdl(MvDropdown param);
-        Task<List<MvCreative>?> UploadAndAddCreative(IFormFile file, MvCreativeUpload upload, string wwwRootPath); 
+        Task<List<MvCreative>?> SaveCreative(IFormFile file, MvCreativeUpload upload, string wwwRootPath); 
         Task<List<MvCreative>?> DeleteCreative(MvDeleteCreative param);
     }
 }

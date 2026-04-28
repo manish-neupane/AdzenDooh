@@ -1,4 +1,4 @@
-export interface mvCreative {
+export interface MvCreative {
     id: number;
     tenantId: number;
     name: string;
@@ -15,7 +15,7 @@ export interface mvCreative {
     deletedBy?: number | null;
 }
 
-export interface mvAddCreative {
+export interface MvAddCreative {
   tenantId: number;
   name: string;
   url: string;
@@ -27,13 +27,18 @@ export interface mvAddCreative {
   createdBy: number;
 } 
 
-export interface mvDeleteCreative {
+export interface MvDeleteCreative {
   id: number;
   tenantId: number;
   deletedBy: number;
 }
-export interface mvCreativeFilter {
+export interface MvCreativeFilter {
   isVideo?: boolean;
   orientation?: string;
   searchText?: string;
+}
+export interface MvCreativeUpload {
+  tenantId:  number;
+  name:      string;
+  createdBy: number;
 }

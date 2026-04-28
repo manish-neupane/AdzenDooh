@@ -11,9 +11,9 @@ namespace AdzenDooh.Interface.Application.Inventory.Screen
 {
     public interface IScreenService
     {
-        Task<GridResponse<MvScreen>?> ScreenGrid(MvParamOption<MvScreenFilter> param);
+        Task<GridResponse<MvScreen>?> GetGrid(MvParamOption<MvScreenFilter> param);
         
-        Task<List<MvScreen>?> UpsertScreen(MvUpsertScreen param);
+        Task<List<MvScreen>?> SaveScreen(MvUpsertScreen param);
 
         Task<List<MvDropdown>?> ScreenDdl(MvDropdown param);
 

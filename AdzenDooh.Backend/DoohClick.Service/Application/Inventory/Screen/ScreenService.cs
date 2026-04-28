@@ -14,7 +14,7 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
     {
       
 
-        public async Task<GridResponse<MvScreen>?> ScreenGrid(MvParamOption<MvScreenFilter> param) { 
+        public async Task<GridResponse<MvScreen>?> GetGrid(MvParamOption<MvScreenFilter> param) { 
        
             try
             {
@@ -42,7 +42,7 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
             }
         }
 
-        public async  Task<List<MvScreen>?> UpsertScreen(MvUpsertScreen param)
+        public async  Task<List<MvScreen>?> SaveScreen(MvUpsertScreen param)
         {
             try
             {
@@ -64,11 +64,23 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
 
 
 
-        public Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param)
+        public async Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string result = await _DataAccessService.ActionProcedure(
+                    "inv.SpScreenDel", JsonConvert.SerializeObject(param));
+
+                var response = JsonConvert.DeserializeObject<MvSpError>(result);
+
+                if (response?.Type != "Success")
+                    throw new InvalidOperationException(response?.Message ?? "An error occurred");
+
+                return null; 
+            }
+            catch { throw; }
         }
 
-        
+
     }
 }

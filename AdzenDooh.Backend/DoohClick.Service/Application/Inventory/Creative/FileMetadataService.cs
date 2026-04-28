@@ -9,11 +9,11 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
 {
     public class FileMetadata
     {
-        public string? Resolution    { get; set; }   // e.g. "1920x1080"
+        public string? Resolution    { get; set; }  
         public string Orientation    { get; set; } = "landscape";
         public int? DurationSecond   { get; set; }
         public bool IsVideo          { get; set; }
-        public string Extension      { get; set; } = string.Empty;
+        public required string Extension      { get; set; } 
     }
 
     public interface IFileMetadataService
@@ -97,7 +97,7 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             };
         }
 
-        // ── VIDEO ─────────────────────────────────────────────────────────────
+        // ── VIDEO ----------------------------------------------------
         private async Task<FileMetadata> ExtractVideoMetadata(string filePath, string ext)
         {
             try

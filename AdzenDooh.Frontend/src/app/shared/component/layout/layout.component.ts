@@ -26,6 +26,7 @@ export class LayoutComponent {
     { label: 'Campaigns',       route: 'campaigns',        icon: 'pi pi-megaphone', group: 'Campaigns' },
     { label: 'Ads',             route: 'ads',              icon: 'pi pi-image',     group: 'Campaigns' },
     { label: 'Bookings',        route: 'bookings',         icon: 'pi pi-briefcase', group: 'Campaigns' },
+    { label: 'Operating Hours', route: 'operating-hours',  icon: 'pi pi-clock',     group: 'Inventory' },
   ];
 
   itemsByGroup(group: string) {

@@ -1,0 +1,29 @@
+<p-dialog [(visible)]="isOpen" header="Upload Media" [modal]="true" [style]="{ width: '35rem' }" appendTo="body">
+  <ng-template pTemplate="content">
+    <div [formGroup]="formGroup" class="p-fluid">
+      <div class="field">
+        <label for="name">Creative Name <span class="required">*</span></label>
+        <input id="name" type="text" pInputText formControlName="name" placeholder="e.g. Summer Sale Video" />
+      </div>
+
+      <div class="field">
+        <label>File (Image or Video) <span class="required">*</span></label>
+        <p-fileUpload 
+          mode="advanced" 
+          [customUpload]="true" 
+          (onSelect)="onFileSelect($event)"
+          accept="image/*,video/*" 
+          [maxFileSize]="500000000"
+          [showUploadButton]="false"
+          [showCancelButton]="false"
+          chooseLabel="Select File">
+        </p-fileUpload>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="isOpen = false" />
+    <p-button label="Upload" icon="pi pi-upload" (onClick)="onSubmit()" [loading]="isLoading" [disabled]="!selectedFile" />
+  </ng-template>
+</p-dialog>

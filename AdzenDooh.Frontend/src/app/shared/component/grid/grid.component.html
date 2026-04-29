@@ -1,21 +1,43 @@
+<!-- ─── grid.component.html ──────────────────────────────────────────────────
+     Generic table shell. No domain knowledge here.
+     The filter bar, table, pagination, and action buttons all live here.
+     The parent wires the data and handles events.
+     ─────────────────────────────────────────────────────────────────────── -->
+
 <div class="grid-wrapper">
 
-  <!-- LOADING -->
+  <!-- ── Filter Bar ──────────────────────────────────────────────────────── -->
+  <div class="grid-toolbar">
+    <p-iconField>
+      <p-inputIcon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        placeholder="Search..."
+        [(ngModel)]="filterValue"
+        (input)="onFilter()"
+        (keydown.escape)="onFilterClear()"
+        class="filter-input"
+      />
+    </p-iconField>
+  </div>
+
+  <!-- ── Loading State ───────────────────────────────────────────────────── -->
   <div *ngIf="loading" class="state-message">
     <i class="pi pi-spin pi-spinner"></i> Loading...
   </div>
 
-  <!-- ERROR -->
+  <!-- ── Error State ─────────────────────────────────────────────────────── -->
   <div *ngIf="error && !loading" class="error-message">
     <i class="pi pi-exclamation-circle"></i> {{ error }}
   </div>
 
-  <!-- EMPTY -->
+  <!-- ── Empty State ─────────────────────────────────────────────────────── -->
   <div *ngIf="!loading && !error && config.dataSource.data.length === 0" class="state-message">
     <i class="pi pi-inbox"></i> No data found
   </div>
 
-  <!-- TABLE -->
+  <!-- ── Table ───────────────────────────────────────────────────────────── -->
   <p-table
     *ngIf="!loading && !error && config.dataSource.data.length > 0"
     [value]="config.dataSource.data"
@@ -26,31 +48,30 @@
     [totalRecords]="config.dataSource.totalCount"
     (onPage)="onPageChange($event)"
     (onSort)="onSort($event)"
-    [globalFilterFields]="filterFields"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines"
   >
 
+    <!-- Header -->
     <ng-template pTemplate="header">
       <tr>
         <th *ngFor="let col of config.columns">
-          <div class="th-content">
-            <ng-container *ngIf="col.sortable; else noSort">
-              <span [pSortableColumn]="col.name">
-                {{ col.columnName }}
-                <p-sortIcon [field]="col.name"></p-sortIcon>
-              </span>
-            </ng-container>
-            <ng-template #noSort>
-              <span>{{ col.columnName }}</span>
-            </ng-template>
-          </div>
+          <ng-container *ngIf="col.sortable; else noSort">
+            <span [pSortableColumn]="col.name">
+              {{ col.columnName }}
+              <p-sortIcon [field]="col.name" />
+            </span>
+          </ng-container>
+          <ng-template #noSort>
+            <span>{{ col.columnName }}</span>
+          </ng-template>
         </th>
         <th *ngIf="config.showActions">Actions</th>
       </tr>
     </ng-template>
 
+    <!-- Body -->
     <ng-template pTemplate="body" let-row>
       <tr>
         <td *ngFor="let col of config.columns">
@@ -66,8 +87,8 @@
               [rounded]="true"
               [pTooltip]="action.tooltip"
               tooltipPosition="top"
-              (onClick)="action.handler(row)">
-            </p-button>
+              (onClick)="action.handler(row)"
+            />
           </div>
         </td>
       </tr>

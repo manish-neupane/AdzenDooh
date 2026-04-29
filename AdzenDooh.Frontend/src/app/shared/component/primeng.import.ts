@@ -9,6 +9,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog'; // ← was ConfirmD
 import { ToastModule } from 'primeng/toast';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { TooltipModule } from 'primeng/tooltip';
+import { FileUploadModule } from 'primeng/fileupload'; 
+import { SidebarModule }         from 'primeng/sidebar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageModule }         from 'primeng/message';
 
 export { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -25,4 +32,11 @@ export const sharedImports = [
   ToastModule,
   InputTextareaModule,
   SelectButtonModule,
+  IconFieldModule,
+  InputIconModule,
+  TooltipModule,
+   FileUploadModule,
+   SidebarModule,
+   ProgressSpinnerModule,
+   MessageModule
 ];

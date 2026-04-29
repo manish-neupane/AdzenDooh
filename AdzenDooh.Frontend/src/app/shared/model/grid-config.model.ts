@@ -1,3 +1,8 @@
+// ─── grid-config.model.ts ────────────────────────────────────────────────────
+// Shared models for the reusable GridComponent.
+// Nothing domain-specific lives here — screens, campaigns, etc. stay in their
+// own feature folders.
+
 export interface GridColumn {
   name: string;
   columnName: string;

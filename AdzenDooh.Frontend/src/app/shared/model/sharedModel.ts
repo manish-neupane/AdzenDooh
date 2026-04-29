@@ -10,6 +10,7 @@ export interface GridResponse<T> {
 }
 
   export interface ParamOption<T> {
+  tenantId?: number;
   filter?: T;
   offset?: number;
   pageSize?: number;

@@ -1,63 +1,112 @@
+<!-- ─── screen-create-edit.component.html ───────────────────────────────────
+     Dialog for creating or editing a screen.
+
+     Key decisions:
+       - appendTo="body" prevents the dialog from being clipped by any parent
+         container that has overflow:hidden or a CSS transform applied.
+       - (onHide) maps to onHide() in the TS, which calls close().
+       - The Save button shows a spinner via [loading]="isLoading".
+       - markAllAsTouched() is called in onSubmit() so errors show immediately
+         when the user clicks Save on an untouched invalid form.
+     ─────────────────────────────────────────────────────────────────────── -->
+
 <p-dialog
   [(visible)]="isOpen"
   [header]="isNewScreen ? 'Create Screen' : 'Edit Screen'"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{width: '40rem'}"
-  (onHide)="close()">
+  [style]="{ width: '40rem' }"
+  appendTo="body"
+  (onHide)="onHide()"
+>
 
   <ng-template pTemplate="content">
-    <form [formGroup]="formGroup" class="flex flex-column gap-3 p-fluid">
+    <form [formGroup]="formGroup" class="screen-form p-fluid">
 
+      <!-- Name -->
       <div class="field">
-        <label for="name">Name</label>
+        <label for="name">Name <span class="required">*</span></label>
         <input id="name" type="text" pInputText formControlName="name" />
-        <small *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched" class="p-error">
+        <small
+          *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched"
+          class="p-error"
+        >
           Name is required.
         </small>
       </div>
 
+      <!-- Resolution -->
       <div class="field">
-        <label for="resolution">Resolution</label>
-        <input id="resolution" type="text" pInputText formControlName="resolution" />
-        <small *ngIf="formGroup.get('resolution')?.invalid && formGroup.get('resolution')?.touched" class="p-error">
+        <label for="resolution">Resolution <span class="required">*</span></label>
+        <input id="resolution" type="text" pInputText formControlName="resolution" placeholder="e.g. 1920x1080" />
+        <small
+          *ngIf="formGroup.get('resolution')?.invalid && formGroup.get('resolution')?.touched"
+          class="p-error"
+        >
           Resolution is required.
         </small>
       </div>
 
+      <!-- Orientation -->
       <div class="field">
         <label for="orientation">Orientation</label>
         <input id="orientation" type="text" pInputText formControlName="orientation" />
       </div>
 
+      <!-- MAC Address -->
       <div class="field">
-        <label for="macAddress">MAC Address</label>
-        <input id="macAddress" type="text" pInputText formControlName="macAddress" />
-        <small *ngIf="formGroup.get('macAddress')?.invalid && formGroup.get('macAddress')?.touched" class="p-error">
+        <label for="macAddress">MAC Address <span class="required">*</span></label>
+        <input id="macAddress" type="text" pInputText formControlName="macAddress" placeholder="e.g. AA:BB:CC:DD:EE:FF" />
+        <small
+          *ngIf="formGroup.get('macAddress')?.invalid && formGroup.get('macAddress')?.touched"
+          class="p-error"
+        >
           MAC Address is required.
         </small>
       </div>
 
+      <!-- Location -->
       <div class="field">
-        <label for="location">Location</label>
+        <label for="location">Location <span class="required">*</span></label>
         <input id="location" type="text" pInputText formControlName="location" />
-        <small *ngIf="formGroup.get('location')?.invalid && formGroup.get('location')?.touched" class="p-error">
+        <small
+          *ngIf="formGroup.get('location')?.invalid && formGroup.get('location')?.touched"
+          class="p-error"
+        >
           Location is required.
         </small>
       </div>
 
+      <!-- Address (optional) -->
       <div class="field">
         <label for="address">Address</label>
         <input id="address" type="text" pInputText formControlName="address" />
       </div>
 
-      <div class="field flex justify-content-end gap-2 mt-4">
-        <p-button label="Cancel" severity="secondary" (onClick)="close()" />
-        <p-button label="Save" (onClick)="onSubmit()" [disabled]="formGroup.invalid" [loading]="isLoading" />
+      <!-- Error Banner -->
+      <div *ngIf="errorMessage" class="error-banner">
+        <i class="pi pi-exclamation-circle"></i> {{ errorMessage }}
       </div>
 
     </form>
+  </ng-template>
+
+  <!-- Footer Actions -->
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cancel()"
+      [disabled]="isLoading"
+    />
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [loading]="isLoading"
+    />
   </ng-template>
 
 </p-dialog>

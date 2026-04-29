@@ -1,10 +1,9 @@
-// screen-create-edit.component.scss
+// ─── screen-create-edit.component.scss ───────────────────────────────────────
 
-:host {
-  // Form layout
-  form {
-    padding: 0.5rem 0;
-  }
+.screen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 
   .field {
     display: flex;
@@ -12,36 +11,25 @@
     gap: 0.4rem;
 
     label {
-      font-size: 0.875rem;
       font-weight: 500;
-      color: var(--text-color-secondary);
+      font-size: 0.875rem;
     }
 
-    input,
-    textarea {
-      width: 100%;
-      font-size: 0.95rem;
-
-      &.ng-invalid.ng-touched {
-        border-color: var(--red-500);
-      }
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .p-error {
-      font-size: 0.775rem;
+    .required {
       color: var(--red-500);
+      margin-left: 2px;
     }
   }
+}
 
-  // Footer buttons
-  .field.flex {
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--surface-border);
-    margin-top: 0.5rem;
-  }
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--red-50);
+  color: var(--red-700);
+  font-size: 0.875rem;
+  border: 1px solid var(--red-200);
 }

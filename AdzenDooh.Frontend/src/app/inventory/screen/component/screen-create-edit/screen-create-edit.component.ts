@@ -1,11 +1,34 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { MvScreen, MvUpsertScreen } from '../../model/screen.model';
+// ─── screen-create-edit.component.ts ─────────────────────────────────────────
+// RESPONSIBILITY: Own the dialog UI, the reactive form, and the save HTTP call.
+//
+// Lifecycle of this component:
+//   1. Parent sets [screen] input (could be empty object for add, or full object for edit)
+//   2. Parent calls open() via template reference variable
+//   3. open() populates the form and shows the dialog
+//   4. User submits → saveScreen() → emits afterFormClosed with the saved record
+//   5. User cancels → close() → emits afterFormClosed(null)
+//
+// IMPORTANT — form population happens ONLY in open().
+// ngOnChanges does NOT touch the form. This avoids a race condition where
+// ngOnChanges fires and resets the form before open() has patched the values.
+
+import {
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ScreenService } from '../../service/screen.service';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { ApiResponse } from '../../../../shared/model/sharedModel';
+import { Subject, takeUntil, finalize } from 'rxjs';
+
 import { AppComponent } from '../../../../app.component';
 import { sharedImports } from '../../../../shared/component/primeng.import';
+import { MvScreen, MvUpsertScreen } from '../../model/screen.model';
+import { ScreenService } from '../../service/screen.service';
+import { ApiResponse } from '../../../../shared/model/sharedModel';
 
 @Component({
   selector: 'screen-create-edit',
@@ -14,22 +37,26 @@ import { sharedImports } from '../../../../shared/component/primeng.import';
   templateUrl: './screen-create-edit.component.html',
   styleUrl: './screen-create-edit.component.scss'
 })
-export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnChanges, OnDestroy {
+export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnDestroy {
 
+  // ─── Inputs & Outputs ─────────────────────────────────────────────────────
   @Input() screen!: MvScreen;
   @Output() afterFormClosed = new EventEmitter<MvScreen | null>();
 
+  // ─── State ────────────────────────────────────────────────────────────────
   formGroup!: FormGroup;
   isOpen       = false;
   isLoading    = false;
-  errorMessage = "";
+  errorMessage = '';
 
   private _unSubscribeAll$ = new Subject<void>();
 
+  // ─── Computed ─────────────────────────────────────────────────────────────
   get isNewScreen(): boolean {
-    return !this.screen || !this.screen.id;
+    return !this.screen?.id;
   }
 
+  // ─── Constructor ──────────────────────────────────────────────────────────
   constructor(
     private injector: Injector,
     private formBuilder: FormBuilder,
@@ -38,11 +65,18 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     super(injector);
   }
 
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    this.initForm();
+    this.buildForm();
   }
 
-  private initForm(): void {
+  ngOnDestroy(): void {
+    this._unSubscribeAll$.next();
+    this._unSubscribeAll$.complete();
+  }
+
+  // ─── Form ─────────────────────────────────────────────────────────────────
+  private buildForm(): void {
     this.formGroup = this.formBuilder.group({
       name:        ['', Validators.required],
       resolution:  ['', Validators.required],
@@ -53,63 +87,81 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['screen'] && this.formGroup) {
-      this.errorMessage = "";
-      this.formGroup.reset(this.screen);
-    }
-  }
-
-  public open(): void {
-    this.formGroup.patchValue({
-      name:        this.screen?.name        || '',
-      resolution:  this.screen?.resolution  || '',
-      orientation: this.screen?.orientation || 'landscape',
-      macAddress:  this.screen?.macAddress  || '',
-      location:    this.screen?.location    || '',
-      address:     this.screen?.address     || ''
+  // ─── Public API (called by parent via template ref) ───────────────────────
+  open(): void {
+    // Reset the form cleanly first, then patch with current screen values.
+    // Doing both here (not in ngOnChanges) keeps population in one place
+    // and avoids any timing issues.
+    this.formGroup.reset({
+      name:        this.screen?.name        ?? '',
+      resolution:  this.screen?.resolution  ?? '',
+      orientation: this.screen?.orientation ?? 'landscape',
+      macAddress:  this.screen?.macAddress  ?? '',
+      location:    this.screen?.location    ?? '',
+      address:     this.screen?.address     ?? ''
     });
-    this.errorMessage = "";
-    this.isOpen = true;
+    this.errorMessage = '';
+    this.isOpen       = true;
   }
 
-  protected close(): void {
-    this.isOpen = false;
+  // ─── Dialog Event Handlers ────────────────────────────────────────────────
+  protected onHide(): void {
+    // Called when the user clicks the X or clicks outside the dialog.
+    // We treat this the same as Cancel.
+    this.close();
+  }
+
+  protected cancel(): void {
+    this.close();
   }
 
   protected onSubmit(): void {
-    if (this.formGroup.invalid) return;
+    if (this.formGroup.invalid) {
+      // Mark all fields as touched so validation messages appear
+      this.formGroup.markAllAsTouched();
+      return;
+    }
     this.isLoading    = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
     this.saveScreen();
   }
 
+  // ─── Save ─────────────────────────────────────────────────────────────────
   private saveScreen(): void {
-    const payload = this.formGroup.value as MvUpsertScreen;
+    const payload: MvUpsertScreen = {
+      ...this.formGroup.value,
+      // Include id only for edits; 0 or undefined signals a create
+      ...(this.isNewScreen ? {} : { id: this.screen.id })
+    };
+
     this.screenService.saveScreen(payload)
-      .pipe(takeUntil(this._unSubscribeAll$), finalize(() => this.isLoading = false))
+      .pipe(
+        takeUntil(this._unSubscribeAll$),
+        finalize(() => this.isLoading = false)
+      )
       .subscribe({
         next: (response: ApiResponse<MvScreen[]>) => {
-          this.showMessage("success", "Success", this.isNewScreen ? "Screen created!" : "Screen updated!");
-          this.afterFormClosed.emit(response.data[0]);
+          const saved = response.data[0];
+          this.showMessage(
+            'success',
+            'Success',
+            this.isNewScreen ? 'Screen created successfully' : 'Screen updated successfully'
+          );
+          this.afterFormClosed.emit(saved);
           this.close();
         },
         error: (err: any) => {
-          this.handleError(err);
-          this.afterFormClosed.emit(null);
+          const msg = err?.error?.message ?? 'Action failed';
+          this.errorMessage = msg;
+          this.showMessage('error', 'Error', msg);
+          // Do NOT emit afterFormClosed here — the dialog stays open so the
+          // user can correct the error and try again.
         }
       });
   }
 
-  private handleError(err: any): void {
-    this.isLoading = false;
-    const msg = err?.error?.message ?? "Action failed";
-    this.showMessage("error", "Error", msg);
-    this.errorMessage = msg;
-  }
-
-  ngOnDestroy(): void {
-    this._unSubscribeAll$.next();
-    this._unSubscribeAll$.complete();
+  // ─── Close ────────────────────────────────────────────────────────────────
+  private close(): void {
+    this.isOpen = false;
   }
 }

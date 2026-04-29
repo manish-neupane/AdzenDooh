@@ -7,11 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Auth\" />
-    <Folder Include="Application\Asset\" />
-    <Folder Include="Application\Campaign\" />
-    <Folder Include="Application\Playback\" />
+    <Compile Remove="Application\Asset\**" />
+    <Compile Remove="Application\Auth\**" />
+    <Compile Remove="Application\Campaign\**" />
+    <Compile Remove="Application\Playback\**" />
+    <EmbeddedResource Remove="Application\Asset\**" />
+    <EmbeddedResource Remove="Application\Auth\**" />
+    <EmbeddedResource Remove="Application\Campaign\**" />
+    <EmbeddedResource Remove="Application\Playback\**" />
+    <None Remove="Application\Asset\**" />
+    <None Remove="Application\Auth\**" />
+    <None Remove="Application\Campaign\**" />
+    <None Remove="Application\Playback\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Core\" />
     <Folder Include="Shared\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
   </ItemGroup>
 
 </Project>

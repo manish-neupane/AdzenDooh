@@ -7,11 +7,37 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Asset\" />
-    <Folder Include="Application\Auth\" />
-    <Folder Include="Application\Campaign\" />
-    <Folder Include="Application\Playback\" />
+    <Compile Remove="Application\Asset\**" />
+    <Compile Remove="Application\Auth\**" />
+    <Compile Remove="Application\Campaign\**" />
+    <Compile Remove="Application\Playback\**" />
+    <EmbeddedResource Remove="Application\Asset\**" />
+    <EmbeddedResource Remove="Application\Auth\**" />
+    <EmbeddedResource Remove="Application\Campaign\**" />
+    <EmbeddedResource Remove="Application\Playback\**" />
+    <None Remove="Application\Asset\**" />
+    <None Remove="Application\Auth\**" />
+    <None Remove="Application\Campaign\**" />
+    <None Remove="Application\Playback\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Core\" />
+	  
     <Folder Include="Shared\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccessService\AdzenDooh.DataAccess.csproj" />
+    <ProjectReference Include="..\DoohClick.Interface\AdzenDooh.Interface.csproj" />
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MetadataExtractor" Version="2.9.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Xabe.FFmpeg" Version="6.0.2" />
+	</ItemGroup>
 
 </Project>

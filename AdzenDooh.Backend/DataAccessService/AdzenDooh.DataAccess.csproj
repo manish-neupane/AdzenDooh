@@ -6,4 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
+	  <PackageReference Include="Dapper" Version="2.1.28" />
+	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>

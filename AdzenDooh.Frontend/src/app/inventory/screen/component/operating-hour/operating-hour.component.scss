@@ -1,0 +1,120 @@
+::ng-deep .soh-sidebar .p-sidebar-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.soh-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.soh-title {
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.soh-screen-name {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.soh-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.soh-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-color-secondary);
+  }
+}
+
+.soh-optional {
+  font-weight: 400;
+  font-style: italic;
+}
+
+.soh-slots-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-color-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.soh-spinner {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.soh-empty {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  padding: 8px 0;
+}
+
+.soh-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--surface-ground);
+  margin-bottom: 6px;
+}
+
+.soh-slot-time {
+  flex: 1;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.soh-slot-audience {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.soh-add-form {
+  border-top: 1px solid var(--surface-border);
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.soh-add-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.soh-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}

@@ -1,0 +1,23 @@
+
+
+<div class="page">
+
+  <!-- HEADER (always consistent) -->
+  <div class="page-header">
+
+    <div class="page-title">
+      <ng-content select="[title]"></ng-content>
+    </div>
+
+    <div class="page-actions">
+      <ng-content select="[actions]"></ng-content>
+    </div>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="page-content">
+    <ng-content></ng-content>
+  </div>
+
+</div>

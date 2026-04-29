@@ -11,10 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Application\" />
-    <Folder Include="Controllers\Shared\Base\" />
+    <Folder Include="Controllers\Application\Core\" />
     <Folder Include="Controllers\Shared\Util\" />
-    <Folder Include="MIddleware\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccessService\AdzenDooh.DataAccess.csproj" />
+    <ProjectReference Include="..\DoohClick.Interface\AdzenDooh.Interface.csproj" />
+    <ProjectReference Include="..\DoohClick.Model\AdzenDooh.Model.csproj" />
+    <ProjectReference Include="..\DoohClick.Service\AdzenDooh.Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,11 +3,13 @@
      Opens as p-sidebar from the right.
      ──────────────────────────────────────────────────────────────────────── -->
 
-<p-sidebar
+<p-dialog
   [(visible)]="visible"
-  position="right"
-  styleClass="soh-sidebar"
-  [style]="{ width: '420px' }"
+  header="Operating Hours"
+  [style]="{ width: '1200px' , height: '980px' }"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
 >
 
   <!-- // Header// -->
@@ -22,7 +24,7 @@
     </div>
   </ng-template>
 
-  // BOdy
+  
   <div class="soh-body">
 
     <!-- Day Dropdown -->
@@ -144,4 +146,4 @@
 
   </div>
 
-</p-sidebar>
+</p-dialog>

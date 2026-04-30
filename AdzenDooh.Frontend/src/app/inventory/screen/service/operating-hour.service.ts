@@ -21,7 +21,7 @@ export class ScreenOperatingHourService {
   constructor(private api: ApiService) {}
 
   getSlots(param: MvScreenOperatingHourFilter): Observable<ApiResponse<MvScreenOperatingHour[]>> {
-    return this.api.get(`${this.base}/GetSlot`, param);
+    return this.api.get(`${this.base}/GetAll`, param);
   }
 
   addSlots(payload: MvAddScreenOperatingHour[]): Observable<ApiResponse<MvScreenOperatingHour[]>> {

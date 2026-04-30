@@ -24,7 +24,7 @@ import {
   MvScreenOperatingHour,
   MvAddScreenOperatingHour,
   MvDeleteScreenOperatingHour,
-  DAY_OPTIONS,
+  DayOption,
   DayOfWeek
 } from '../../model/operating-hour.model';
 
@@ -48,7 +48,7 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
   visible = false;
 
   
-  dayOptions   = DAY_OPTIONS;
+  dayOptions   = DayOption;
   selectedDay: DayOfWeek | null = null;
 
   // slot data

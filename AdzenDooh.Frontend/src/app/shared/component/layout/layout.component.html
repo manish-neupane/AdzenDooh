@@ -1,50 +1,86 @@
 <div class="app-shell">
+
+  <!-- SIDEBAR -->
   <aside class="sidebar" [class.collapsed]="isCollapsed">
 
-    <div class="logo">
-      <div class="logo-icon">
-        <i class="pi pi-desktop"></i>
+    <!-- HEADER -->
+    <div class="sidebar-header">
+
+      <div class="logo">
+        <i class="pi pi-desktop logo-icon"></i>
+
+        <div class="logo-text" *ngIf="!isCollapsed">
+          <div class="title">AdZen Dooh</div>
+          <div class="subtitle">Ad Operations</div>
+        </div>
       </div>
-      <div class="logo-text-block">
-        <span class="logo-title">DOOH Manager</span>
-        <span class="logo-sub">Ad Operations</span>
-      </div>
+
+      <button
+        pButton
+        type="button"
+        icon="pi"
+        [icon]="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"
+        class="p-button-text toggle-btn"
+        (click)="toggleSidebar()"
+        pTooltip="Toggle Sidebar"
+        tooltipPosition="right">
+      </button>
+
     </div>
 
-    <button class="toggle-btn" (click)="toggleSidebar()">
-      <i class="pi pi-chevron-left"></i>
-    </button>
-
+    <!-- NAVIGATION -->
     <nav class="nav">
-      @for (group of navGroups; track group) {
-        <div class="nav-section">
-          <span class="nav-section-label">{{ group }}</span>
-          @for (item of itemsByGroup(group); track item.route) {
-            <a class="nav-item"
-               [routerLink]="item.route"
-               routerLinkActive="active"
-               [title]="isCollapsed ? item.label : ''">
-              <i [class]="item.icon + ' nav-icon'"></i>
-              <span class="nav-item-label">{{ item.label }}</span>
-            </a>
-          }
+
+      <ng-container *ngFor="let group of navGroups">
+
+        <!-- GROUP TITLE -->
+        <div class="nav-group-title" *ngIf="!isCollapsed">
+          {{ group }}
         </div>
-        @if (!$last) {
-          <div class="nav-divider"></div>
-        }
-      }
+
+        <!-- ITEMS -->
+        <a
+          *ngFor="let item of itemsByGroup(group)"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-item"
+          pRipple
+          pTooltip="{{ isCollapsed ? item.label : '' }}"
+          tooltipPosition="right">
+
+          <i [class]="item.icon"></i>
+
+          <span class="label" *ngIf="!isCollapsed">
+            {{ item.label }}
+          </span>
+
+        </a>
+
+      </ng-container>
+
     </nav>
 
+    <!-- FOOTER -->
     <div class="sidebar-footer">
-      <div class="user-row">
-        <div class="avatar">M</div>
-        <span class="user-name">Manish</span>
+
+      <p-avatar
+        icon="pi pi-user"
+        shape="circle"
+        size="normal">
+      </p-avatar>
+
+      <div class="user-info" *ngIf="!isCollapsed">
+        <div class="name">Admin</div>
+        <div class="role">Super User</div>
       </div>
+
     </div>
 
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="content">
-    <router-outlet />
+    <router-outlet></router-outlet>
   </main>
+
 </div>

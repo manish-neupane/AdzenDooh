@@ -16,11 +16,11 @@ export class ScreenService {
   constructor(private api: ApiService) {}
 
   getGrid(param: ParamOption<MvScreenFilter>): Observable<ApiResponse<GridResponse<MvScreen>>> {
-    return this.api.get(`${this.base}/GetGrid`, param);
+    return this.api.get(`${this.base}/GetAll`, param);
   }
 
   saveScreen(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
-    return this.api.post(`${this.base}/saveScreen`, payload);
+    return this.api.post(`${this.base}/SaveScreen`, payload);
   }
 
   deleteScreen(payload: MvDeleteScreen): Observable<ApiResponse<MvScreen>> {

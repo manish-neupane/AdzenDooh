@@ -17,7 +17,7 @@ export class CreativeService {
 
 
   getGrid(filter: ParamOption<MvCreativeFilter>): Observable<ApiResponse<GridResponse<MvCreative>>> {
-    return this.api.get<ApiResponse<GridResponse<MvCreative>>>(`${this.base}/GetGrid`, filter);
+    return this.api.get<ApiResponse<GridResponse<MvCreative>>>(`${this.base}/GetAll`, filter);
   }
 
   upload(file: File, payload: MvCreativeUpload): Observable<ApiResponse<MvCreative[]>> {
@@ -27,7 +27,7 @@ export class CreativeService {
     form.append('name',      payload.name);
     form.append('createdBy', payload.createdBy.toString());
 
-    return this.api.post<ApiResponse<MvCreative[]>>(`${this.base}/Upload/upload`, form);
+    return this.api.post<ApiResponse<MvCreative[]>>(`${this.base}/Upload`, form);
   }
  
   deleteCreative(payload: MvDeleteCreative): Observable<ApiResponse<MvCreative>> {

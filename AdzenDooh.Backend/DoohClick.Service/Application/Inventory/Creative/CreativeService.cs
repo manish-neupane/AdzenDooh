@@ -90,7 +90,7 @@ namespace AdzenDooh.Service.Application.Inventory.Creative
             try
             {
                 string result = await _DataAccessService.RetrievalProcedure(
-                    "Inv.SpCreativeDropSel", JsonConvert.SerializeObject(param));
+                    "Inv.SpCreativeDdl", JsonConvert.SerializeObject(param));
                 return JsonConvert.DeserializeObject<List<MvDropdown>>(result);
             }
             catch { throw; }

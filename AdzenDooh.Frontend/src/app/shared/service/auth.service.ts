@@ -7,9 +7,10 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 
   // ── Temp hardcoded user until real auth is built ──
-  currentUser = {
+   currentUser = {
     tenantId: 1,
     userId:   1
+    
   };
 
 }

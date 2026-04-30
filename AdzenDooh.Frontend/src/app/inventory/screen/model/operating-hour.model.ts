@@ -10,7 +10,7 @@ export enum DayOfWeek {
   Saturday  = 6
 }
 
-export const DAY_OPTIONS = [
+export const DayOption = [
   { label: 'Sunday',    value: DayOfWeek.Sunday    },
   { label: 'Monday',    value: DayOfWeek.Monday    },
   { label: 'Tuesday',   value: DayOfWeek.Tuesday   },
@@ -24,7 +24,7 @@ export const DAY_OPTIONS = [
 export interface MvScreenOperatingHour {
   id:                   number;
   screenId:             number;
-  dayOfWeek:            DayOfWeek;
+  dayOfWeek:            number;
   startTime:            string;   // ISO datetime string from SQL
   endTime:              string;
   averageAudienceCount: number | null;

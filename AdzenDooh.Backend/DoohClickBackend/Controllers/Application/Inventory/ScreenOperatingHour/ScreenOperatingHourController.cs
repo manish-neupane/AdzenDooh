@@ -12,7 +12,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
     {
 
         [HttpGet]
-        public async Task<IActionResult> GetSlot(
+        public async Task<IActionResult> GetAll(
             [FromQuery] MvScreenOperatingHourFilter param)
         {
             try

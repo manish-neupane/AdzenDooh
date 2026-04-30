@@ -1,93 +1,101 @@
 .page {
-  padding: 22px 26px;
-  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  background: #f4f6f9;
+
+  /* more breathing room */
+  padding: 28px;
+  gap: 18px;
 }
 
-/* ─── HEADER (premium card feel) ───────────────────────────── */
+/* =========================
+   HEADER (card style)
+========================= */
 .page-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
-  padding: 16px 18px;
-  margin-bottom: 20px;
+  padding: 16px 22px;
 
   background: #ffffff;
-  border: 1px solid #eceff3;
+  border: 1px solid #e6e9ef;
   border-radius: 14px;
 
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
-}
-
-/* ─── TITLE (this is the real upgrade) ─────────────────────── */
-.page-title {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 700; /* 🔥 stronger presence */
-  letter-spacing: -0.02em;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  color: #0f172a;
-}
-
-/* icon refinement */
-.page-title i {
-  font-size: 18px;
-  color: #6366f1;
-}
-
-/* ─── ACTION AREA ───────────────────────────────────────────── */
-.page-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* buttons feel more premium */
-.page-actions .p-button {
-  border-radius: 10px;
-  font-weight: 500;
-}
-
-/* inputs/selects upgraded */
-.page-actions select,
-.page-actions input {
-  height: 38px;
-  padding: 6px 12px;
-
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-
-  background: white;
-
-  font-size: 13px;
-  font-weight: 500;
+  /* stronger but soft shadow */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 6px 18px rgba(0, 0, 0, 0.06);
 
   transition: all 0.2s ease;
 }
 
-.page-actions select:focus,
-.page-actions input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+/* optional hover depth (feels premium) */
+.page-header:hover {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 10px 26px rgba(0, 0, 0, 0.08);
 }
 
-/* ─── CONTENT AREA ─────────────────────────────────────────── */
+/* =========================
+   TITLE
+========================= */
+.page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: 0.2px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* =========================
+   CONTENT AREA (main card)
+========================= */
 .page-content {
-  display: block;
-}
+  flex: 1;
 
-/* grid feels like a card */
-.page-content grid-table {
-  display: block;
-
-  background: white;
-  border: 1px solid #eceff3;
+  background: #ffffff;
+  border: 1px solid #e6e9ef;
   border-radius: 14px;
 
-  box-shadow: 0 2px 10px rgba(16, 24, 40, 0.03);
-  overflow: hidden;
+  /* more breathing room inside */
+  padding: 22px;
+
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.05);
+
+  overflow: auto;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .page {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }

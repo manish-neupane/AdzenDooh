@@ -10,7 +10,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
     public class ScreenController(IScreenService screenService) : BaseController
     {
         [HttpGet]
-        public async Task<IActionResult> GetGrid([FromQuery] MvParamOption<MvScreenFilter> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvParamOption<MvScreenFilter> param)
         {
             try
             {

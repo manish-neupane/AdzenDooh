@@ -16,7 +16,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
     {
         private readonly IWebHostEnvironment _env = _Env;  
 
-        [HttpPost("upload")]
+        [HttpPost]
         [RequestSizeLimit(500_000_000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 500_000_000)]
         public async Task<IActionResult> Upload(
@@ -42,7 +42,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Creative
 
 
         [HttpGet]
-        public async Task<IActionResult> GetGrid([FromQuery] MvParamOption<MvCreativeFilter> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvParamOption<MvCreativeFilter> param)
         {
             try
             {

@@ -1,19 +1,18 @@
 <!-- ─── screen-operating-hour.component.html ─────────────────────────────────
      Side overlay for managing operating hour slots of a single screen.
-     Opens as p-sidebar from the right.
+     - Day dropdown: selects which day you're adding a slot to
+     - Slot list: always shows ALL slots, grouped by each day
      ──────────────────────────────────────────────────────────────────────── -->
 
 <p-dialog
   [(visible)]="visible"
-  header="Operating Hours"
-  [style]="{ width: '1200px' , height: '980px' }"
+  [style]="{ width: '1200px', height: '980px' }"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
 >
 
-  <!-- // Header// -->
-   
+  <!-- Header -->
   <ng-template pTemplate="header">
     <div class="soh-header">
       <span class="soh-title">
@@ -24,73 +23,30 @@
     </div>
   </ng-template>
 
-  
   <div class="soh-body">
 
-    <!-- Day Dropdown -->
-    <div class="soh-field">
-      <label>Day</label>
-      <p-dropdown
-        [options]="dayOptions"
-        [(ngModel)]="selectedDay"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Select a day"
-        styleClass="w-full"
-        (onChange)="onDayChange()"
-      />
-    </div>
-
-    <!-- Slot List for selected day -->
-    <div class="soh-slots" *ngIf="selectedDay !== null">
-
-      <div class="soh-slots-label">
-        Existing Slots
-        <p-progressSpinner
-          *ngIf="isLoadingSlots"
-          styleClass="soh-spinner"
-          strokeWidth="4"
-        />
-      </div>
-
-      <!-- Empty state -->
-      <div class="soh-empty" *ngIf="!isLoadingSlots && filteredSlots.length === 0">
-        No slots for this day yet.
-      </div>
-
-      <!-- Slot rows -->
-      <div
-        class="soh-slot-row"
-        *ngFor="let slot of filteredSlots"
-      >
-        <span class="soh-slot-time">
-          <i class="pi pi-clock"></i>
-          {{ formatTime(slot.startTime) }} – {{ formatTime(slot.endTime) }}
-        </span>
-
-        <span class="soh-slot-audience" *ngIf="slot.averageAudienceCount !== null">
-          <i class="pi pi-users"></i>
-          {{ slot.averageAudienceCount }}
-        </span>
-
-        <p-button
-          icon="pi pi-trash"
-          severity="danger"
-          [text]="true"
-          size="small"
-          [loading]="isDeletingId === slot.id"
-          (onClick)="deleteSlot(slot)"
-        />
-      </div>
-    </div>
-
-    <!-- ── Add Slot Form (only shown when a day is selected) ─────────────── -->
-    <div class="soh-add-form" *ngIf="selectedDay !== null">
+    <!-- ── Add Slot Form ─────────────────────────────────────────────────── -->
+    <div class="soh-add-form">
 
       <div class="soh-add-title">Add New Slot</div>
 
       <div class="soh-form-row">
 
+        <!-- Day selector -->
+        <div class="soh-field">
+          <label>Day</label>
+          <p-dropdown
+            [options]="dayOptions"
+            [(ngModel)]="selectedDay"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a day"
+            styleClass="w-full"
+            (onChange)="onDayChange()"
+          />
+        </div>
+
+        <!-- Start Time -->
         <div class="soh-field">
           <label>Start Time</label>
           <p-calendar
@@ -102,6 +58,7 @@
           />
         </div>
 
+        <!-- End Time -->
         <div class="soh-field">
           <label>End Time</label>
           <p-calendar
@@ -113,28 +70,90 @@
           />
         </div>
 
+        <!-- Avg Audience -->
+        <div class="soh-field">
+          <label>
+            Avg. Audience Count
+            <span class="soh-optional">(optional)</span>
+          </label>
+          <p-inputNumber
+            [formControl]="$any(form.get('averageAudienceCount'))"
+            placeholder="e.g. 100"
+            styleClass="w-full"
+            [min]="0"
+          />
+        </div>
+
+        <!-- Submit -->
+        <div class="soh-field soh-field--action">
+          <label>&nbsp;</label>
+          <p-button
+            label="Add Slot"
+            icon="pi pi-plus"
+            styleClass="w-full"
+            [loading]="isSaving"
+            [disabled]="form.invalid || selectedDay === null"
+            (onClick)="addSlot()"
+          />
+        </div>
+
       </div>
-
-      <div class="soh-field">
-        <label>Avg. Audience Count <span class="soh-optional">(optional)</span></label>
-        <p-inputNumber
-          [formControl]="$any(form.get('averageAudienceCount'))"
-          placeholder="e.g. 100"
-          styleClass="w-full"
-          [min]="0"
-        />
-      </div>
-
-      <p-button
-        label="Add Slot"
-        icon="pi pi-plus"
-        styleClass="w-full"
-        [loading]="isSaving"
-        [disabled]="form.invalid"
-        (onClick)="addSlot()"
-      />
-
     </div>
+
+    <!-- ── All Slots grouped by Day ──────────────────────────────────────── -->
+    <div class="soh-slots-section">
+
+     <!-- Replace the spinner inside soh-slots-label with this block below it -->
+<div class="soh-loading-overlay" *ngIf="isLoadingSlots">
+  <p-progressSpinner strokeWidth="4" />
+</div>
+
+      <!-- One block per day — always rendered -->
+      <div class="soh-day-group" *ngFor="let day of dayOptions">
+
+        <div class="soh-day-header">
+          <span class="soh-day-label">{{ day.label }}</span>
+          <span class="soh-slot-count">
+            {{ (slotsByDay[day.value] || []).length }} slot(s)
+          </span>
+        </div>
+
+        <!-- Empty state for this day -->
+        <div
+          class="soh-empty"
+          *ngIf="!isLoadingSlots && (slotsByDay[day.value] || []).length === 0"
+        >
+          No slots for this day.
+        </div>
+
+        <!-- Slot rows for this day -->
+        <div
+          class="soh-slot-row"
+          *ngFor="let slot of slotsByDay[day.value]"
+        >
+          <span class="soh-slot-time">
+            <i class="pi pi-clock"></i>
+            {{ formatTime(slot.startTime) }} – {{ formatTime(slot.endTime) }}
+          </span>
+
+          <span class="soh-slot-audience" *ngIf="slot.averageAudienceCount !== null">
+            <i class="pi pi-users"></i>
+            {{ slot.averageAudienceCount }}
+          </span>
+
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            size="small"
+            [loading]="isDeletingId === slot.id"
+            (onClick)="deleteSlot(slot)"
+          />
+        </div>
+
+      </div><!-- /soh-day-group -->
+
+    </div><!-- /soh-slots-section -->
 
     <!-- Error -->
     <p-message
@@ -144,6 +163,6 @@
       styleClass="w-full mt-2"
     />
 
-  </div>
+  </div><!-- /soh-body -->
 
 </p-dialog>

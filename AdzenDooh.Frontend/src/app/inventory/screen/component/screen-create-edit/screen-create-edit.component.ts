@@ -83,6 +83,7 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
       orientation: ['landscape', Validators.required],
       macAddress:  ['', Validators.required],
       location:    ['', Validators.required],
+       status:      ['active', Validators.required] ,
       address:     ['']
     });
   }
@@ -130,6 +131,8 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
   private saveScreen(): void {
     const payload: MvUpsertScreen = {
       ...this.formGroup.value,
+      tenantId: 1,
+      createdBy: 1,
       // Include id only for edits; 0 or undefined signals a create
       ...(this.isNewScreen ? {} : { id: this.screen.id })
     };

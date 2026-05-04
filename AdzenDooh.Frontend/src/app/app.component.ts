@@ -26,8 +26,7 @@ export class AppComponent {
     message: string,
     header: string,
     icon: string,
-    acceptCallback: () => void
-  ): void {
+    acceptCallback: () => void): void {
     this._confirmationService.confirm({
       message,
       header,

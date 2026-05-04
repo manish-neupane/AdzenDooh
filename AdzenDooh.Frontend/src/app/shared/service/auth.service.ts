@@ -9,7 +9,7 @@ export class AuthService {
   // ── Temp hardcoded user until real auth is built ──
    currentUser = {
     tenantId: 1,
-    userId:   1
+    userId:   1,
     
   };
 

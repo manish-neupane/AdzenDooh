@@ -177,7 +177,7 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
 
   openOperatingHours(screen: MvScreen): void {
   this.currentScreen = { ...screen };
-  this.screenOperatingHour.open();
+  this.screenOperatingHour.open(screen);
 }
   // ─── After Dialog Closes ──────────────────────────────────────────────────
   // Called by ScreenCreateEditComponent via (afterFormClosed) output.

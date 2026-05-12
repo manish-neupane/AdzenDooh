@@ -1,0 +1,54 @@
+<page-wrapper>
+
+  <div title>
+    <i class="pi pi-megaphone" style="margin-right: 6px;"></i>Campaign
+  </div>
+
+  <div actions>
+    <p-button
+      label="Add Campaign"
+      icon="pi pi-plus"
+      (onClick)="addCampaign()"
+    />
+  </div>
+
+  <grid-table
+    [config]="campaignConfig"
+    [loading]="isLoading"
+    [error]="errorMessage"
+    (pageChange)="onPage($event)"
+    (sortChange)="onSort($event)"
+    (filterChange)="onFilter($event)"
+  >
+    <ng-template #customCell let-row let-col="col">
+      @if (col.name === 'status') {
+        <span [class]="'status-badge ' + getStatusClass(row.status)">
+          {{ getStatusText(row.status) }}
+        </span>
+      }
+      @if (col.name === 'thumbnail') {
+        <img [src]="row.thumbnailUrl" width="50" alt="Campaign thumbnail" />
+      }
+    </ng-template>
+  </grid-table>
+
+</page-wrapper>
+
+<!-- Child dialogs -->
+<campaign-create-edit
+  #campaignCreateEdit
+  [availableScreens]="screenDdl"
+  (afterFormClosed)="afterFormClosed($event)"
+/>
+
+<!-- assign-creative selector matches AssignCreativeComponent -->
+<assign-creative
+  #campaignAssignCreative
+  (afterSaved)="afterAssignCreativeClosed()"
+/>
+
+<campaign-detail #campaignDetail />
+
+<p-toast />
+<p-confirmDialog />
+<router-outlet />

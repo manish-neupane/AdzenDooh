@@ -23,6 +23,21 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
             }
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> GetDdl([FromBody] MvScreenDdl param)
+        {
+            try
+            {
+                var response = await screenService.ScreenDdl(param);
+                return Ok(ApiResult.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveScreen([FromBody] MvUpsertScreen param)
         {

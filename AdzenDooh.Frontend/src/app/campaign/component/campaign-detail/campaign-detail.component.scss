@@ -1,0 +1,207 @@
+// campaign-detail.component.scss
+
+.cd-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.cd-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e293b;
+  
+  i {
+    margin-right: 0.5rem;
+    color: #3b82f6;
+  }
+}
+
+.cd-name {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.cd-body {
+  position: relative;
+  min-height: 400px;
+  background: #ffffff;
+}
+
+.cd-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.cd-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cd-section-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.6rem;
+  
+  i {
+    color: #3b82f6;
+    font-size: 1rem;
+  }
+}
+
+.cd-count {
+  background: #e2e8f0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.cd-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.cd-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  &--full {
+    grid-column: span 2;
+  }
+}
+
+.cd-info-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.cd-info-value {
+  font-size: 0.9rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.cd-screen-list, .cd-date-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cd-screen-row, .cd-date-row {
+  background: #f8fafc;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.85rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cd-screen-name {
+  font-weight: 500;
+  color: #1e293b;
+  
+  i {
+    margin-right: 0.5rem;
+    color: #3b82f6;
+    font-size: 0.8rem;
+  }
+}
+
+.cd-screen-location {
+  color: #64748b;
+  font-size: 0.8rem;
+  
+  i {
+    margin-right: 0.25rem;
+    font-size: 0.7rem;
+    color: #94a3b8;
+  }
+}
+
+.cd-date-row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.cd-date-index {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.75rem;
+  background: #a9abad;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+.cd-date-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #334155;
+  font-weight: 500;
+  
+  i {
+    font-size: 0.7rem;
+    color: #64748b;
+  }
+}
+
+.cd-date-arrow {
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.cd-empty {
+  text-align: center;
+  padding: 1.5rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+}
+
+// Dialog shadow enhancement
+:host ::ng-deep {
+  .p-dialog {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  
+  .p-dialog-header {
+    padding: 1.25rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .p-dialog-content {
+    padding: 1.5rem;
+    background: #ffffff;
+  }
+}

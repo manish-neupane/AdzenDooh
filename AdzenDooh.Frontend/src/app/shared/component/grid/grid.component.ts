@@ -1,30 +1,31 @@
-// ─── grid.component.ts ───────────────────────────────────────────────────────
-// A fully generic, reusable table component.
-//
-// RESPONSIBILITY: Render a table with columns, pagination, sorting, filtering,
-// action buttons, and loading/empty/error states. That is ALL it does.
-//
-// It knows NOTHING about screens, campaigns, or any domain object.
-// Every interaction is emitted outward — the parent decides what to do.
-
 import {
   Component,
   Input,
   Output,
   EventEmitter,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy,
+  OnInit,
+  ContentChild,
+  TemplateRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
+import { TableModule, TablePageEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 import { GridConfig } from '../../model/grid-config.model';
+
+interface SortEvent {
+  field?: string;
+  order?: number;
+}
 
 @Component({
   selector: 'grid-table',
@@ -42,65 +43,100 @@ import { GridConfig } from '../../model/grid-config.model';
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss']
 })
-export class GridComponent<T extends { id: number }> implements OnChanges {
-
-  // ─── Inputs ───────────────────────────────────────────────────────────────
+export class GridComponent<T extends { id: number }> implements OnChanges, OnDestroy, OnInit {
 
   @Input() config!: GridConfig<T>;
   @Input() loading: boolean = false;
   @Input() error: string = '';
 
-  // ─── Outputs ──────────────────────────────────────────────────────────────
-
-  // Parent handles pagination against the server
-  @Output() pageChange = new EventEmitter<{ first: number; rows: number }>();
-
-  // Parent handles sort against the server
-  @Output() sortChange = new EventEmitter<{ field: string; order: number }>();
-
-  // Parent handles filter against the server (debounce if needed in parent)
+  @Output() pageChange   = new EventEmitter<{ first: number; rows: number }>();
+  @Output() sortChange   = new EventEmitter<{ field: string; order: number }>();
   @Output() filterChange = new EventEmitter<string>();
 
-  // ─── Internal State ───────────────────────────────────────────────────────
+  @ContentChild('customCell') customCellTemplate?: TemplateRef<any>;
 
-  protected filterFields: string[] = [];
-  protected pageRows: number = 10;
+  protected filterFields: (keyof T)[] = [];
   protected filterValue: string = '';
+  
+  // State for PrimeNG table
+  protected first: number = 0;
+  protected rows: number = 10;
+  protected sortField: string = '';
+  protected sortOrder: number = 1;
 
-  // ─── Lifecycle ────────────────────────────────────────────────────────────
+  private filterSubject = new Subject<string>();
+  private _unSubscribeAll$ = new Subject<void>();
+
+  ngOnInit(): void {
+    this.filterSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this._unSubscribeAll$)
+    ).subscribe(value => {
+      // Reset to first page when filtering
+      this.first = 0;
+      this.filterChange.emit(value);
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['config'] && this.config) {
-      const marked = this.config.columns.filter(c => c.filterable).map(c => c.name);
-      const all    = this.config.columns.map(c => c.name);
+      const marked = this.config.columns
+        .filter(c => c.filterable)
+        .map(c => c.name);
+      
+      const all = this.config.columns.map(c => c.name);
       this.filterFields = marked.length ? marked : all;
-      this.pageRows     = this.config.rows ?? 10;
+      
+      // Update rows per page from config
+      if (this.config.rows && this.config.rows !== this.rows) {
+        this.rows = this.config.rows;
+        this.first = 0;
+      }
     }
   }
 
-  // ─── Event Handlers ───────────────────────────────────────────────────────
-
-  onPageChange(event: any): void {
-    this.pageChange.emit({ first: event.first, rows: event.rows });
+  onPageChange(event: TablePageEvent): void {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 10;
+    
+    this.pageChange.emit({ 
+      first: this.first, 
+      rows: this.rows 
+    });
   }
 
-  onSort(event: any): void {
-    this.sortChange.emit({ field: event.field, order: event.order });
+  onSortChange(event: SortEvent): void {
+    if (!event.field) return;
+    
+    this.sortField = event.field;
+    this.sortOrder = event.order === 1 ? 1 : -1;
+    
+    // Reset to first page when sorting
+    this.first = 0;
+    
+    this.sortChange.emit({ 
+      field: this.sortField, 
+      order: this.sortOrder 
+    });
   }
 
-  onFilter(): void {
-    // Emit the current filter value; parent calls their load method
-    this.filterChange.emit(this.filterValue.trim());
-  }
-
+onFilterChange(value: string): void {
+    const trimmed = value.trim();
+    this.filterValue = value;           // Update local model
+    this.filterSubject.next(trimmed);   // Emit trimmed value
+}
   onFilterClear(): void {
     this.filterValue = '';
-    this.filterChange.emit('');
+    this.filterSubject.next('');
+}
+
+  getValue(row: T, key: keyof T): T[keyof T] {
+    return row[key];
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-
-  getValue(row: T, columnName: string): any {
-    return row[columnName as keyof T];
+  ngOnDestroy(): void {
+    this._unSubscribeAll$.next();
+    this._unSubscribeAll$.complete();
   }
 }

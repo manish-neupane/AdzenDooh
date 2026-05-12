@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../shared/service/api.service';
-import { MvScreen, MvUpsertScreen, MvDeleteScreen, MvScreenFilter } from '../model/screen.model';
+import { MvScreen, MvUpsertScreen, MvDeleteScreen, MvScreenFilter, MvScreenDdl } from '../model/screen.model';
 import { ApiResponse, GridResponse, ParamOption } from '../../../shared/model/sharedModel';
 import { environment } from '../../../../environments/environment';
 
@@ -15,12 +15,16 @@ export class ScreenService {
 
   constructor(private api: ApiService) {}
 
-  getGrid(param: ParamOption<MvScreenFilter>): Observable<ApiResponse<GridResponse<MvScreen>>> {
+  getAll(param: ParamOption<MvScreenFilter>): Observable<ApiResponse<GridResponse<MvScreen>>> {
     return this.api.get(`${this.base}/GetAll`, param);
   }
 
   saveScreen(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
     return this.api.post(`${this.base}/SaveScreen`, payload);
+  }
+
+  getDdl(param: MvScreenDdl): Observable<ApiResponse<MvScreen[]>> {
+    return this.api.post(`${this.base}/GetDdl`, param);
   }
 
   deleteScreen(payload: MvDeleteScreen): Observable<ApiResponse<MvScreen>> {

@@ -9,20 +9,16 @@
   <ItemGroup>
     <Compile Remove="Application\Asset\**" />
     <Compile Remove="Application\Auth\**" />
-    <Compile Remove="Application\Campaign\**" />
     <Compile Remove="Application\Playback\**" />
     <EmbeddedResource Remove="Application\Asset\**" />
     <EmbeddedResource Remove="Application\Auth\**" />
-    <EmbeddedResource Remove="Application\Campaign\**" />
     <EmbeddedResource Remove="Application\Playback\**" />
     <None Remove="Application\Asset\**" />
     <None Remove="Application\Auth\**" />
-    <None Remove="Application\Campaign\**" />
     <None Remove="Application\Playback\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Core\" />
     <Folder Include="Shared\" />
   </ItemGroup>
 

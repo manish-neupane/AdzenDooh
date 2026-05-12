@@ -1,14 +1,4 @@
-<!-- ─── screen-create-edit.component.html ───────────────────────────────────
-     Dialog for creating or editing a screen.
 
-     Key decisions:
-       - appendTo="body" prevents the dialog from being clipped by any parent
-         container that has overflow:hidden or a CSS transform applied.
-       - (onHide) maps to onHide() in the TS, which calls close().
-       - The Save button shows a spinner via [loading]="isLoading".
-       - markAllAsTouched() is called in onSubmit() so errors show immediately
-         when the user clicks Save on an untouched invalid form.
-     ─────────────────────────────────────────────────────────────────────── -->
 
 <p-dialog
   [(visible)]="isOpen"

@@ -15,7 +15,7 @@ namespace AdzenDooh.Interface.Application.Inventory.Screen
         
         Task<List<MvScreen>?> SaveScreen(MvUpsertScreen param);
 
-        Task<List<MvDropdown>?> ScreenDdl(MvDropdown param);
+        Task<List<MvDropdown>?> ScreenDdl(MvScreenDdl param);
 
         Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param);
 

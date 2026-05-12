@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CheckboxControlValueAccessor, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -16,6 +16,8 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { SidebarModule }         from 'primeng/sidebar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule }         from 'primeng/message';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CalendarModule } from 'primeng/calendar';
 
 export { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -38,5 +40,7 @@ export const sharedImports = [
    FileUploadModule,
    SidebarModule,
    ProgressSpinnerModule,
-   MessageModule
+   MessageModule,
+   CheckboxModule,
+   CalendarModule
 ];

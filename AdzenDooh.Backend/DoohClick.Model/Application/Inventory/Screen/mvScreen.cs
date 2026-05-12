@@ -63,6 +63,12 @@ namespace AdzenDooh.Model.Application.Inventory.Screen
     }
 
 
+    public class MvScreenDdl
+    {
+        public int TenantId { get; set; }
+        public int? CampaignId { get; set; }
+    }
+
 
     //public class MvScreenOprtHour {
 

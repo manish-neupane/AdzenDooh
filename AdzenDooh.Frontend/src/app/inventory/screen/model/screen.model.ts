@@ -1,6 +1,5 @@
 // screen.model.ts
 export interface MvScreen {
-  screenName: any;
   id: number;
   tenantId: number;
   name: string;
@@ -42,4 +41,9 @@ export interface MvUpsertScreen {
 export interface MvDeleteScreen {
   id: number;
   deletedBy: number;
+}
+export interface MvScreenDdl
+{
+      TenantId : number;  
+    CampaignId? : number; 
 }

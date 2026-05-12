@@ -172,7 +172,7 @@ CREATE TABLE dbo.CampaignCreative (
     UpdatedAt         DATETIME2   NULL,
     UpdatedBy         INT         NULL     REFERENCES core.[User](Id),
     IsDeleted         BIT         NOT NULL DEFAULT 0,
-    DeletedAt         DATETIME2   NULL,
+    DeletedAt         DATETIME2   NULL, 
     DeletedBy         INT         NULL     REFERENCES core.[User](Id),
     CONSTRAINT UQ_CampaignCreative_Order UNIQUE (CampaignDateId, PlayOrder)
 );

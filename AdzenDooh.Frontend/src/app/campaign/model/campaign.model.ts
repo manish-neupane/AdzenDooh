@@ -1,10 +1,10 @@
-//  Filters 
+// ── Filters ──────────────────────────────────────────────────────────
 
 export interface MvCampaignFilter {
   search?: string;
 }
 
-//  Nested Objects (joined from DB) 
+// ── Nested / Joined Models ───────────────────────────────────────────
 
 export interface MvCampaignScreen {
   id:         number;
@@ -33,7 +33,7 @@ export interface MvCampaignCreative {
   isVideo:      boolean;
 }
 
-
+// ── Reference Types (for POST bodies) ───────────────────────────────
 
 export interface MvCampaignScreenRef {
   screenId: number;
@@ -44,7 +44,7 @@ export interface MvCampaignDateRef {
   endDate:   string;
 }
 
-//  (POST bodies) 
+// ── POST Bodies ──────────────────────────────────────────────────────
 
 export interface MvCreateCampaign {
   tenantId:       number;
@@ -74,9 +74,9 @@ export interface MvCreativeItem {
   playSequence: number;
 }
 
-//  (GET responses) 
+// ── GET Responses ────────────────────────────────────────────────────
 
-// Lightweight — for the grid list
+/** Lightweight model used in list/grid views. */
 export interface MvCampaign {
   id:             number;
   tenantId:       number;
@@ -89,7 +89,7 @@ export interface MvCampaign {
   dates:          MvCampaignDate[];
 }
 
-// Full detail — for the campaign detail/overview 
+/** Full detail model used in campaign overview and creative assignment. */
 export interface MvCampaignDetail {
   id:             number;
   tenantId:       number;
@@ -103,7 +103,7 @@ export interface MvCampaignDetail {
   creatives:      MvCampaignCreative[];
 }
 
-//  Lookup Models (dropdown / checkbox data) 
+// ── Lookup / Dropdown Models ─────────────────────────────────────────
 
 export interface MvScreen {
   id:       number;
@@ -120,7 +120,7 @@ export interface MvCreative {
   orientation:    string;
 }
 
-//  Form Value Shapes (component-only)
+// ── Form Value Shapes (component-only) ──────────────────────────────
 
 export interface CampaignFormValue {
   name:             string;
@@ -135,30 +135,24 @@ export interface DateRowValue {
   endDate:   Date | null;
 }
 
-export interface MvCampaignDetail{
+// ── Assign-Creative UI State ─────────────────────────────────────────
 
-  campaignId: number;
-  tenantId : number ;
-}
-
-
-// campaign/model/assign-media.model.ts
- 
-// ── Creative DDL (dropdown) ──────────────────────────────────────────
-
- 
-// ── In-memory per-screen UI state ────────────────────────────────────
 export interface MvScreenSlot {
   screenId:   number;
   screenName: string;
-  playDate:   Date | null;  // per-screen PlayDate, validated against campaign range
+  playDate:   Date | null;
   creatives:  MvCreativeRow[];
 }
- 
+
 export interface MvCreativeRow {
   creativeId:   number;
   creativeName: string;
   thumbnailUrl: string;
-  fileType:     string;
+  fileType:     'image' | 'video';
   playSequence: number;
+}
+
+export interface MvCreativeGroupedByScreen {
+  screenName: string;
+  creatives:  MvCampaignCreative[];
 }

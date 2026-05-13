@@ -53,10 +53,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
     this.loadCreatives();
   }
 
-  ngOnDestroy(): void {
-    this._unSubscribeAll$.next();
-    this._unSubscribeAll$.complete();
-  }
+ 
 
   //  Data 
 
@@ -148,4 +145,9 @@ closePreview(): void {
   this.previewItem  = null;
   this.previewVisible = false;
 }
+
+ ngOnDestroy(): void {
+    this._unSubscribeAll$.next();
+    this._unSubscribeAll$.complete();
+  }
 }

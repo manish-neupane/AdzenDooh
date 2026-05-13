@@ -29,97 +29,77 @@ import {
 } from '../../model/campaign.model';
 import { buildDatePayload, validateDateRanges } from './campaign-date-utils';
 
-//  Form type aliases 
-
-type DateRowGroup = FormGroup<{
-  startDate: FormControl<Date | null>;
-  endDate:   FormControl<Date | null>;
-}>;
-
-type CampaignFormGroup = FormGroup<{
-  name:             FormControl<string | null>;
-  remarks:          FormControl<string | null>;
-  status:           FormControl<number | null>;
-  screenSelections: FormArray<FormControl<boolean | null>>;
-  dates:            FormArray<DateRowGroup>;
-}>;
-
-// ======================================
-
 @Component({
-  selector:    'campaign-create-edit',
-  standalone:  true,
-  imports:     [...sharedImports, StepsModule],
+  selector: 'campaign-create-edit',
+  standalone: true,
+  imports: [...sharedImports, StepsModule],
   templateUrl: './campaign-create.component.html',
-  styleUrl:    './campaign-create.component.scss',
+  styleUrl: './campaign-create.component.scss',
 })
 export class CampaignCreateComponent extends AppComponent implements OnDestroy {
 
-  @Input()  availableScreens: MvScreen[] = [];
+  @Input() availableScreens: MvScreen[] = [];
   @Output() afterFormClosed = new EventEmitter<MvCampaign | null>();
 
-  protected formGroup!: CampaignFormGroup;
+ 
   protected isDialogOpen = false;
-  protected isLoading    = false;
-  protected activeStep   = 0;
-  protected today        = new Date();
+  protected isLoading = false;
+  protected activeStep = 0;
+  protected today = new Date();
+  protected formGroup!: FormGroup;
 
   private readonly __unSubscribeAll$ = new Subject<void>();
 
-  readonly steps: { label: string }[] = [
+  readonly steps = [
     { label: 'Details' },
     { label: 'Screens' },
-    { label: 'Dates'   },
+    { label: 'Dates' },
   ];
 
   constructor(
-    private injector:          Injector,
-    private _fb:               FormBuilder,
-    private _campaignService:  CampaignService,
-    private _authService:      AuthService,
+    private injector: Injector,
+    private _fb: FormBuilder,
+    private _campaignService: CampaignService,
+    private _authService: AuthService,
   ) {
     super(injector);
     this.initForm();
   }
- 
 
-    private initForm(): void {
-    this.formGroup = this._fb.group<CampaignFormGroup['controls']>({
-      name:             this._fb.control<string | null>('', Validators.required),
-      remarks:          this._fb.control<string | null>(''),
-      status:           this._fb.control<number | null>(0),
-      screenSelections: this._fb.array<FormControl<boolean | null>>([]),
-      dates:            this._fb.array<DateRowGroup>([]),
+  private initForm(): void {
+    this.formGroup = this._fb.group({
+      name: this._fb.control('', Validators.required),
+      remarks: this._fb.control(''),
+      status: this._fb.control(0),
+      screenSelections: this._fb.array([]),
+      dates: this._fb.array([]),
     });
   }
-  //  Form accessors 
 
-  protected get screenSelections(): FormArray<FormControl<boolean | null>> {
-    return this.formGroup.controls.screenSelections;
+  get screenSelections(): FormArray {
+    return this.formGroup.get('screenSelections') as FormArray;
   }
 
-  protected get dates(): FormArray<DateRowGroup> {
-    return this.formGroup.controls.dates;
+  get dates(): FormArray {
+    return this.formGroup.get('dates') as FormArray;
   }
-
-  //  Open / close 
 
   open(): void {
     this.activeStep = 0;
-    this.today      = new Date();
+    this.today = new Date();
 
     this.formGroup.patchValue({ name: '', remarks: '', status: 0 });
     this.formGroup.setControl('screenSelections', this.buildScreenCheckboxes());
-    this.formGroup.setControl('dates', this._fb.array<DateRowGroup>([]));
+    this.formGroup.setControl('dates', this._fb.array([]));
 
     this.isDialogOpen = true;
   }
 
-  protected onHide(): void {
+  onHide(): void {
     this.cancel();
   }
 
-  protected cancel(): void {
+  cancel(): void {
     this.afterFormClosed.emit(null);
     this.close();
   }
@@ -127,8 +107,6 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
   private close(): void {
     this.isDialogOpen = false;
   }
-
-  //   Step navigation 
 
   nextStep(): void {
     if (!this.canAdvanceFrom(this.activeStep)) return;
@@ -145,14 +123,12 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
     return true;
   }
 
-  // Date rows 
-
   addDateRow(): void {
     this.dates.push(
       this._fb.group({
-        startDate: this._fb.control<Date | null>(null, Validators.required),
-        endDate:   this._fb.control<Date | null>(null, Validators.required),
-      }) as DateRowGroup,
+        startDate: this._fb.control(null, Validators.required),
+        endDate: this._fb.control(null, Validators.required),
+      })
     );
   }
 
@@ -160,11 +136,12 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
     this.dates.removeAt(index);
   }
 
-  //  Validation 
-
   private validateName(): boolean {
-    const ctrl = this.formGroup.controls.name;
-    if (ctrl.invalid) { ctrl.markAsTouched(); return false; }
+    const ctrl = this.formGroup.get('name');
+    if (ctrl?.invalid) {
+      ctrl.markAsTouched();
+      return false;
+    }
     return true;
   }
 
@@ -183,12 +160,13 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
       this.dates.markAllAsTouched();
       return false;
     }
-    const error = validateDateRanges(this.dates.getRawValue() as DateRowValue[]);
-    if (error) { this.showMessage('warn', 'Validation', error); return false; }
+    const error = validateDateRanges(this.dates.getRawValue());
+    if (error) {
+      this.showMessage('warn', 'Validation', error);
+      return false;
+    }
     return true;
   }
-
-  //  5. Save 
 
   onSubmit(): void {
     if (!this.validateDates()) return;
@@ -207,22 +185,17 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
           this.close();
         },
         error: (err: unknown) => {
-          const message =
-            err instanceof Error
-              ? err.message
-              : (err as { error?: { message?: string } })?.error?.message ?? 'Action failed.';
+          const message = err instanceof Error
+            ? err.message
+            : (err as any)?.error?.message ?? 'Action failed.';
           this.showMessage('error', 'Error', message);
         },
       });
   }
 
-  
-
-
-
-  private buildScreenCheckboxes(): FormArray<FormControl<boolean | null>> {
+  private buildScreenCheckboxes(): FormArray {
     const controls = this.availableScreens.map(() =>
-      this._fb.control<boolean | null>(false),
+      this._fb.control(false)
     );
     return this._fb.array(controls);
   }
@@ -234,23 +207,21 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
     return {
       tenantId,
       createdBy,
-      name:           raw.name    ?? '',
-      remarks:        raw.remarks ?? '',
-      status:         raw.status  ?? 0,
+      name: raw.name ?? '',
+      remarks: raw.remarks ?? '',
+      status: raw.status ?? 0,
       durationInDays: 0,
-      screens:        this.getSelectedScreens(),
-      dates:          buildDatePayload(this.dates.getRawValue() as DateRowValue[]),
+      screens: this.getSelectedScreens(),
+      dates: buildDatePayload(this.dates.getRawValue()),
     };
   }
 
   private getSelectedScreens(): { screenId: number }[] {
     return this.screenSelections.controls
       .map((ctrl, i) => ({ checked: ctrl.value === true, screen: this.availableScreens[i] }))
-      .filter((x): x is { checked: true; screen: MvScreen } => x.checked && x.screen != null)
-      .map((x) => ({ screenId: x.screen.id }));
+      .filter(x => x.checked && x.screen != null)
+      .map(x => ({ screenId: x.screen.id }));
   }
-
-
 
   ngOnDestroy(): void {
     this.__unSubscribeAll$.next();

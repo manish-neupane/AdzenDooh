@@ -34,7 +34,7 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
   private readonly sohService  = inject(ScreenOperatingHourService);
   private readonly authService = inject(AuthService);
 
-  visible = false;
+  isOpen = false;
 
   dayOptions  = DayOption;
   selectedDay: DayOfWeek | null = null;
@@ -49,7 +49,7 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
   isDeletingId: number | null = null;
   errorMessage   = '';
 
-  form = new FormGroup({
+  formGroup = new FormGroup({
     startTime:            new FormControl<Date | null>(null, Validators.required),
     endTime:              new FormControl<Date | null>(null, Validators.required),
     averageAudienceCount: new FormControl<number | null>(null),
@@ -62,13 +62,13 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
   }
 
   open(screen: MvScreen): void {
-    this.visible      = true;
+    this.isOpen      = true;
     this.screen       = screen;
     this.selectedDay  = null;
     this.allSlots     = [];
     this.slotsByDay   = {};
     this.errorMessage = '';
-    this.form.reset();
+    this.formGroup.reset();
     this.loadSlots();
   }
 
@@ -110,13 +110,13 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
   }
 
   onDayChange(): void {
-    this.form.reset();
+    this.formGroup.reset();
   }
 
   addSlot(): void {
-    if (this.form.invalid || this.selectedDay === null || !this.screen) return;
+    if (this.formGroup.invalid || this.selectedDay === null || !this.screen) return;
 
-    const { startTime, endTime, averageAudienceCount } = this.form.getRawValue();
+    const { startTime, endTime, averageAudienceCount } = this.formGroup.getRawValue();
 
     if (!startTime || !endTime) return;
 
@@ -149,7 +149,7 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
           if (response.success && response.data) {
             this.allSlots = [...this.allSlots, ...response.data];
             this.rebuildSlotsByDay();
-            this.form.reset();
+            this.formGroup.reset();
             this.showMessage('success', 'Saved', 'Slot added successfully');
           }
         },

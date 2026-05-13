@@ -14,34 +14,35 @@ import {
   Validators,
 } from '@angular/forms';
 import { finalize, Subject, takeUntil } from 'rxjs';
-
-import { TabViewModule } from 'primeng/tabview';
-import { AppComponent } from '../../../app.component';
-import { sharedImports } from '../../../shared/component/primeng.import';
-import { CampaignService } from '../../service/campaign.service';
-import { AuthService } from '../../../shared/service/auth.service';
+  
 import { AccordionModule } from 'primeng/accordion';
 import { BadgeModule } from 'primeng/badge';
-import {TableModule} from 'primeng/table';
+import { TableModule } from 'primeng/table';
+import { TabViewModule } from 'primeng/tabview';
+
+import { AppComponent } from '../../../app.component';
+import { sharedImports } from '../../../shared/component/primeng.import';
+import { AuthService } from '../../../shared/service/auth.service';
+import { CreativeService } from '../../../cms/creative/service/creative.service';
+import { MvCreativeDdl } from '../../../cms/creative/model/creative.model';
+import { CampaignService } from '../../service/campaign.service';
+import { environment } from '../../../../environments/environment';
 
 import {
   MvCampaignDetail,
+  MvCreativeGroupedByScreen,
+  MvCreativeRow,
   MvSaveCampaignCreative,
   MvScreenSlot,
-  MvCreativeRow,
 } from '../../model/campaign.model';
-import { MvCreativeDdl } from '../../../cms/creative/model/creative.model';
 import {
-  formatDateIso,
-  deriveMinDate,
   deriveMaxDate,
+  deriveMinDate,
+  formatDateIso,
   getFileIcon,
   renumberSequences,
   toScreenSlot,
 } from './assign-creative.util';
-import { CreativeService } from '../../../cms/creative/service/creative.service';
-import { environment } from '../../../../environments/environment';
-
 
 @Component({
   selector: 'assign-creative',
@@ -54,7 +55,6 @@ import { environment } from '../../../../environments/environment';
     BadgeModule,
     TableModule,
     TabViewModule,
-    
   ],
   templateUrl: './campaign-assign-creative.component.html',
   styleUrl: './campaign-assign-creative.component.scss',
@@ -62,54 +62,58 @@ import { environment } from '../../../../environments/environment';
 export class AssignCreativeComponent extends AppComponent implements OnInit, OnDestroy {
   @Output() afterFormClosed = new EventEmitter<void>();
 
-  protected isPlaylistOpen = false;
+  //  Dialog / loading state 
+  protected isOpen = false;
   protected isCreativePickerOpen = false;
   protected isLoading = false;
   protected isSaving = false;
 
+  //  Campaign state 
   protected campaignId = 0;
+  protected campaign: MvCampaignDetail | null = null;
   protected minDate: Date | null = null;
   protected maxDate: Date | null = null;
   protected screenSlots: MvScreenSlot[] = [];
+  protected activeTabIndex = 0;
 
+  //  Creative picker state 
   protected creatives: MvCreativeDdl[] = [];
+  formGroup!: FormGroup;
+
+  // ── Utility 
+  readonly getFileIcon = getFileIcon;
 
   private activeScreenIndex = -1;
-  protected formGroup!: FormGroup;
-
-  
-  protected activeTabIndex = 0;
-  protected detail: MvCampaignDetail | null = null;
-
-  readonly getFileIcon = getFileIcon;
   private readonly __unSubscribeAll$ = new Subject<void>();
 
   constructor(
-    private _fb: FormBuilder,
-    private _campaignService: CampaignService,
-    private _creativeService: CreativeService,
-    private _authService: AuthService,
-    private injector: Injector,
+    private readonly _fb: FormBuilder,
+    private readonly _campaignService: CampaignService,
+    private readonly _creativeService: CreativeService,
+    private readonly _authService: AuthService,
+    injector: Injector,
   ) {
     super(injector);
   }
 
+  // ── Lifecycle ──────────────────────────────────────────────────────
+
   ngOnInit(): void {
     this.initForm();
-    this.getCreativeDdl();
+    this.loadCreativeDdl();
+    this.loadCampaignDetails();
   }
 
+  
 
-
-   protected initForm(): void {
+  private initForm(): void {
     this.formGroup = this._fb.group({
-      creativeId: [null, Validators.required],
+      creativeId:   [null, Validators.required],
       playSequence: [1, [Validators.required, Validators.min(1), Validators.max(999)]],
     });
   }
 
-
-    protected getCreativeDdl(): void {
+  private loadCreativeDdl(): void {
     this._creativeService
       .getDdl(this._authService.currentUser.tenantId)
       .pipe(takeUntil(this.__unSubscribeAll$))
@@ -121,27 +125,8 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
         },
       });
   }
-  
 
-  open(campaignId: number): void {
-    this.campaignId = campaignId;
-    this.screenSlots = [];
-    this.minDate = null;
-    this.maxDate = null;
-    this.detail = null;
-    this.activeTabIndex = 0;
-    this.isPlaylistOpen = true;
-
-    this.getCampaignScreens();
-  }
-
-  close(): void {
-    this.isPlaylistOpen = false;
-  }
-
-  
-
-  private getCampaignScreens(): void {
+  private loadCampaignDetails(): void {
     this.isLoading = true;
 
     this._campaignService
@@ -154,11 +139,11 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
         next: (res) => {
           if (!res.success || !res.data) return;
 
-          const detail: MvCampaignDetail = res.data;
-          this.detail = detail;
-          this.minDate = deriveMinDate(detail.dates ?? []);
-          this.maxDate = deriveMaxDate(detail.dates ?? []);
-          this.screenSlots = (detail.screens ?? []).map(toScreenSlot);
+          const { dates = [], screens = [] } = res.data;
+          this.campaign = res.data;
+          this.minDate = deriveMinDate(dates);
+          this.maxDate = deriveMaxDate(dates);
+          this.screenSlots = screens.map(toScreenSlot);
         },
         error: (err: unknown) => {
           const message =
@@ -169,32 +154,58 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
       });
   }
 
+  private patchScreenCreatives(screenIndex: number, creatives: MvCreativeRow[]): void {
+    this.screenSlots = this.screenSlots.map((slot, i) =>
+      i === screenIndex ? { ...slot, creatives } : slot,
+    );
+  }
 
-  // Details tab
-  get creativesGroupedByScreen() {
-  return this.screenSlots.map(slot => ({
-    screenName: slot.screenName,
-    creatives: (this.detail?.creatives ?? [])
-      .filter(c => c.screenId === slot.screenId)
-      .sort((a, b) => a.playSequence - b.playSequence),
-  }));
-}
+  
+    private resetState(): void {
+    this.screenSlots = [];
+    this.minDate = null;
+    this.maxDate = null;
+    this.campaign = null;
+    this.activeTabIndex = 0;
+  }
 
-  //  Play-date helper 
+  // ── Public API (called from parent) ───────────────────────────────
+
+  open(campaignId: number): void {
+    this.campaignId = campaignId;
+    this.resetState();
+    this.isOpen = true;
+    this.loadCampaignDetails();
+  }
+
+
+
+ 
+
+  // ── Details tab ────────────────────────────────────────────────────
+
+  get creativesGroupedByScreen(): MvCreativeGroupedByScreen[] {
+    return this.screenSlots.map((slot) => ({
+      screenName: slot.screenName,
+      creatives: (this.campaign?.creatives ?? [])
+        .filter((c) => c.screenId === slot.screenId)
+        .sort((a, b) => a.playSequence - b.playSequence),
+    }));
+  }
+
+  // ── Play-date helpers ──────────────────────────────────────────────
 
   applyDateToAll(date: Date | null): void {
     if (!date) return;
     this.screenSlots = this.screenSlots.map((slot) => ({ ...slot, playDate: date }));
   }
 
-  //  Creative picker 
+  // ── Creative picker ────────────────────────────────────────────────
 
   openCreativePickerForScreen(screenIndex: number): void {
     this.activeScreenIndex = screenIndex;
-
     const nextSequence = this.screenSlots[screenIndex].creatives.length + 1;
     this.formGroup.reset({ creativeId: null, playSequence: nextSequence });
-
     this.isCreativePickerOpen = true;
   }
 
@@ -205,13 +216,15 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     }
 
     const { creativeId, playSequence } = this.formGroup.value;
-    const selected = this.creatives.find((c) => c.id === creativeId)!;
+    const selected = this.creatives.find((c) => c.id === creativeId);
+
+    if (!selected) return;
 
     const newRow: MvCreativeRow = {
-      creativeId: selected.id,
+      creativeId:   selected.id,
       creativeName: selected.name,
       thumbnailUrl: `${environment.baseUrl}${selected.url}`,
-      fileType: selected.isVideo ? 'video' : 'image',
+      fileType:     selected.isVideo ? 'video' : 'image',
       playSequence,
     };
 
@@ -222,11 +235,10 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
 
     renumberSequences(updatedCreatives);
     this.patchScreenCreatives(this.activeScreenIndex, updatedCreatives);
-
     this.isCreativePickerOpen = false;
   }
 
-  // Reorder / remove 
+  // ── Reorder / remove ──────────────────────────────────────────────
 
   moveCreativeUp(screenIndex: number, rowIndex: number): void {
     if (rowIndex === 0) return;
@@ -251,23 +263,17 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.patchScreenCreatives(screenIndex, creatives);
   }
 
-  private patchScreenCreatives(screenIndex: number, creatives: MvCreativeRow[]): void {
-    this.screenSlots = this.screenSlots.map((slot, i) =>
-      i === screenIndex ? { ...slot, creatives } : slot,
-    );
-  }
+  // ── Validation ────────────────────────────────────────────────────
 
-  //  Validation 
-
-  protected get readyScreenSlots(): MvScreenSlot[] {
+  get readyScreenSlots(): MvScreenSlot[] {
     return this.screenSlots.filter((slot) => slot.playDate && slot.creatives.length > 0);
   }
 
-  protected get canSave(): boolean {
+  get canSave(): boolean {
     return this.readyScreenSlots.length > 0 && !this.isSaving;
   }
 
-  //  Save 
+  // ── Save ──────────────────────────────────────────────────────────
 
   save(): void {
     if (!this.canSave) return;
@@ -275,12 +281,12 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
 
     const payload: MvSaveCampaignCreative = {
       campaignId: this.campaignId,
-      createdBy: this._authService.currentUser.userId,
+      createdBy:  this._authService.currentUser.userId,
       screens: this.readyScreenSlots.map((slot) => ({
-        screenId: slot.screenId,
-        playDate: formatDateIso(slot.playDate!),
+        screenId:  slot.screenId,
+        playDate:  formatDateIso(slot.playDate!),
         creatives: slot.creatives.map((c) => ({
-          creativeId: c.creativeId,
+          creativeId:   c.creativeId,
           playSequence: c.playSequence,
         })),
       })),
@@ -294,11 +300,10 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
       )
       .subscribe({
         next: (res) => {
-          if (res.success) {
-            this.showMessage('success', 'Saved', 'Creative assignments saved successfully.');
-            this.afterFormClosed.emit();
-            this.close();
-          }
+          if (!res.success) return;
+          this.showMessage('success', 'Saved', 'Creative assignments saved successfully.');
+          this.afterFormClosed.emit();
+          this.close();
         },
         error: (err: unknown) => {
           const message =
@@ -309,7 +314,11 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
       });
   }
 
-    ngOnDestroy(): void {
+  close(): void {
+    this.isOpen = false;
+  }
+
+   ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

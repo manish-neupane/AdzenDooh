@@ -52,13 +52,13 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
 
  
   ngOnInit(): void {
-    this.buildForm();
+    this.initForm();
   }
 
 
 
   
-  private buildForm(): void {
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
       name:        ['', Validators.required],
       resolution:  ['', Validators.required],

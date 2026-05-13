@@ -7,11 +7,11 @@ import {
 } from '../../model/campaign.model';
 
 import {
-  MvCreativeDdl,
+
   MvCreativeRow,
   MvScreenSlot,
 } from '../../model/campaign.model';
-
+import { MvCreativeDdl } from '../../../cms/creative/model/creative.model';
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
 /**
@@ -22,19 +22,17 @@ export function formatDateIso(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-/**
- * Derives the earliest startDate across all MvCampaignDate records.
- * Passed to p-calendar [minDate] to enforce SP's CampaignDate validation.
- */
+
+//   Derives the earliest startDate across all MvCampaignDate records.
+ 
 export function deriveMinDate(dates: MvCampaignDate[]): Date | null {
   if (!dates?.length) return null;
   return new Date(Math.min(...dates.map(d => new Date(d.startDate).getTime())));
 }
 
-/**
- * Derives the latest endDate across all MvCampaignDate records.
- * Passed to p-calendar [maxDate] to enforce SP's CampaignDate validation.
- */
+
+//  Derives the latest endDate across all MvCampaignDate records.
+ 
 export function deriveMaxDate(dates: MvCampaignDate[]): Date | null {
   if (!dates?.length) return null;
   return new Date(Math.max(...dates.map(d => new Date(d.endDate).getTime())));
@@ -77,17 +75,5 @@ export function toScreenSlot(screen: MvCampaignScreen): MvScreenSlot {
   };
 }
 
-/**
- * Maps MvCreative (DB/API model) → MvCreativeDdl (dropdown UI model).
- * Called when wiring the real creative service response.
- *   MvCreative.isVideo → fileType 'video' | 'image'
- *   MvCreative.url     → thumbnailUrl
- */
-export function toCreativeDdl(creative: MvCreative): MvCreativeDdl {
-  return {
-    id:           creative.id,
-    name:         creative.name,
-    thumbnailUrl: creative.url,
-    fileType:     creative.isVideo ? 'video' : 'image',
-  };
-}
+
+

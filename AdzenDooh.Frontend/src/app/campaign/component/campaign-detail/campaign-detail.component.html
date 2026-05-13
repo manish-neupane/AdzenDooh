@@ -1,9 +1,12 @@
+<!-- campaign/component/campaign-detail/campaign-detail.component.html -->
+
 <p-dialog
-  [(visible)]="visible"
+  [(visible)]="isDialogOpen"
   [style]="{ width: '900px', height: '700px' }"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
+  (onHide)="close()"
 >
 
   <!-- Header -->
@@ -13,30 +16,21 @@
         <i class="pi pi-megaphone"></i>
         Campaign Details
       </span>
-   
     </div>
   </ng-template>
 
   <!-- Body -->
   <div class="cd-body">
 
-   
+    <!-- Loading state -->
     <div class="cd-loading-overlay" *ngIf="isLoading">
       <p-progressSpinner strokeWidth="4" />
     </div>
 
+    <!-- Content -->
+    <ng-container *ngIf="!isLoading && campaignDetail">
 
-    <p-message
-      *ngIf="errorMessage"
-      severity="error"
-      [text]="errorMessage"
-      styleClass="w-full mb-3"
-    />
-
-   
-    <ng-container *ngIf="!isLoading && campaign">
-
-      
+      <!-- General Info -->
       <div class="cd-section">
         <div class="cd-section-title">
           <i class="pi pi-info-circle"></i> General Info
@@ -46,42 +40,41 @@
 
           <div class="cd-info-item">
             <span class="cd-info-label">Status</span>
-            <p-tag
-              [value]="getStatusLabel(campaign.status)"
-     
-            />
-          </div>
-            <div class="cd-info-item">
-            <span class="cd-info-label">Name</span>
-            <span class="cd-info-value">{{ campaign.name }}</span>
-          </div>
-          <div class="cd-info-item">
-            <span class="cd-info-label">Duration</span>
-            <span class="cd-info-value">{{ campaign.durationInDays }} day(s)</span>
+            <p-tag [value]="getStatusLabel(campaignDetail.status)" />
           </div>
 
-          <div class="cd-info-item ">
+          <div class="cd-info-item">
+            <span class="cd-info-label">Name</span>
+            <span class="cd-info-value">{{ campaignDetail.name }}</span>
+          </div>
+
+          <div class="cd-info-item">
+            <span class="cd-info-label">Duration</span>
+            <span class="cd-info-value">{{ campaignDetail.durationInDays }} day(s)</span>
+          </div>
+
+          <div class="cd-info-item">
             <span class="cd-info-label">Remarks</span>
-            <span class="cd-info-value">{{ campaign.remarks || '—' }}</span>
+            <span class="cd-info-value">{{ campaignDetail.remarks || '—' }}</span>
           </div>
 
         </div>
       </div>
 
-     
+      <!-- Screens -->
       <div class="cd-section">
         <div class="cd-section-title">
           <i class="pi pi-desktop"></i>
           Screens
-          <span class="cd-count">{{ campaign.screens.length  }}</span>
+          <span class="cd-count">{{ campaignDetail.screens.length }}</span>
         </div>
 
-        <div class="cd-empty" *ngIf="!campaign.screens.length">
+        <div class="cd-empty" *ngIf="!campaignDetail.screens.length">
           No screens assigned to this campaign.
         </div>
 
-        <div class="cd-screen-list" *ngIf="campaign.screens.length">
-          <div class="cd-screen-row" *ngFor="let screen of campaign.screens">
+        <div class="cd-screen-list" *ngIf="campaignDetail.screens.length">
+          <div class="cd-screen-row" *ngFor="let screen of campaignDetail.screens">
             <span class="cd-screen-name">
               <i class="pi pi-desktop"></i>
               {{ screen.screenName }}
@@ -94,20 +87,20 @@
         </div>
       </div>
 
-     
+      <!-- Date Ranges -->
       <div class="cd-section">
         <div class="cd-section-title">
           <i class="pi pi-calendar"></i>
           Date Ranges
-          <span class="cd-count">{{ campaign.dates.length }}</span>
+          <span class="cd-count">{{ campaignDetail.dates.length }}</span>
         </div>
 
-        <div class="cd-empty" *ngIf="!campaign.dates.length">
+        <div class="cd-empty" *ngIf="!campaignDetail.dates.length">
           No date ranges defined.
         </div>
 
-        <div class="cd-date-list" *ngIf="campaign.dates.length">
-          <div class="cd-date-row" *ngFor="let date of campaign.dates; let i = index">
+        <div class="cd-date-list" *ngIf="campaignDetail.dates.length">
+          <div class="cd-date-row" *ngFor="let date of campaignDetail.dates; let i = index">
             <span class="cd-date-index">Range {{ i + 1 }}</span>
             <span class="cd-date-range">
               <i class="pi pi-calendar"></i>

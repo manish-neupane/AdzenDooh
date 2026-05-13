@@ -145,12 +145,7 @@ export interface MvCampaignDetail{
 // campaign/model/assign-media.model.ts
  
 // ── Creative DDL (dropdown) ──────────────────────────────────────────
-export interface MvCreativeDdl {
-  id: number;
-  name: string;
-  thumbnailUrl: string;
-  fileType: 'image' | 'video' | 'html';
-}
+
  
 // ── In-memory per-screen UI state ────────────────────────────────────
 export interface MvScreenSlot {

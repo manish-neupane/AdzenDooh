@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../shared/service/api.service';
-import { MvCreative, MvDeleteCreative, MvCreativeFilter, MvCreativeUpload } from '../model/creative.model';
+import { MvCreative, MvDeleteCreative, MvCreativeFilter, MvCreativeUpload, MvCreativeDdl } from '../model/creative.model';
 import { ApiResponse, GridResponse, ParamOption} from '../../../shared/model/sharedModel';
 import { environment } from '../../../../environments/environment';
 
@@ -19,7 +19,11 @@ export class CreativeService {
   getGrid(filter: ParamOption<MvCreativeFilter>): Observable<ApiResponse<GridResponse<MvCreative>>> {
     return this.api.get<ApiResponse<GridResponse<MvCreative>>>(`${this.base}/GetAll`, filter);
   }
+ 
 
+  getDdl(tenantId: number): Observable<ApiResponse<MvCreativeDdl[]>> {
+    return this.api.get<ApiResponse<MvCreativeDdl[]>>(`${this.base}/GetDdl`, { tenantId });
+  }
   upload(file: File, payload: MvCreativeUpload): Observable<ApiResponse<MvCreative[]>> {
     const form = new FormData();
     form.append('file',      file);

@@ -55,6 +55,21 @@ namespace AdzenDooh.Api.Controllers.Application.Cms.Creative
             }
         }
 
-        
+
+        [HttpGet]
+        public async Task<IActionResult> GetDdl([FromQuery] MvTenantId param)
+        {
+            try
+            {
+                var response = await _CreativeService.CreativeDdl(param);
+                return Ok(ApiResult.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
+
+
     }
 }

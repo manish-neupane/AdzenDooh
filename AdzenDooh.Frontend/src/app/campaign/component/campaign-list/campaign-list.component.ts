@@ -8,7 +8,7 @@ import { GridConfig } from '../../../shared/model/grid-config.model';
 import { GridComponent } from '../../../shared/component/grid/grid.component';
 import { PageWrapperComponent } from '../../../shared/component/page-wrapper/page-wrapper.component';
 import { CampaignService } from '../../service/campaign.service';
-import { CampaignCreateComponent } from '../campaign-create-edit/campaign-create-edit.component';
+import { CampaignCreateComponent } from '../campaign-create/campaign-create.component';
 import { MvCampaign, MvCampaignFilter, MvScreen } from '../../model/campaign.model';
 import { campaignColumns } from './campaign-list-column';
 import { ScreenService } from '../../../inventory/screen/service/screen.service';
@@ -18,7 +18,7 @@ import { RouterOutlet } from '@angular/router';
 import { AssignCreativeComponent } from '../campaign-assign-creative/campaign-assign-creative.component';
 
 @Component({
-  selector: 'app-campaign-list',
+  selector: 'campaign-list',
   standalone: true,
   imports: [
     ...sharedImports,
@@ -27,7 +27,7 @@ import { AssignCreativeComponent } from '../campaign-assign-creative/campaign-as
     PageWrapperComponent,
     CampaignDetailComponent,
     RouterOutlet,
-    AssignCreativeComponent,   // ← makes <assign-creative> available in the template
+    AssignCreativeComponent,  
   ],
   templateUrl: './campaign-list.component.html',
   styleUrl: './campaign-list.component.scss',
@@ -38,7 +38,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
   @ViewChild('campaignDetail')        campaignDetail!:        CampaignDetailComponent;
   @ViewChild('campaignAssignCreative') campaignAssignCreative!: AssignCreativeComponent;
 
-  // ── Status helpers ────────────────────────────────────────────────────
+  //  Status helpers 
   protected getStatusText(status: number): string {
     const map: Record<number, string> = { 0: 'Draft', 1: 'Active', 2: 'Inactive' };
     return map[status] ?? 'Unknown';
@@ -48,12 +48,12 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     switch (status) {
       case 0:  return 'status-draft';
       case 1:  return 'status-active';
-      case 2:  return 'status-inactive';
+      case 2:  return 'status-inactive';  
       default: return '';
     }
   }
 
-  // ── Grid config ───────────────────────────────────────────────────────
+  //  Grid config 
   campaignConfig: GridConfig<MvCampaign> = {
     columns: campaignColumns,
     dataSource: { data: [], totalCount: 0 },
@@ -76,7 +76,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     ],
   };
 
-  // ── State ─────────────────────────────────────────────────────────────
+  //  State 
   isLoading    = false;
   errorMessage = '';
   screenDdl: MvScreen[] = [];
@@ -99,19 +99,15 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     super(injector);
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────
+  //  Lifecycle 
 
   ngOnInit(): void {
     this.loadScreenDdl();
     this.loadCampaigns();
   }
 
-  ngOnDestroy(): void {
-    this._unSubscribeAll$.next();
-    this._unSubscribeAll$.complete();
-  }
 
-  // ── Data loading ──────────────────────────────────────────────────────
+  //  Data loading 
 
   private loadCampaigns(): void {
     this.isLoading    = true;
@@ -160,7 +156,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
       });
   }
 
-  // ── Dialog actions ────────────────────────────────────────────────────
+  //  Dialog actions 
 
   protected addCampaign(): void {
     this.campaignCreateEdit.open();
@@ -174,9 +170,9 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     this.campaignAssignCreative.open(campaign.id);
   }
 
-  // ── Callbacks from child dialogs ──────────────────────────────────────
+  //  Callbacks from child dialogs ──────────────────────────────────────
 
-  /** Called by campaign-create-edit after save */
+
   public afterFormClosed(campaign: MvCampaign | null): void {
     if (!campaign) return;
 
@@ -196,7 +192,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     this.loadCampaigns();
   }
 
-  // ── Grid event handlers ───────────────────────────────────────────────
+  //  Grid event handlers ───────────────────────────────────────────────
 
   onPage(event: { first: number; rows: number }): void {
     this.param = { ...this.param, offset: event.first, pageSize: event.rows };
@@ -216,4 +212,15 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     this.param = { ...this.param, offset: 0, filter: { ...this.param.filter, search } };
     this.loadCampaigns();
   }
+
+
+
+  
+  ngOnDestroy(): void {
+    this._unSubscribeAll$.next();
+    this._unSubscribeAll$.complete();
+
+  }
+
+
 }

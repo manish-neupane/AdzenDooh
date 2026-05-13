@@ -85,13 +85,12 @@ namespace AdzenDooh.Service.Application.Cms.Creative
         }
 
       
-        public async Task<List<MvDropdown>?> CreativeDdl(MvDropdown param)
+        public async Task<List<MvCreativeDdl>?> CreativeDdl( MvTenantId param)
         {
             try
             {
-                string result = await _DataAccessService.RetrievalProcedure(
-                    "Inv.SpCreativeDdl", JsonConvert.SerializeObject(param));
-                return JsonConvert.DeserializeObject<List<MvDropdown>>(result);
+                string result = await _DataAccessService.RetrievalProcedure("dbo.SpCreativeDdl", JsonConvert.SerializeObject(param));
+                return JsonConvert.DeserializeObject<List<MvCreativeDdl>>(result);
             }
             catch { throw; }
         }

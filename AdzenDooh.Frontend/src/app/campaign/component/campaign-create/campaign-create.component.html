@@ -1,10 +1,7 @@
-<!-- ─── campaign-create-edit.component.html ──────────────────────────────────
-     3-step wizard dialog for creating a campaign.
-     Class names match campaign-create-edit.component.scss exactly.
-     ─────────────────────────────────────────────────────────────────────── -->
+<!-- campaign/component/campaign-create-edit/campaign-create-edit.component.html -->
 
 <p-dialog
-  [(visible)]="isOpen"
+  [(visible)]="isDialogOpen"
   header="Create Campaign"
   [modal]="true"
   [draggable]="false"
@@ -14,8 +11,9 @@
   [blockScroll]="false"
   (onHide)="onHide()"
 >
+
+  <!--  Step Indicator  -->
   <ng-template pTemplate="content">
-    <!-- ── Step Indicator ── -->
     <p-steps
       [model]="steps"
       [activeIndex]="activeStep"
@@ -24,14 +22,12 @@
     />
 
     <form [formGroup]="formGroup" class="p-fluid">
-      <!-- ───────────────────────────────────────────────────────────────── -->
-      <!-- Step 1: Details                                                   -->
-      <!-- ───────────────────────────────────────────────────────────────── -->
+
+      <!--  Details  -->
       <ng-container *ngIf="activeStep === 0">
+
         <div class="field">
-          <label for="name">
-            Campaign Name <span class="required">*</span>
-          </label>
+          <label for="name">Campaign Name <span class="required">*</span></label>
           <input
             id="name"
             type="text"
@@ -40,10 +36,8 @@
             placeholder="e.g. Summer Campaign 2026"
           />
           <small
-            *ngIf="
-              formGroup.get('name')?.invalid && formGroup.get('name')?.touched
-            "
             class="p-error"
+            *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched"
           >
             Name is required.
           </small>
@@ -59,24 +53,21 @@
             placeholder="Optional notes about this campaign"
           ></textarea>
         </div>
+
       </ng-container>
 
-      <!-- ───────────────────────────────────────────────────────────────── -->
-      <!-- Step 2: Screens                                                   -->
-      <!-- ───────────────────────────────────────────────────────────────── -->
+      <!--  Screens  -->
       <ng-container *ngIf="activeStep === 1">
+
         <p class="step-hint">Select the screens this campaign will run on.</p>
 
         <div formArrayName="screenSelections" class="screen-list">
+
           <div
             *ngFor="let screen of availableScreens; let i = index"
             class="screen-row"
             [class.is-checked]="screenSelections.controls[i].value"
-            (click)="
-              screenSelections.controls[i].setValue(
-                !screenSelections.controls[i].value
-              )
-            "
+            (click)="screenSelections.controls[i].setValue(!screenSelections.controls[i].value)"
           >
             <p-checkbox
               [formControl]="$any(screenSelections.controls[i])"
@@ -91,19 +82,17 @@
           </div>
 
           <div *ngIf="availableScreens.length === 0" class="no-screens">
-            <i
-              class="pi pi-desktop mb-2"
-              style="font-size: 1.5rem; display: block"
-            ></i>
+            <i class="pi pi-desktop mb-2" style="font-size: 1.5rem; display: block"></i>
             No screens available.
           </div>
+
         </div>
+
       </ng-container>
 
-      <!-- ───────────────────────────────────────────────────────────────── -->
-      <!-- Step 3: Dates                                                     -->
-      <!-- ───────────────────────────────────────────────────────────────── -->
+      <!--  Dates  -->
       <ng-container *ngIf="activeStep === 2">
+
         <p class="step-hint">Add one or more date ranges for this campaign.</p>
 
         <div formArrayName="dates" class="date-rows">
@@ -112,7 +101,7 @@
             [formGroupName]="i"
             class="date-row"
           >
-            <!-- Start Date -->
+
             <div class="date-field">
               <label>Start Date</label>
               <p-calendar
@@ -124,11 +113,8 @@
                 appendTo="body"
               />
               <small
-                *ngIf="
-                  group.get('startDate')?.invalid &&
-                  group.get('startDate')?.touched
-                "
                 class="p-error"
+                *ngIf="group.get('startDate')?.invalid && group.get('startDate')?.touched"
               >
                 Required.
               </small>
@@ -136,7 +122,6 @@
 
             <span class="date-separator">—</span>
 
-            <!-- End Date -->
             <div class="date-field">
               <label>End Date</label>
               <p-calendar
@@ -148,16 +133,13 @@
                 appendTo="body"
               />
               <small
-                *ngIf="
-                  group.get('endDate')?.invalid && group.get('endDate')?.touched
-                "
                 class="p-error"
+                *ngIf="group.get('endDate')?.invalid && group.get('endDate')?.touched"
               >
                 Required.
               </small>
             </div>
 
-            <!-- Remove -->
             <div class="date-remove">
               <p-button
                 icon="pi pi-trash"
@@ -167,10 +149,10 @@
                 (onClick)="removeDateRow(i)"
               />
             </div>
+
           </div>
         </div>
 
-        <!-- Add Row -->
         <div class="add-date-btn">
           <p-button
             label="Add date range"
@@ -178,25 +160,22 @@
             (onClick)="addDateRow()"
           />
         </div>
+
       </ng-container>
 
-      <!-- ── Error Banner ── -->
-      <div *ngIf="errorMessage" class="error-banner">
-        <i class="pi pi-exclamation-circle"></i>
-        <span>{{ errorMessage }}</span>
-      </div>
     </form>
   </ng-template>
 
-  <!-- ── Footer ── -->
+  <!--  Footer  -->
   <ng-template pTemplate="footer">
     <div class="footer-actions">
+
       <p-button
         label="Cancel"
         severity="secondary"
         [outlined]="true"
-        (onClick)="cancel()"
         [disabled]="isLoading"
+        (onClick)="cancel()"
       />
 
       <p-button
@@ -205,8 +184,8 @@
         icon="pi pi-arrow-left"
         severity="secondary"
         [outlined]="true"
-        (onClick)="prevStep()"
         [disabled]="isLoading"
+        (onClick)="prevStep()"
       />
 
       <p-button
@@ -221,19 +200,11 @@
         *ngIf="activeStep === 2"
         label="Create Campaign"
         icon="pi pi-check"
-        (onClick)="onSubmit()"
         [loading]="isLoading"
+        (onClick)="onSubmit()"
       />
 
-      <p-toast />
-      <p-confirmDialog />
-      <router-outlet />
     </div>
   </ng-template>
-  
-  <p-toast></p-toast>
 
-  <p-confirmDialog></p-confirmDialog>
-
-  <router-outlet></router-outlet>
 </p-dialog>

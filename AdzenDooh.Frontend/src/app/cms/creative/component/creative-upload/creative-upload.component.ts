@@ -57,7 +57,7 @@ export class CreativeUploadComponent extends AppComponent {
     const payload = {
       ...this.formGroup.value,
       tenantId: this.authService.currentUser.tenantId,
-      createdBy: this.authService.currentUser.userId// Get from Auth/Session
+      createdBy: this.authService.currentUser.userId
     };
 
     this.creativeService.upload( this.selectedFile!,payload)

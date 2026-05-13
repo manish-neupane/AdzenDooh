@@ -42,3 +42,9 @@ export interface MvCreativeUpload {
   name:      string;
   createdBy: number;
 }
+export interface MvCreativeDdl {
+  id: number;
+  name: string;
+  url: string;
+  isVideo: boolean;
+}

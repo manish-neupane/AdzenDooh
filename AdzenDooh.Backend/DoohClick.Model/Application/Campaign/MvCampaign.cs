@@ -115,6 +115,7 @@ public class MvCampaignDetail
 
     public List<MvCampaignScreen> Screens { get; set; } = [];
     public List<MvCampaignDate> Dates { get; set; } = [];
+    public List<MvCampaignDetailCreative> Creatives { get; set; } = [];  // ← add
 }
 
 public class MvCampaignScreen
@@ -141,4 +142,17 @@ public class MvCampaignCreative
     public DateTime PlayDate { get; set; }
     public int PlaySequence { get; set; }
     public DateTime CreatedAt { get; set; }
+}
+
+public class MvCampaignDetailCreative
+{
+    public int Id { get; set; }
+    public int CampaignId { get; set; }
+    public int ScreenId { get; set; }
+    public int CreativeId { get; set; }
+    public DateOnly PlayDate { get; set; }
+    public int PlaySequence { get; set; }
+    public required string CreativeName { get; set; }
+    public required string CreativeUrl { get; set; }
+    public bool IsVideo { get; set; }
 }

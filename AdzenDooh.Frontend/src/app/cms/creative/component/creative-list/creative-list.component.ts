@@ -58,10 +58,10 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
     this._unSubscribeAll$.complete();
   }
 
-  // ─── Data ─────────────────────────────────────────────────────────────────
+  //  Data 
 
   loadCreatives(): void {
-    console.log('param:', JSON.stringify(this.param));
+
     this.isLoading = true;
     this.creativeService.getGrid(this.param)
       .pipe(
@@ -79,7 +79,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
       });
   }
 
-  // ─── Upload ───────────────────────────────────────────────────────────────
+  //  Upload 
 
   openUpload(): void {
     this.creativeUpload.open();
@@ -89,7 +89,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
     if (success) this.loadCreatives();
   }
 
-  // ─── Delete ───────────────────────────────────────────────────────────────
+  //  Delete 
 
   deleteCreative(creative: MvCreative): void {
     this.confirmDialog(
@@ -100,7 +100,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
     );
   }
 
-  // ─── Pagination ───────────────────────────────────────────────────────────
+  //  Pagination 
 
  onPage(event: { first: number; rows: number }): void {
   this.param = { 
@@ -111,7 +111,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
   this.loadCreatives();
 }
 
-  // ─── Filters ──────────────────────────────────────────────────────────────
+  //  Filters 
 
   onFilter(searchText: string): void {
     this.param = {

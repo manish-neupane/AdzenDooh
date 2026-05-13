@@ -8,8 +8,9 @@ namespace AdzenDooh.Interface.Application.Cms.Creative
     public interface ICreativeService
     {
         Task<GridResponse<MvCreative>?> GetGrid(MvParamOption<MvCreativeFilter> param);
-        Task<List<MvDropdown>?> CreativeDdl(MvDropdown param);
+        Task<List<MvCreativeDdl>?> CreativeDdl(MvTenantId param);
         Task<List<MvCreative>?> SaveCreative(IFormFile file, MvCreativeUpload upload, string wwwRootPath); 
         Task<List<MvCreative>?> DeleteCreative(MvDeleteCreative param);
+
     }
 }

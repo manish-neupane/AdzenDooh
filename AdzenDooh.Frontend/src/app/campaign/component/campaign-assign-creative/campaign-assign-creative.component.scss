@@ -1,0 +1,407 @@
+// assign-media.component.scss
+
+// ============================================
+// VARIABLES
+// ============================================
+$primary: #3b82f6;
+$success: #22c55e;
+$warning: #f59e0b;
+$danger: #ef4444;
+$border: #c8cdd7;
+$text: #374151;
+$text-light: #6b7280;
+$bg-hover: #f9fafb;
+
+// ============================================
+// LOADING STATE
+// ============================================
+.am-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem;
+  color: $text-light;
+  
+  i { font-size: 1.5rem; }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.am-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: $text-light;
+  
+  i {
+    font-size: 3rem;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+  }
+  
+  p { margin: 0.5rem 0; font-weight: 500; }
+  small { font-size: 0.875rem; }
+}
+
+// ============================================
+// DATE HINT BANNER
+// ============================================
+.am-date-hint {
+  background: #eff6ff;
+  border-left: 3px solid $primary;
+  padding: 0.75rem 1rem;
+  margin: 1rem;
+  font-size: 0.875rem;
+  color: #1e40af;
+  border-radius: 6px;
+  
+  i { margin-right: 0.5rem; }
+}
+
+// ============================================
+// SCREEN ACCORDION
+// ============================================
+:host ::ng-deep .p-accordion {
+  .p-accordion-header {
+    .p-accordion-header-link {
+      padding: 1rem;
+      background: white;
+      border: none;
+      border-bottom: 1px solid $border;
+    }
+  }
+  
+  .p-accordion-content {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border;
+  }
+}
+
+// Screen Header
+.screen-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  
+  .screen-icon { color: $primary; }
+  .screen-name { font-weight: 600; }
+  .header-spacer { flex: 1; }
+  
+  .date-chip {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    
+    &.missing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  }
+}
+
+// ============================================
+// SCREEN CONTENT
+// ============================================
+.screen-content {
+  .date-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    
+    .date-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      
+      .req { color: $danger; }
+    }
+    
+    .date-picker { width: 220px; }
+  }
+  
+  .playlist-empty {
+    text-align: center;
+    padding: 2rem;
+    background: $bg-hover;
+    border-radius: 8px;
+    color: $text-light;
+    margin-bottom: 1rem;
+    
+    i {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// ============================================
+// PLAYLIST TABLE
+// ============================================
+.playlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  
+  th, td {
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid $border;
+  }
+  
+  th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .col-seq { width: 60px; }
+  .col-thumb { width: 60px; }
+  .col-type { width: 80px; }
+  .col-actions { width: 100px; }
+  
+  .seq-badge {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background: $bg-hover;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .thumb-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: $bg-hover;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: $text-light;
+    }
+  }
+  
+  .creative-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+  
+  .type-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    
+    &.type-image { background: #dbeafe; color: #1e40af; }
+    &.type-video { background: #fce7f3; color: #9d174d; }
+    &.type-html { background: #dcfce7; color: #166534; }
+  }
+  
+  .row-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+}
+
+// ============================================
+// ADD MEDIA BAR
+// ============================================
+.add-media-bar {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed $border;
+}
+
+// ============================================
+// SAVE SUMMARY
+// ============================================
+.am-summary {
+  padding: 1rem;
+  background: $bg-hover;
+  border-top: 1px solid $border;
+  font-size: 0.875rem;
+  
+  .summary-hint {
+    color: $text-light;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+}
+
+// ============================================
+// ADD MEDIA DIALOG FORM
+// ============================================
+.add-form {
+  padding: 0.5rem 0;
+  
+  .form-field {
+    margin-bottom: 1.5rem;
+    
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      
+      .req { color: $danger; }
+    }
+    
+    .field-hint {
+      display: block;
+      font-size: 0.7rem;
+      color: $text-light;
+      margin-top: 0.25rem;
+    }
+    
+    .field-error {
+      display: block;
+      font-size: 0.7rem;
+      color: $danger;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+// Creative Dropdown Option
+.creative-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  
+  .co-icon {
+    width: 28px;
+    color: $text-light;
+  }
+  
+  .co-info {
+    flex: 1;
+    
+    .co-name {
+      display: block;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+.w-full { width: 100%; }
+
+
+// ============================================
+// ASSIGNED MEDIA TAB
+// ============================================
+.assigned-screen-block {
+  margin-bottom: 2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .screen-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid $border;
+
+    i { color: $primary; }
+
+    strong {
+      font-size: 0.9rem;
+      color: $text;
+    }
+  }
+}
+
+// p-table overrides for details tab
+:host ::ng-deep .p-datatable {
+  .p-datatable-thead > tr > th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: $bg-hover;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid $border;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid $border;
+    color: $text;
+  }
+
+  .p-datatable-tbody > tr:hover > td {
+    background: $bg-hover;
+  }
+}
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 768px) {
+  .playlist-table {
+    .col-thumb, .col-type {
+      display: none;  // Hide on mobile for better UX
+    }
+  }
+  
+  .date-row {
+    flex-direction: column;
+    align-items: stretch !important;
+    
+    .date-picker { width: 100% !important; }
+  }
+}
+
+:host ::ng-deep .p-accordion {
+  .p-accordion-tab {
+    margin-bottom: 1rem;
+    border: 1px solid $border;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.09);
+  }
+
+  .p-accordion-header .p-accordion-header-link {
+    background: #f8fafc !important;
+    border: none !important;
+    border-bottom: 1px solid $border;
+    padding: 0.875rem 1rem;
+  }
+
+  .p-accordion-content {
+    padding: 1.25rem;
+    border: none;
+  }
+}

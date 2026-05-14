@@ -1,7 +1,9 @@
-﻿using AdzenDooh.Interface.Application.Inventory.Creative;
+﻿using AdzenDooh.Interface.Application.Campaign;
+using AdzenDooh.Interface.Application.Cms.Creative;
 using AdzenDooh.Interface.Application.Inventory.Screen;
 using AdzenDooh.Interface.Application.Inventory.ScreenOperatingHour;
-using AdzenDooh.Service.Application.Inventory.Creative;
+using AdzenDooh.Service.Application.Campaign;
+using AdzenDooh.Service.Application.Cms.Creative;
 using AdzenDooh.Service.Application.Inventory.Screen;
 using AdzenDooh.Service.Application.Inventory.ScreenOperatingHour;
 using DoohClick.DataAccess;
@@ -19,6 +21,7 @@ namespace AdzenDooh.Api.DependencyInjection
             services.AddScoped<ICreativeService, CreativeService>();
             services.AddScoped<IFileMetadataService, FileMetadataService>();
             services.AddScoped<IScreenOperatingHourService, ScreenOperatingHourService>();
+            services.AddScoped<ICampaignService, CampaignService>();
 
 
             return services;

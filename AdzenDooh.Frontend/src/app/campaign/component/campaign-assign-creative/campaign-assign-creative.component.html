@@ -1,0 +1,336 @@
+
+<p-dialog
+  header="Assign Creatives to Screens"
+  [(visible)]="isOpen"
+  [modal]="true"
+  [style]="{ width: '1000px', maxWidth: '100vw',height: '80vh' }"
+  [contentStyle]="{ padding: '0' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="close()"
+>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="am-loading">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Loading campaign screens…</span>
+  </div>
+
+  <div *ngIf="!isLoading" class="am-body">
+
+    <p-tabView [(activeIndex)]="activeTabIndex">
+
+      <!--
+           TAB 1 — Assign
+         -->
+      <p-tabPanel header="Assign Creatives">
+
+        <!-- No screens -->
+        <div *ngIf="screenSlots.length === 0" class="am-empty">
+          <i class="pi pi-desktop"></i>
+          <p>No screens are assigned to this campaign.</p>
+          <small>Assign screens to the campaign first, then add creatives.</small>
+        </div>
+
+        <!-- Date hint -->
+        <div *ngIf="screenSlots.length > 0 && minDate && maxDate" class="am-date-hint">
+          <i class="pi pi-info-circle"></i>
+          <span>
+            Play dates must fall within the campaign schedule:
+            <strong>{{ minDate | date:'mediumDate' }}</strong> –
+            <strong>{{ maxDate | date:'mediumDate' }}</strong>
+          </span>
+        </div>
+
+        <!-- Screen accordion -->
+        <p-accordion *ngIf="screenSlots.length > 0" [multiple]="true">
+          <p-accordionTab
+            *ngFor="let slot of screenSlots; let si = index"
+            [selected]="true"
+          >
+            <ng-template pTemplate="header">
+              <div class="screen-header">
+                <i class="pi pi-desktop screen-icon"></i>
+                <span class="screen-name">{{ slot.screenName }}</span>
+                <span class="header-spacer"></span>
+                <p-badge
+                  [value]="slot.creatives.length.toString()"
+                  [severity]="slot.creatives.length > 0 ? 'success' : 'secondary'"
+                />
+                <span class="date-chip" *ngIf="slot.playDate">
+                  <i class="pi pi-calendar"></i>
+                  {{ slot.playDate | date:'mediumDate' }}
+                </span>
+                <span class="date-chip missing" *ngIf="!slot.playDate">
+                  <i class="pi pi-exclamation-triangle"></i> No date set
+                </span>
+              </div>
+            </ng-template>
+
+            <div class="screen-content">
+
+              <div class="date-row">
+                <label class="date-label">
+                  <i class="pi pi-calendar"></i>
+                  Play Date <span class="req">*</span>
+                </label>
+                <p-calendar
+                  [(ngModel)]="slot.playDate"
+                  [minDate]="minDate!"
+                  [maxDate]="maxDate!"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  placeholder="Select play date"
+                  styleClass="date-picker"
+                />
+                <p-button
+                  *ngIf="si === 0 && screenSlots.length > 1"
+                  label="Apply to all screens"
+                  icon="pi pi-copy"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  pTooltip="Copy this date to every screen"
+                  tooltipPosition="top"
+                  (onClick)="applyDateToAll(slot.playDate)"
+                />
+              </div>
+
+              <div *ngIf="slot.creatives.length === 0" class="playlist-empty">
+                <i class="pi pi-images"></i>
+                <span>No creatives yet — click <strong>Add Creative</strong> to build the playlist.</span>
+              </div>
+
+              <table *ngIf="slot.creatives.length > 0" class="playlist-table">
+                <thead>
+                  <tr>
+                    <th class="col-seq">Seq</th>
+                    <th class="col-thumb">Preview</th>
+                    <th class="col-name">Creative</th>
+                    <th class="col-type">Type</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of slot.creatives; let ri = index; let last = last">
+                    <td class="col-seq"><span class="seq-badge">{{ row.playSequence }}</span></td>
+                    <td class="col-thumb">
+                      <div class="thumb-wrap">
+                        <img *ngIf="row.thumbnailUrl" [src]="row.thumbnailUrl" [alt]="row.creativeName" />
+                        <div *ngIf="!row.thumbnailUrl" class="thumb-placeholder">
+                          <i [class]="getFileIcon(row.fileType)"></i>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="col-name"><span class="creative-name">{{ row.creativeName }}</span></td>
+                    <td class="col-type">
+                      <span [class]="'type-badge type-' + row.fileType">{{ row.fileType }}</span>
+                    </td>
+                    <td class="col-actions">
+                      <div class="row-actions">
+                        <p-button icon="pi pi-arrow-up" [text]="true" [rounded]="true"
+                          severity="secondary" size="small" pTooltip="Move up" tooltipPosition="top"
+                          [disabled]="ri === 0" (onClick)="moveCreativeUp(si, ri)" />
+                        <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
+                          severity="secondary" size="small" pTooltip="Move down" tooltipPosition="top"
+                          [disabled]="last" (onClick)="moveCreativeDown(si, ri)" />
+                        <p-button icon="pi pi-trash" [text]="true" [rounded]="true"
+                          severity="danger" size="small" pTooltip="Remove" tooltipPosition="top"
+                          (onClick)="removeCreative(si, ri)" />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="add-media-bar">
+                <p-button
+                  label="Add Creative"
+                  icon="pi pi-plus"
+                  severity="primary"
+                  size="small"
+                  (onClick)="openCreativePickerForScreen(si)"
+                />
+              </div>
+
+            </div>
+          </p-accordionTab>
+        </p-accordion>
+
+        <!-- Save summary -->
+        <div *ngIf="screenSlots.length > 0" class="am-summary">
+          <span>
+            <strong>{{ readyScreenSlots.length }}</strong> of
+            <strong>{{ screenSlots.length }}</strong> screen(s) ready to save
+            <span *ngIf="readyScreenSlots.length < screenSlots.length" class="summary-hint">
+              (screens without a date or creative will be skipped)
+            </span>
+          </span>
+        </div>
+
+      </p-tabPanel>
+
+      <!-- 
+           TAB 2 — Details
+            -->
+      <p-tabPanel header="Details">
+
+        <div *ngIf="creativesGroupedByScreen.length === 0" class="am-empty">
+          <i class="pi pi-images"></i>
+          <p>No creatives have been assigned yet.</p>
+        </div>
+
+        <div
+          *ngFor="let group of creativesGroupedByScreen"
+          class="assigned-screen-block"
+        >
+          <div class="screen-section-header">
+            <i class="pi pi-desktop"></i>
+            <strong>{{ group.screenName }}</strong>
+          </div>
+
+          <div *ngIf="group.creatives.length === 0" class="am-empty">
+            <small>No creatives assigned to this screen.</small>
+          </div>
+
+          <p-table
+            *ngIf="group.creatives.length > 0"
+            [value]="group.creatives"
+            [tableStyle]="{ 'min-width': '100%' }"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Seq</th>
+                <th>Creative</th>
+                <th>Type</th>
+                <th>Play Date</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td><span class="seq-badge">{{ row.playSequence }}</span></td>
+                <td>{{ row.creativeName }}</td>
+                <td>
+                  <span [class]="'type-badge type-' + (row.isVideo ? 'video' : 'image')">
+                    {{ row.isVideo ? 'video' : 'image' }}
+                  </span>
+                </td>
+                <td>{{ row.playDate | date:'mediumDate' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+        </div>
+
+      </p-tabPanel>
+
+    </p-tabView>
+
+  </div>
+
+  <!-- Footer — Save only relevant on Tab 1 -->
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (onClick)="close()"
+    />
+    <p-button
+      *ngIf="activeTabIndex === 0"
+      label="Save Assignments"
+      icon="pi pi-save"
+      [loading]="isSaving"
+      [disabled]="!canSave"
+      (onClick)="save()"
+    />
+  </ng-template>
+
+</p-dialog>
+
+<!-- Picker dialog unchanged -->
+
+
+<!-- 
+      CREATIVE PICKER DIALOG                                       
+      -->
+<p-dialog
+  header="Add Creative"
+  [(visible)]="isCreativePickerOpen"
+  [modal]="true"
+  [style]="{ width: '1000px', 'background-color': 'blue' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="formGroup" class="add-form">
+
+    <!-- Creative dropdown -->
+    <div class="form-field">
+      <label>Creative <span class="req">*</span></label>
+      <p-dropdown
+        formControlName="creativeId"
+        [options]="creatives"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select a creative…"
+        [filter]="true"
+        filterPlaceholder="Search creatives"
+        styleClass="w-full"
+      >
+        <ng-template let-c pTemplate="item">
+          <div class="creative-option">
+            <div class="co-icon">
+              <i [class]="getFileIcon(c.isVideo ? 'video' : 'image')"></i>
+            </div>
+            <div class="co-info">
+              <span class="co-name">{{ c.name }}</span>
+              <span [class]="'type-badge type-' + (c.isVideo ? 'video' : 'image')">
+                {{ c.isVideo ? 'video' : 'image' }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+      <small
+        class="field-error"
+        *ngIf="formGroup.get('creativeId')?.invalid && formGroup.get('creativeId')?.touched"
+      >Please select a creative.</small>
+    </div>
+
+    <!-- Play sequence -->
+    <div class="form-field">
+      <label>Play Sequence <span class="req">*</span></label>
+      <p-inputNumber
+        formControlName="playSequence"
+        [min]="1"
+        [max]="999"
+        [showButtons]="true"
+        styleClass="w-full"
+      />
+      <small class="field-hint">
+        The order this creative plays within the screen's playlist.
+        Sequences are re-numbered automatically after sorting.
+      </small>
+      <small
+        class="field-error"
+        *ngIf="formGroup.get('playSequence')?.invalid && formGroup.get('playSequence')?.touched"
+      >Must be at least 1.</small>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      [text]="true"
+      severity="secondary"
+      (onClick)="isCreativePickerOpen = false"
+    />
+    <p-button
+      label="Add to Playlist"
+      icon="pi pi-check"
+      (onClick)="confirmAddCreative()"
+    />
+  </ng-template>
+</p-dialog>

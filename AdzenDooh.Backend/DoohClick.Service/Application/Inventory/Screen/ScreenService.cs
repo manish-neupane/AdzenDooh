@@ -28,18 +28,14 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
         }
 
 
-        public async Task<List<MvDropdown>?> ScreenDdl(MvDropdown param)
+        public async Task<List<MvDropdown>?> ScreenDdl(MvScreenDdl param)
         {
             try
             {
-
-                string result = await _DataAccessService.RetrievalProcedure("Inv.SpScreenDropSel", JsonConvert.SerializeObject(param));
+                string result = await _DataAccessService.RetrievalProcedure("inv.SpScreenDdl", JsonConvert.SerializeObject(param));
                 return JsonConvert.DeserializeObject<List<MvDropdown>>(result);
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
         }
 
         public async  Task<List<MvScreen>?> SaveScreen(MvUpsertScreen param)
@@ -47,13 +43,8 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
             try
             {
                 string result = await _DataAccessService.ActionProcedure("inv.SpScreenTsk", JsonConvert.SerializeObject(param));
-
-                if (!result.TrimStart().StartsWith("["))
-                {
-                    var spError = JsonConvert.DeserializeObject<MvSpError>(result);
-                    throw new InvalidOperationException(spError?.Message ?? "An error occurred");
-                }
                 return JsonConvert.DeserializeObject<List<MvScreen>>(result);
+
             }
             catch (Exception)
             {
@@ -62,6 +53,17 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
         }
 
 
+        public async Task<MvScreenDetail?> GetDetail(MvScreenDetailParam param)
+        {
+            try
+            {
+                string result = await _DataAccessService.RetrievalProcedure(
+                    "inv.SpScreenDtlSel", JsonConvert.SerializeObject(param));
+
+                return JsonConvert.DeserializeObject<MvScreenDetail>(result);
+            }
+            catch (Exception) { throw; }
+        }
 
 
         public async Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param)

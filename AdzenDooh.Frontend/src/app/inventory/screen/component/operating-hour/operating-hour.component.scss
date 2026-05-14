@@ -1,65 +1,148 @@
-::ng-deep .soh-sidebar .p-sidebar-content {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+$primary:        #2563eb;
+$primary-light:  #eff6ff;
+$primary-border: #bfdbfe;
+$danger:         #ef4444;
+$surface:        #ffffff;
+$surface-2:      #f8fafc;
+$surface-3:      #f1f5f9;
+$border:         #e2e8f0;
+$border-light:   #f1f5f9;
+$text-primary:   #0f172a;
+$text-secondary: #475569;
+$text-muted:     #94a3b8;
+$radius-md:      10px;
+$radius-lg:      14px;
+$shadow-md:      0 4px 16px rgba(0,0,0,.08);
+
+// ─── Dialog overrides ─────────────────────────────────────────────────────────
+:host ::ng-deep .p-dialog {
+  border-radius: $radius-lg !important;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.15) !important;
+
+  .p-dialog-header {
+    padding: 0 !important;
+    border-bottom: 1px solid $border;
+    background: $surface;
+  }
+
+  .p-dialog-content {
+    padding: 0 !important;
+    background: $surface-2;
+  }
 }
 
+// ─── Header ───────────────────────────────────────────────────────────────────
 .soh-header {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
 }
 
 .soh-title {
-  font-size: 1rem;
-  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: -.2px;
+
+  i { color: $primary; font-size: 14px; }
 }
 
 .soh-screen-name {
-  font-size: 0.8rem;
-  color: var(--text-color-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  color: $primary;
+  background: $primary-light;
+  border: 1px solid $primary-border;
+  padding: 2px 10px;
+  border-radius: 20px;
 }
 
+// ─── Body ─────────────────────────────────────────────────────────────────────
 .soh-body {
-  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  overflow-y: auto;
-  flex: 1;
+  padding: 0;
+}
+
+// ─── Add Slot Form ────────────────────────────────────────────────────────────
+.soh-add-form {
+  background: $surface;
+  border-bottom: 2px solid $border;
+  padding: 20px 24px;
+}
+
+.soh-add-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 14px;
+}
+
+// ── Force a single row with 5 equal columns ───────────────────────────────────
+.soh-form-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.1fr 130px;
+  gap: 12px;
+  align-items: end;
 }
 
 .soh-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+  min-width: 0; // prevent grid blowout
 
   label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-color-secondary);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: $text-secondary;
+    white-space: nowrap;
+  }
+
+  // stretch PrimeNG widgets to fill their column
+  ::ng-deep {
+    .p-dropdown,
+    .p-calendar,
+    .p-inputnumber,
+    .p-inputtext { width: 100% !important; }
+
+    .p-calendar .p-inputtext { width: 100% !important; }
+    .p-inputnumber .p-inputtext { width: 100% !important; }
   }
 }
 
 .soh-optional {
   font-weight: 400;
-  font-style: italic;
+  color: $text-muted;
+  font-size: 10.5px;
+}
+
+// ─── Slots Section ────────────────────────────────────────────────────────────
+.soh-slots-section {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .soh-slots-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-color-secondary);
-  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 4px;
 }
 
 .soh-spinner {
@@ -67,54 +150,119 @@
   height: 16px !important;
 }
 
-.soh-empty {
-  font-size: 0.85rem;
-  color: var(--text-color-secondary);
-  padding: 8px 0;
+// ─── Day Group Card ───────────────────────────────────────────────────────────
+.soh-day-group {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: box-shadow .15s ease;
+
+  &:hover { box-shadow: $shadow-md; }
 }
 
+.soh-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background: $surface-3;
+  border-bottom: 1px solid $border;
+}
+
+.soh-day-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.soh-slot-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-muted;
+  background: $border;
+  padding: 2px 8px;
+  border-radius: 20px;
+
+  // Blue pill when day has slots
+  .soh-day-group:has(.soh-slot-row) & {
+    background: $primary-light;
+    color: $primary;
+    border: 1px solid $primary-border;
+  }
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+.soh-empty {
+  padding: 13px 16px;
+  font-size: 12.5px;
+  color: $text-muted;
+  font-style: italic;
+  text-align: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 5px,
+    rgba(0,0,0,.013) 5px,
+    rgba(0,0,0,.013) 10px
+  );
+}
+
+// ─── Slot Row ─────────────────────────────────────────────────────────────────
 .soh-slot-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--surface-ground);
-  margin-bottom: 6px;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid $border-light;
+  transition: background .1s ease;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $surface-2; }
+
+  // Fade the delete button until the row is hovered
+  &:not(:hover) ::ng-deep .p-button { opacity: .28; }
+  ::ng-deep .p-button { transition: opacity .15s ease; }
 }
 
 .soh-slot-time {
-  flex: 1;
-  font-size: 0.875rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+
+  i { font-size: 12px; color: $primary; opacity: .65; }
 }
 
 .soh-slot-audience {
-  font-size: 0.8rem;
-  color: var(--text-color-secondary);
   display: flex;
   align-items: center;
-  gap: 4px;
-}
-
-.soh-add-form {
-  border-top: 1px solid var(--surface-border);
-  padding-top: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.soh-add-title {
-  font-size: 0.85rem;
+  gap: 5px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--text-color-secondary);
+  color: $text-secondary;
+  background: $surface-3;
+  border: 1px solid $border;
+  padding: 3px 10px;
+  border-radius: 20px;
+  min-width: 70px;
+  justify-content: center;
+
+  i { font-size: 11px; color: $text-muted; }
 }
 
-.soh-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+// ─── Utilities ────────────────────────────────────────────────────────────────
+.w-full { width: 100%; }
+.mt-2   { margin-top: 8px; }
+
+
+.soh-loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
 }

@@ -1,15 +1,3 @@
-<!-- ─── screen-create-edit.component.html ───────────────────────────────────
-     Dialog for creating or editing a screen.
-
-     Key decisions:
-       - appendTo="body" prevents the dialog from being clipped by any parent
-         container that has overflow:hidden or a CSS transform applied.
-       - (onHide) maps to onHide() in the TS, which calls close().
-       - The Save button shows a spinner via [loading]="isLoading".
-       - markAllAsTouched() is called in onSubmit() so errors show immediately
-         when the user clicks Save on an untouched invalid form.
-     ─────────────────────────────────────────────────────────────────────── -->
-
 <p-dialog
   [(visible)]="isOpen"
   [header]="isNewScreen ? 'Create Screen' : 'Edit Screen'"
@@ -20,16 +8,16 @@
   appendTo="body"
   (onHide)="onHide()"
 >
-
   <ng-template pTemplate="content">
     <form [formGroup]="formGroup" class="screen-form p-fluid">
-
       <!-- Name -->
       <div class="field">
         <label for="name">Name <span class="required">*</span></label>
         <input id="name" type="text" pInputText formControlName="name" />
         <small
-          *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched"
+          *ngIf="
+            formGroup.get('name')?.invalid && formGroup.get('name')?.touched
+          "
           class="p-error"
         >
           Name is required.
@@ -38,10 +26,32 @@
 
       <!-- Resolution -->
       <div class="field">
-        <label for="resolution">Resolution <span class="required">*</span></label>
-        <input id="resolution" type="text" pInputText formControlName="resolution" placeholder="e.g. 1920x1080" />
+        <label for="resolution"
+          >Resolution <span class="required">*</span></label
+        >
+        <p-dropdown
+          id="resolution"
+          formControlName="resolution"
+          placeholder="Select a resolution"
+          [options]="[
+            { label: '1920x1080 (Full HD)', value: '1920x1080' },
+            { label: '1280x720 (HD)', value: '1280x720' },
+            { label: '1366x768', value: '1366x768' },
+            { label: '3840x2160 (4K UHD)', value: '3840x2160' },
+            { label: '2560x1440 (2K QHD)', value: '2560x1440' },
+            { label: '1600x900', value: '1600x900' },
+            { label: '1024x768', value: '1024x768' },
+            { label: '1280x1024', value: '1280x1024' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
         <small
-          *ngIf="formGroup.get('resolution')?.invalid && formGroup.get('resolution')?.touched"
+          *ngIf="
+            formGroup.get('resolution')?.invalid &&
+            formGroup.get('resolution')?.touched
+          "
           class="p-error"
         >
           Resolution is required.
@@ -51,32 +61,79 @@
       <!-- Orientation -->
       <div class="field">
         <label for="orientation">Orientation</label>
-        <input id="orientation" type="text" pInputText formControlName="orientation" />
+        <p-dropdown
+          id="orientation"
+          formControlName="orientation"
+          placeholder="Select orientation"
+          [options]="[
+            { label: 'Portrait', value: 'Portrait' },
+            { label: 'Landscape', value: 'Landscape' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
       </div>
 
       <!-- MAC Address -->
-      <div class="field">
-        <label for="macAddress">MAC Address <span class="required">*</span></label>
-        <input id="macAddress" type="text" pInputText formControlName="macAddress" placeholder="e.g. AA:BB:CC:DD:EE:FF" />
-        <small
-          *ngIf="formGroup.get('macAddress')?.invalid && formGroup.get('macAddress')?.touched"
-          class="p-error"
-        >
-          MAC Address is required.
-        </small>
-      </div>
+<div class="field">
+  <label for="macAddress"
+    >MAC Address <span class="required">*</span></label
+  >
+  <input
+    id="macAddress"
+    type="text"
+    pInputText
+    formControlName="macAddress"
+    placeholder="e.g. AA:BB:CC:DD:EE:FF"
+    [readonly]="!isNewScreen"
+  />
+  <small
+    *ngIf="
+      formGroup.get('macAddress')?.invalid &&
+      formGroup.get('macAddress')?.touched
+    "
+    class="p-error"
+  >
+    MAC Address is required.
+  </small>
+</div>
+  <!-- Location -->
+<div class="field">
+  <label for="location">
+    Location <span class="required">*</span>
+  </label>
 
-      <!-- Location -->
-      <div class="field">
-        <label for="location">Location <span class="required">*</span></label>
-        <input id="location" type="text" pInputText formControlName="location" />
-        <small
-          *ngIf="formGroup.get('location')?.invalid && formGroup.get('location')?.touched"
-          class="p-error"
-        >
-          Location is required.
-        </small>
-      </div>
+  <div class="location-wrapper">
+
+    <input
+      id="location"
+      type="text"
+      pInputText
+      formControlName="location"
+      placeholder=" Enter coordinates (e.g. 27.7172, 85.3240)"
+    />
+
+    <p-button
+      icon="pi pi-map-marker"
+      label="Map"
+      severity="secondary"
+      type="button"
+      (onClick)="openMapPicker()"
+    />
+
+  </div>
+
+  <small
+    *ngIf="
+      formGroup.get('location')?.invalid &&
+      formGroup.get('location')?.touched
+    "
+    class="p-error"
+  >
+    Location is required.
+  </small>
+</div>
 
       <!-- Address (optional) -->
       <div class="field">
@@ -84,11 +141,22 @@
         <input id="address" type="text" pInputText formControlName="address" />
       </div>
 
-      <!-- Error Banner -->
-      <div *ngIf="errorMessage" class="error-banner">
-        <i class="pi pi-exclamation-circle"></i> {{ errorMessage }}
+      <!-- status -->
+      <div class="field" style="margin-bottom: 3rem;">
+        <label for="status">Status</label>
+        <p-dropdown
+          id="status"
+          formControlName="status"
+          placeholder="Select status"
+          [options]="[
+            { label: 'Active', value: 'Active' },
+            { label: 'Inactive', value: 'Inactive' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
       </div>
-
     </form>
   </ng-template>
 
@@ -107,6 +175,100 @@
       (onClick)="onSubmit()"
       [loading]="isLoading"
     />
+  </ng-template>
+</p-dialog>
+
+
+
+<!-- ─────────────────────────────────────────────── -->
+<!-- MAP PICKER DIALOG -->
+<!-- ─────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="isMapDialogOpen"
+  header="Select Location"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '900px', height: '700px' }"
+  appendTo="body"
+>
+
+  <div class="map-dialog-body">
+
+    <!-- Search -->
+    <div class="map-toolbar">
+
+      <input
+        type="text"
+        pInputText
+        placeholder="Search location..."
+        [(ngModel)]="mapSearchText"
+      />
+
+      <p-button
+        icon="pi pi-search"
+        label="Search"
+        severity="secondary"
+        type="button"
+      />
+
+      <p-button
+        icon="pi pi-crosshairs"
+        label="Use Current Location"
+        severity="contrast"
+        type="button"
+      />
+
+    </div>
+
+    <!-- Selected Coordinates -->
+    <div class="map-coordinates">
+
+      <div class="coord-box">
+        <label>Latitude</label>
+        <input
+          type="text"
+          pInputText
+          [value]="selectedLatitude"
+          readonly
+        />
+      </div>
+
+      <div class="coord-box">
+        <label>Longitude</label>
+        <input
+          type="text"
+          pInputText
+          [value]="selectedLongitude"
+          readonly
+        />
+      </div>
+
+    </div>
+
+    <!-- Actual Map -->
+    <div id="screen-map"></div>
+
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      type="button"
+      (onClick)="isMapDialogOpen = false"
+    />
+
+    <p-button
+      label="Use This Location"
+      icon="pi pi-check"
+      type="button"
+      (onClick)="confirmMapLocation()"
+    />
+
   </ng-template>
 
 </p-dialog>

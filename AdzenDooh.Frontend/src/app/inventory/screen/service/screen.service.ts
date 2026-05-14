@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../shared/service/api.service';
-import { MvScreen, MvUpsertScreen, MvDeleteScreen, MvScreenFilter } from '../model/screen.model';
+import { MvScreen, MvUpsertScreen, MvDeleteScreen, MvScreenFilter, MvScreenDdl, MvScreenDetailParam, MvScreenDetail } from '../model/screen.model';
 import { ApiResponse, GridResponse, ParamOption } from '../../../shared/model/sharedModel';
 import { environment } from '../../../../environments/environment';
 
@@ -15,12 +15,19 @@ export class ScreenService {
 
   constructor(private api: ApiService) {}
 
-  getGrid(param: ParamOption<MvScreenFilter>): Observable<ApiResponse<GridResponse<MvScreen>>> {
-    return this.api.get(`${this.base}/GetGrid`, param);
+  getAll(param: ParamOption<MvScreenFilter>): Observable<ApiResponse<GridResponse<MvScreen>>> {
+    return this.api.get(`${this.base}/GetAll`, param);
+  }
+  
+  getDetail(param: MvScreenDetailParam): Observable<ApiResponse<MvScreenDetail>> {
+  return this.api.get(`${this.base}/GetDetail`,  param);
+}
+  saveScreen(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
+    return this.api.post(`${this.base}/SaveScreen`, payload);
   }
 
-  saveScreen(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
-    return this.api.post(`${this.base}/saveScreen`, payload);
+  getDdl(param: MvScreenDdl): Observable<ApiResponse<MvScreen[]>> {
+    return this.api.post(`${this.base}/GetDdl`, param);
   }
 
   deleteScreen(payload: MvDeleteScreen): Observable<ApiResponse<MvScreen>> {

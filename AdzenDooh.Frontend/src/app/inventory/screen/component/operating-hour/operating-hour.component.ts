@@ -1,19 +1,12 @@
-// ─── screen-operating-hour.component.ts ──────────────────────────────────────
-// RESPONSIBILITY:
-//   • Opens as a p-sidebar overlay from ScreenListComponent
-//   • Loads all slots for the given screen once on open
-//   • Filters slots in-memory when the selected day changes (no extra HTTP call)
-//   • Handles add (single slot per submission) and delete actions
-
 import {
   Component,
   Input,
   OnDestroy,
   Injector,
-  inject
+  OnInit
 } from '@angular/core';
 import { Subject, takeUntil, finalize } from 'rxjs';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { sharedImports } from '../../../../shared/component/primeng.import';
 import { AppComponent } from '../../../../app.component';
@@ -24,82 +17,93 @@ import {
   MvScreenOperatingHour,
   MvAddScreenOperatingHour,
   MvDeleteScreenOperatingHour,
-  DAY_OPTIONS,
+  DayOption,
   DayOfWeek
 } from '../../model/operating-hour.model';
+import { AuthService } from '../../../../shared/service/auth.service';
 
 @Component({
   selector: 'screen-operating-hour',
   standalone: true,
-  imports: [...sharedImports,CalendarModule],
+  imports: [...sharedImports, CalendarModule],
   templateUrl: './operating-hour.component.html',
-  styleUrl:    './operating-hour.component.scss'
+  styleUrl: './operating-hour.component.scss'
 })
-export class ScreenOperatingHourComponent extends AppComponent implements OnDestroy {
+export class ScreenOperatingHourComponent extends AppComponent implements OnInit, OnDestroy {
 
- 
- 
-  @Input() screen: MvScreen = {} as MvScreen;
+  @Input() screen: MvScreen | null = null;
+  @Input() mode: 'edit' | 'view' = 'edit';
 
- 
-  private sohService = inject(ScreenOperatingHourService);
+  protected isOpen = false;
+  protected dayOptions = DayOption;
+  protected selectedDay: DayOfWeek | null = null;
+  protected operatingHours: MvScreenOperatingHour[] = [];
+  protected operatingHoursByDay: Record<string, MvScreenOperatingHour[]> = {};
+  protected isLoading = false;
+  protected isCreating = false;
+  protected isDeletingId: number | null = null;
+  protected errorMessage = '';
 
+  formGroup!: FormGroup;
 
-  visible = false;
+  private readonly __unSubscribeAll$ = new Subject<void>();
 
-  
-  dayOptions   = DAY_OPTIONS;
-  selectedDay: DayOfWeek | null = null;
-
-  // slot data
-  allSlots:     MvScreenOperatingHour[] = [];   
-  filteredSlots: MvScreenOperatingHour[] = [];  
-
-  //  Loading / Error 
-  isLoadingSlots  = false;
-  isSaving        = false;
-  isDeletingId: number | null = null;
-  errorMessage    = '';
-
-  
-  // p-calendar 
-  form = new FormGroup({
-    startTime:            new FormControl<Date | null>(null, Validators.required),
-    endTime:              new FormControl<Date | null>(null, Validators.required),
-    averageAudienceCount: new FormControl<number | null>(null)
-  });
-
-  private _unSubscribeAll$ = new Subject<void>();
-
-  constructor(private injector: Injector) {
+  constructor(
+    private injector: Injector,
+    private _fb: FormBuilder,
+    private readonly _sohService: ScreenOperatingHourService,
+    private readonly _authService: AuthService
+  ) {
     super(injector);
   }
 
-
-  open(): void {
-    this.visible     = true;
-    this.selectedDay = null;
-    this.allSlots    = [];
-    this.filteredSlots = [];
-    this.form.reset();
-    this.loadSlots();
+  ngOnInit(): void {
+    this.initForm();
   }
 
-  // ─── Data Loading 
-  private loadSlots(): void {
-    this.isLoadingSlots = true;
-    this.errorMessage   = '';
+  private initForm(): void {
+    this.formGroup = this._fb.group({
+      startTime: this._fb.control<Date | null>(null, Validators.required),
+      endTime: this._fb.control<Date | null>(null, Validators.required),
+      averageAudienceCount: this._fb.control<number | null>(null,Validators.required),
+    });
+  }
 
-    this.sohService.getSlots({ screenId: this.screen.id })
+  
+protected get isViewMode(): boolean {
+  return this.mode === 'view';
+}
+
+  open(screen: MvScreen,mode: 'edit' | 'view' = 'edit'): void {
+    this.isOpen = true;
+    this.screen = screen;
+    this.mode = mode;
+    this.selectedDay = null;
+    this.operatingHours = [];
+    this.operatingHoursByDay = {};
+    this.errorMessage = '';
+    if (this.mode === 'edit') {
+      this.initForm();
+    }
+    this.loadOperatingHours();
+  }
+
+  private loadOperatingHours(): void {
+    if (!this.screen) return;
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this._sohService.getOperatingHours({ screenId: this.screen.id })
       .pipe(
-        takeUntil(this._unSubscribeAll$),
-        finalize(() => this.isLoadingSlots = false)
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => this.isLoading = false)
       )
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
-            this.allSlots = response.data;
-            this.applyDayFilter();
+            this.operatingHours = response.data;
+            this.rebuildOperatingHoursByDay();
           }
         },
         error: () => {
@@ -108,112 +112,112 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnDest
       });
   }
 
-  
-  onDayChange(): void {
-    this.form.reset();
-    this.applyDayFilter();
-  }
-
-  private applyDayFilter(): void {
-    if (this.selectedDay === null) {
-      this.filteredSlots = [];
-      return;
+  private rebuildOperatingHoursByDay(): void {
+    const map: Record<string, MvScreenOperatingHour[]> = {};
+    for (const day of DayOption) {
+      map[day.value] = [];
     }
-    this.filteredSlots = this.allSlots.filter(s => s.dayOfWeek === this.selectedDay);
+    for (const hour of this.operatingHours) {
+      if (map[hour.dayOfWeek] !== undefined) {
+        map[hour.dayOfWeek].push(hour);
+      }
+    }
+    this.operatingHoursByDay = map;
   }
 
+  onDayChange(): void {
+    this.initForm();
+  }
 
-  addSlot(): void {
-    if (this.form.invalid || this.selectedDay === null) return;
+  createOperatingHour(): void {
+    if (this.formGroup.invalid || this.selectedDay === null || !this.screen) return;
 
-    const { startTime, endTime, averageAudienceCount } = this.form.value;
+    const { startTime, endTime, averageAudienceCount } = this.formGroup.getRawValue();
 
-    
-    const toIso = (d: Date) => {
+    if (!startTime || !endTime) return;
+
+    const TIME_ONLY_DATE = '1970-01-01';
+
+    const toIso = (d: Date): string => {
       const hh = String(d.getHours()).padStart(2, '0');
       const mm = String(d.getMinutes()).padStart(2, '0');
-      return `2026-01-01T${hh}:${mm}:00`;
+      return `${TIME_ONLY_DATE}T${hh}:${mm}:00`;
     };
 
     const payload: MvAddScreenOperatingHour[] = [{
-      screenId:             this.screen.id,
-      createdBy:            1,             
-      dayOfWeek:            this.selectedDay,
-      startTime:            toIso(startTime!),
-      endTime:              toIso(endTime!),
-      averageAudienceCount: averageAudienceCount ?? null
+      screenId: this.screen.id,
+      createdBy: this._authService.currentUser.userId,
+      dayOfWeek: this.selectedDay,
+      startTime: toIso(startTime),
+      endTime: toIso(endTime),
+      averageAudienceCount: averageAudienceCount ?? null,
     }];
 
-    this.isSaving = true;
+    this.isCreating = true;
 
-    this.sohService.addSlots(payload)
+    this._sohService.createOperatingHours(payload)
       .pipe(
-        takeUntil(this._unSubscribeAll$),
-        finalize(() => this.isSaving = false)
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => this.isCreating = false)
       )
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
-            
-            this.allSlots = [...this.allSlots, ...response.data];
-            this.applyDayFilter();
-            this.form.reset();
-            this.showMessage('success', 'Saved', 'Slot added successfully');
+            this.operatingHours = [...this.operatingHours, ...response.data];
+            this.rebuildOperatingHoursByDay();
+            this.initForm();
+            this.showMessage('success', 'Created', 'Operating hour created successfully');
           }
         },
-        error: (err) => {
-          this.showMessage('error', 'Error', err?.error?.message ?? 'Failed to add slot');
+        error: (err: unknown) => {
+          const msg = (err as { error?: { message?: string } })?.error?.message ?? 'Failed to create operating hour';
+          this.showMessage('error', 'Error', msg);
         }
       });
   }
 
- 
-  deleteSlot(slot: MvScreenOperatingHour): void {
+  deleteOperatingHour(operatingHour: MvScreenOperatingHour): void {
     this.confirmDialog(
-      `Delete slot ${this.formatTime(slot.startTime)} – ${this.formatTime(slot.endTime)}?`,
+      `Delete operating hour ${this.formatTime(operatingHour.startTime)} – ${this.formatTime(operatingHour.endTime)}?`,
       'Confirm Delete',
       'pi pi-exclamation-triangle',
-      () => this.executeDelete(slot)
+      () => this.executeDelete(operatingHour)
     );
   }
 
-  private executeDelete(slot: MvScreenOperatingHour): void {
-    this.isDeletingId = slot.id;
+  private executeDelete(operatingHour: MvScreenOperatingHour): void {
+    this.isDeletingId = operatingHour.id;
 
     const payload: MvDeleteScreenOperatingHour = {
-      id:        slot.id,
-      deletedBy: 1   
+      id: operatingHour.id,
+      deletedBy: this._authService.currentUser.userId,
     };
 
-    this.sohService.deleteSlot(payload)
+    this._sohService.deleteOperatingHour(payload)
       .pipe(
-        takeUntil(this._unSubscribeAll$),
+        takeUntil(this.__unSubscribeAll$),
         finalize(() => this.isDeletingId = null)
       )
       .subscribe({
         next: () => {
-         
-          this.allSlots = this.allSlots.filter(s => s.id !== slot.id);
-          this.applyDayFilter();
-          this.showMessage('success', 'Deleted', 'Slot deleted successfully');
+          this.operatingHours = this.operatingHours.filter(h => h.id !== operatingHour.id);
+          this.rebuildOperatingHoursByDay();
+          this.showMessage('success', 'Deleted', 'Operating hour deleted successfully');
         },
         error: () => {
-          this.showMessage('error', 'Error', 'Failed to delete slot');
+          this.showMessage('error', 'Error', 'Failed to delete operating hour');
         }
       });
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-  // Extracts HH:mm from ISO datetime string for display
-  formatTime(isoString: string): string {
+  formatTime(isoString: string | null | undefined): string {
     if (!isoString) return '';
     const d = new Date(isoString);
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
-  // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnDestroy(): void {
-    this._unSubscribeAll$.next();
-    this._unSubscribeAll$.complete();
+    this.__unSubscribeAll$.next();
+    this.__unSubscribeAll$.complete();
   }
 }

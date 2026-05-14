@@ -12,7 +12,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
     {
 
         [HttpGet]
-        public async Task<IActionResult> GetSlot(
+        public async Task<IActionResult> GetAll(
             [FromQuery] MvScreenOperatingHourFilter param)
         {
             try
@@ -28,7 +28,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
 
 
         [HttpPost]
-        public async Task<IActionResult> AddSlot(
+        public async Task<IActionResult> Add(
             [FromBody] List<MvAddScreenOperatingHour> param)
         {
             try
@@ -44,7 +44,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
 
         
         [HttpDelete]
-        public async Task<IActionResult> DeleteSlot(
+        public async Task<IActionResult> Delete(
             [FromBody] MvDeleteScreenOperatingHour param)
         {
             try

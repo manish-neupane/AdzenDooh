@@ -1,17 +1,3 @@
-// ─── screen-create-edit.component.ts ─────────────────────────────────────────
-// RESPONSIBILITY: Own the dialog UI, the reactive form, and the save HTTP call.
-//
-// Lifecycle of this component:
-//   1. Parent sets [screen] input (could be empty object for add, or full object for edit)
-//   2. Parent calls open() via template reference variable
-//   3. open() populates the form and shows the dialog
-//   4. User submits → saveScreen() → emits afterFormClosed with the saved record
-//   5. User cancels → close() → emits afterFormClosed(null)
-//
-// IMPORTANT — form population happens ONLY in open().
-// ngOnChanges does NOT touch the form. This avoids a race condition where
-// ngOnChanges fires and resets the form before open() has patched the values.
-
 import {
   Component,
   EventEmitter,
@@ -19,7 +5,9 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
@@ -37,26 +25,29 @@ import { ApiResponse } from '../../../../shared/model/sharedModel';
   templateUrl: './screen-create-edit.component.html',
   styleUrl: './screen-create-edit.component.scss'
 })
-export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnDestroy {
+export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnDestroy, OnChanges {
 
-  // ─── Inputs & Outputs ─────────────────────────────────────────────────────
   @Input() screen!: MvScreen;
   @Output() afterFormClosed = new EventEmitter<MvScreen | null>();
 
-  // ─── State ────────────────────────────────────────────────────────────────
-  formGroup!: FormGroup;
-  isOpen       = false;
-  isLoading    = false;
-  errorMessage = '';
+  protected formGroup!: FormGroup;
+  protected isOpen = false;
+  protected isLoading = false;
+  protected errorMessage = '';
 
   private _unSubscribeAll$ = new Subject<void>();
+  
+// Map picker state
+  isMapDialogOpen = false;
+  mapSearchText = '';
 
-  // ─── Computed ─────────────────────────────────────────────────────────────
+  selectedLatitude: number | null = null;
+  selectedLongitude: number | null = null;
+
   get isNewScreen(): boolean {
     return !this.screen?.id;
   }
 
-  // ─── Constructor ──────────────────────────────────────────────────────────
   constructor(
     private injector: Injector,
     private formBuilder: FormBuilder,
@@ -65,49 +56,62 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     super(injector);
   }
 
-  // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    this.buildForm();
+    this.initForm();
   }
 
-  ngOnDestroy(): void {
-    this._unSubscribeAll$.next();
-    this._unSubscribeAll$.complete();
-  }
-
-  // ─── Form ─────────────────────────────────────────────────────────────────
-  private buildForm(): void {
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
-      name:        ['', Validators.required],
-      resolution:  ['', Validators.required],
+      name: ['', Validators.required],
+      resolution: ['', Validators.required],
       orientation: ['landscape', Validators.required],
-      macAddress:  ['', Validators.required],
-      location:    ['', Validators.required],
-      address:     ['']
+      macAddress: ['', Validators.required],
+      location: ['', Validators.required],
+      status: ['active', Validators.required],
+      address: ['']
     });
   }
 
-  // ─── Public API (called by parent via template ref) ───────────────────────
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['screen'] && this.formGroup && this.screen) {
+      this.loadScreenData();
+    }
+  }
+
   open(): void {
-    // Reset the form cleanly first, then patch with current screen values.
-    // Doing both here (not in ngOnChanges) keeps population in one place
-    // and avoids any timing issues.
-    this.formGroup.reset({
-      name:        this.screen?.name        ?? '',
-      resolution:  this.screen?.resolution  ?? '',
-      orientation: this.screen?.orientation ?? 'landscape',
-      macAddress:  this.screen?.macAddress  ?? '',
-      location:    this.screen?.location    ?? '',
-      address:     this.screen?.address     ?? ''
-    });
-    this.errorMessage = '';
-    this.isOpen       = true;
+    if (this.formGroup) {
+      if (this.isNewScreen) {
+        this.formGroup.reset({
+          name: '',
+          resolution: '',
+          orientation: 'landscape',
+          macAddress: '',
+          location: '',
+          address: '',
+          status: 'active'
+        });
+      } else {
+        // Load data for existing screen
+        this.loadScreenData();
+      }
+      this.errorMessage = '';
+      this.isOpen = true;
+    }
   }
 
-  // ─── Dialog Event Handlers ────────────────────────────────────────────────
+  private loadScreenData(): void {
+    this.formGroup.patchValue({
+      name: this.screen?.name ?? '',
+      resolution: this.screen?.resolution ?? '',
+      orientation: this.screen?.orientation ?? 'landscape',
+      macAddress: this.screen?.macAddress ?? '',
+      location: this.screen?.location ?? '',
+      address: this.screen?.address ?? '',
+      status: this.screen?.status ?? 'active'
+    });
+  }
+
   protected onHide(): void {
-    // Called when the user clicks the X or clicks outside the dialog.
-    // We treat this the same as Cancel.
     this.close();
   }
 
@@ -117,20 +121,19 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
 
   protected onSubmit(): void {
     if (this.formGroup.invalid) {
-      // Mark all fields as touched so validation messages appear
       this.formGroup.markAllAsTouched();
       return;
     }
-    this.isLoading    = true;
+    this.isLoading = true;
     this.errorMessage = '';
     this.saveScreen();
   }
 
-  // ─── Save ─────────────────────────────────────────────────────────────────
   private saveScreen(): void {
     const payload: MvUpsertScreen = {
       ...this.formGroup.value,
-      // Include id only for edits; 0 or undefined signals a create
+      tenantId: 1,
+      createdBy: 1,
       ...(this.isNewScreen ? {} : { id: this.screen.id })
     };
 
@@ -154,14 +157,37 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
           const msg = err?.error?.message ?? 'Action failed';
           this.errorMessage = msg;
           this.showMessage('error', 'Error', msg);
-          // Do NOT emit afterFormClosed here — the dialog stays open so the
-          // user can correct the error and try again.
         }
       });
   }
 
-  // ─── Close ────────────────────────────────────────────────────────────────
+  // Map picker methods
+openMapPicker(): void {
+  this.isMapDialogOpen = false;
+}
+confirmMapLocation(): void {
+
+  if (
+    this.selectedLatitude !== null &&
+    this.selectedLongitude !== null
+  ) {
+
+    this.formGroup.patchValue({
+      location: `${this.selectedLatitude}, ${this.selectedLongitude}`
+    });
+
+    this.isMapDialogOpen = false;
+  }
+}
+
+
+
   private close(): void {
     this.isOpen = false;
+  }
+
+  ngOnDestroy(): void {
+    this._unSubscribeAll$.next();
+    this._unSubscribeAll$.complete();
   }
 }

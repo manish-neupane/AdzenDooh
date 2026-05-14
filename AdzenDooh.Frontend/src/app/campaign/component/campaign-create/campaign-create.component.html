@@ -1,0 +1,216 @@
+
+
+<p-dialog
+  [(visible)]="isDialogOpen"
+  header="Create Campaign"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '58rem' }"
+  appendTo="body"
+  [blockScroll]="false"
+  (onHide)="onHide()"
+>
+
+  <!--  Step Indicator  -->
+  <ng-template pTemplate="content">
+    <p-steps
+      [model]="steps"
+      [activeIndex]="activeStep"
+      [readonly]="true"
+      styleClass="mb-4"
+    />
+
+    <form [formGroup]="formGroup" class="p-fluid">
+
+      <!--  Details  -->
+      <ng-container *ngIf="activeStep === 0">
+
+        <div class="field">
+          <label for="name">Campaign Name <span class="required">*</span></label>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            placeholder="e.g. Summer Campaign 2026"
+          />
+          <small
+            class="p-error"
+            *ngIf="formGroup.get('name')?.invalid && formGroup.get('name')?.touched"
+          >
+            Name is required.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="remarks">Remarks</label>
+          <textarea
+            id="remarks"
+            pTextarea
+            formControlName="remarks"
+            rows="4"
+            placeholder="Optional notes about this campaign"
+          ></textarea>
+        </div>
+
+      </ng-container>
+
+      <!--  Screens  -->
+      <ng-container *ngIf="activeStep === 1">
+
+        <p class="step-hint">Select the screens this campaign will run on.</p>
+
+        <div formArrayName="screenSelections" class="screen-list">
+
+          <div
+            *ngFor="let screen of availableScreens; let i = index"
+            class="screen-row"
+            [class.is-checked]="screenSelections.controls[i].value"
+            (click)="screenSelections.controls[i].setValue(!screenSelections.controls[i].value)"
+          >
+            <p-checkbox
+              [formControl]="$any(screenSelections.controls[i])"
+              [binary]="true"
+              [inputId]="'screen_' + i"
+              (click)="$event.stopPropagation()"
+            />
+            <div class="screen-info">
+              <span class="screen-name">{{ screen.name }}</span>
+              <span class="screen-location">{{ screen.location }}</span>
+            </div>
+
+            <!-- inside .screen-row, after .screen-info div -->
+              <div class="screen-detail-btn">
+              
+              </div>
+          </div>
+
+          <div *ngIf="availableScreens.length === 0" class="no-screens">
+            <i class="pi pi-desktop mb-2" style="font-size: 1.5rem; display: block"></i>
+            No screens available.
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!--  Dates  -->
+      <ng-container *ngIf="activeStep === 2">
+
+        <p class="step-hint">Add one or more date ranges for this campaign.</p>
+
+        <div formArrayName="dates" class="date-rows">
+          <div
+            *ngFor="let group of dates.controls; let i = index"
+            [formGroupName]="i"
+            class="date-row"
+          >
+
+            <div class="date-field">
+              <label>Start Date</label>
+              <p-calendar
+                formControlName="startDate"
+                placeholder="Pick a date"
+                dateFormat="yy-mm-dd"
+                [showIcon]="true"
+                [minDate]="today"
+                appendTo="body"
+              />
+              <small
+                class="p-error"
+                *ngIf="group.get('startDate')?.invalid && group.get('startDate')?.touched"
+              >
+                Required.
+              </small>
+            </div>
+
+            <span class="date-separator">—</span>
+
+            <div class="date-field">
+              <label>End Date</label>
+              <p-calendar
+                formControlName="endDate"
+                placeholder="Pick a date"
+                dateFormat="yy-mm-dd"
+                [showIcon]="true"
+                [minDate]="today"
+                appendTo="body"
+              />
+              <small
+                class="p-error"
+                *ngIf="group.get('endDate')?.invalid && group.get('endDate')?.touched"
+              >
+                Required.
+              </small>
+            </div>
+
+            <div class="date-remove">
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="removeDateRow(i)"
+              />
+            </div>
+
+          </div>
+        </div>
+
+        <div class="add-date-btn">
+          <p-button
+            label="Add date range"
+            [text]="true"
+            (onClick)="addDateRow()"
+          />
+        </div>
+
+      </ng-container>
+
+    </form>
+  </ng-template>
+
+  <!--  Footer  -->
+  <ng-template pTemplate="footer">
+    <div class="footer-actions">
+
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isLoading"
+        (onClick)="cancel()"
+      />
+
+      <p-button
+        *ngIf="activeStep > 0"
+        label="Back"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isLoading"
+        (onClick)="prevStep()"
+      />
+
+      <p-button
+        *ngIf="activeStep < 2"
+        label="Next"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="nextStep()"
+      />
+
+      <p-button
+        *ngIf="activeStep === 2"
+        label="Create Campaign"
+        icon="pi pi-check"
+        [loading]="isLoading"
+        (onClick)="onSubmit()"
+      />
+
+    </div>
+  </ng-template>
+ 
+  
+</p-dialog>

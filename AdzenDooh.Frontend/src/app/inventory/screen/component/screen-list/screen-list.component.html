@@ -1,16 +1,7 @@
-<!-- ─── screen-list.component.html ──────────────────────────────────────────
-     This template owns only two things:
-       1. The top toolbar (page title + Add button)
-       2. The grid-table shell + the create/edit dialog
-
-     All table rendering lives inside <grid-table>.
-     All form/dialog rendering lives inside <screen-create-edit>.
-     ─────────────────────────────────────────────────────────────────────── -->
-
 <page-wrapper>
 
-  <!-- ── Page Header ──────────────────────────────────────────────────────── -->
-  <div title>Screens</div>
+
+  <div title> <i class="pi pi-desktop" style="margin-right: 6px;"></i>Screens</div>
 
   <div actions>
     <p-button
@@ -20,7 +11,6 @@
     />
   </div>
 
-  <!-- ── Grid ─────────────────────────────────────────────────────────────── -->
   <grid-table
     [config]="screenConfig"
     [loading]="isLoading"
@@ -32,10 +22,7 @@
 
 </page-wrapper>
 
-<!-- ── Create / Edit Dialog ───────────────────────────────────────────────────
-     Lives outside the wrapper div so it is never clipped by overflow rules.
-     The #screenCreateEdit ref is used by the TS to call open() directly.
-     ─────────────────────────────────────────────────────────────────────── -->
+
 <screen-create-edit
   #screenCreateEdit
   [screen]="currentScreen"
@@ -44,4 +31,15 @@
 <screen-operating-hour
   #screenOperatingHour
   [screen]="currentScreen"
+  [mode]="'edit'"
 />
+
+<screen-detail
+  #screenDetail
+
+/>
+<p-toast></p-toast>
+
+<p-confirmDialog></p-confirmDialog>
+
+<router-outlet></router-outlet>

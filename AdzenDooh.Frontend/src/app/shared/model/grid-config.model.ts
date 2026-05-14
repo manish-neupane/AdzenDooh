@@ -1,10 +1,8 @@
-// ─── grid-config.model.ts ────────────────────────────────────────────────────
-// Shared models for the reusable GridComponent.
-// Nothing domain-specific lives here — screens, campaigns, etc. stay in their
-// own feature folders.
+// grid-config.model.ts
 
-export interface GridColumn {
-  name: string;
+export interface GridColumn<T> {
+  // Now 'name' must be a key of T (e.g., 'macAddress' if T is Screen)
+  name: keyof T; 
   columnName: string;
   type: 'text' | 'number' | 'date' | 'boolean' | 'custom';
   sortable?: boolean;
@@ -25,7 +23,7 @@ export interface GridAction<T> {
 }
 
 export interface GridConfig<T> {
-  columns: GridColumn[];
+  columns: GridColumn<T>[]; // Passed T down here
   dataSource: GridDataSource<T>;
   rows?: number;
   showActions?: boolean;

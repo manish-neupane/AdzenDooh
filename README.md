@@ -192,4 +192,4 @@ All routes follow the convention `api/[Controller]/[Action]`.
 ## Authors
 
 - **Manish Neupane** — Backend / Database
-- **Kazuko** — Frontend / Full-stack
+

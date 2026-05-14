@@ -32,7 +32,28 @@
     }
   }
 }
+.screen-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
 
+  .screen-info {
+    flex: 1; // pushes detail button to the far right
+    display: flex;
+    flex-direction: column;
+
+    .screen-name { font-weight: 500; }
+    .screen-location { font-size: 0.8rem; color: var(--text-color-secondary); }
+  }
+
+  .screen-detail-btn {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+}
 .field {
   margin-bottom: 1.5rem;
 

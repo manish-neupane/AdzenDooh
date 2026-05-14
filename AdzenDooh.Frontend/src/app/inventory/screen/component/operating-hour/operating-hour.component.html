@@ -17,7 +17,7 @@
     <div class="soh-header">
       <span class="soh-title">
         <i class="pi pi-clock"></i>
-        Operating Hours
+       {{ isViewMode ? 'Operating Hours' : 'Manage Operating Hours' }}
       </span>
       <span class="soh-screen-name">{{ screen?.name }}</span>
     </div>
@@ -26,7 +26,7 @@
   <div class="soh-body">
 
     <!-- ── Add Slot Form  -->
-    <div class="soh-add-form">
+    <div class="soh-add-form" *ngIf="!isViewMode">
 
       <div class="soh-add-title">Add New Slot</div>
 
@@ -91,9 +91,9 @@
             label="Add Slot"
             icon="pi pi-plus"
             styleClass="w-full"
-            [loading]="isSaving"
+            [loading]="isCreating"
             [disabled]="formGroup.invalid || selectedDay === null"
-            (onClick)="addSlot()"
+            (onClick)="createOperatingHour()"
           />
         </div>
 
@@ -104,7 +104,7 @@
     <div class="soh-slots-section">
 
      <!-- Replace the spinner inside soh-slots-label with this block below it -->
-<div class="soh-loading-overlay" *ngIf="isLoadingSlots">
+<div class="soh-loading-overlay" *ngIf="isLoading">
   <p-progressSpinner strokeWidth="4" />
 </div>
 
@@ -114,14 +114,14 @@
         <div class="soh-day-header">
           <span class="soh-day-label">{{ day.label }}</span>
           <span class="soh-slot-count">
-            {{ (slotsByDay[day.value] || []).length }} slot(s)
+            {{ (operatingHoursByDay[day.value] || []).length }} slot(s)
           </span>
         </div>
 
         <!-- Empty state for this day -->
         <div
           class="soh-empty"
-          *ngIf="!isLoadingSlots && (slotsByDay[day.value] || []).length === 0"
+          *ngIf="!isLoading && (operatingHoursByDay[day.value] || []).length === 0"
         >
           No slots for this day.
         </div>
@@ -129,7 +129,7 @@
         <!-- Slot rows for this day -->
         <div
           class="soh-slot-row"
-          *ngFor="let slot of slotsByDay[day.value]"
+          *ngFor="let slot of operatingHoursByDay[day.value]"
         >
           <span class="soh-slot-time">
             <i class="pi pi-clock"></i>
@@ -142,12 +142,13 @@
           </span>
 
           <p-button
+            *ngIf="!isViewMode"
             icon="pi pi-trash"
             severity="danger"
             [text]="true"
             size="small"
             [loading]="isDeletingId === slot.id"
-            (onClick)="deleteSlot(slot)"
+            (onClick)="deleteOperatingHour(slot)"
           />
         </div>
 

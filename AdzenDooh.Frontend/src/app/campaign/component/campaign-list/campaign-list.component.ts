@@ -109,9 +109,11 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
 
   //  Data loading 
 
-  private loadCampaigns(): void {
-    this.isLoading    = true;
-    this.errorMessage = '';
+  private loadCampaigns(showLoading: boolean = true): void {
+    if (showLoading) {
+      this.isLoading    = true;
+      this.errorMessage = '';
+    }
 
     this.campaignService.getCampaigns(this.param)
       .pipe(
@@ -141,7 +143,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
       });
   }
 
-  private loadScreenDdl(): void {
+  private loadScreenDdl( ): void {
     this.screenService.getDdl({ TenantId: this.authService.currentUser.tenantId })
       .pipe(takeUntil(this._unSubscribeAll$))
       .subscribe({
@@ -209,8 +211,8 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
   }
 
   onFilter(search: string): void {
-    this.param = { ...this.param, offset: 0, filter: { ...this.param.filter, search } };
-    this.loadCampaigns();
+    this.param = { ...this.param, offset: 0, filter: { ...this.param.filter, searchText: search } };
+    this.loadCampaigns(false);
   }
 
 

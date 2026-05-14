@@ -45,7 +45,7 @@ import {
 } from './assign-creative.util';
 
 @Component({
-  selector: 'assign-creative',
+  selector: 'campaign-assign-creative',
   standalone: true,
   imports: [
     ...sharedImports,
@@ -80,7 +80,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
   protected creatives: MvCreativeDdl[] = [];
   formGroup!: FormGroup;
 
-  // ── Utility 
+  //  Utility 
   readonly getFileIcon = getFileIcon;
 
   private activeScreenIndex = -1;
@@ -96,7 +96,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     super(injector);
   }
 
-  // ── Lifecycle ──────────────────────────────────────────────────────
+
 
   ngOnInit(): void {
     this.initForm();
@@ -169,7 +169,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.activeTabIndex = 0;
   }
 
-  // ── Public API (called from parent) ───────────────────────────────
+  //   call from parent
 
   open(campaignId: number): void {
     this.campaignId = campaignId;
@@ -182,7 +182,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
 
  
 
-  // ── Details tab ────────────────────────────────────────────────────
+  //  Details tab 
 
   get creativesGroupedByScreen(): MvCreativeGroupedByScreen[] {
     return this.screenSlots.map((slot) => ({
@@ -193,14 +193,14 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     }));
   }
 
-  // ── Play-date helpers ──────────────────────────────────────────────
+  //  Play-date 
 
   applyDateToAll(date: Date | null): void {
     if (!date) return;
     this.screenSlots = this.screenSlots.map((slot) => ({ ...slot, playDate: date }));
   }
 
-  // ── Creative picker ────────────────────────────────────────────────
+  //  Creative picker 
 
   openCreativePickerForScreen(screenIndex: number): void {
     this.activeScreenIndex = screenIndex;
@@ -238,7 +238,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.isCreativePickerOpen = false;
   }
 
-  // ── Reorder / remove ──────────────────────────────────────────────
+  //  Reorder / remove 
 
   moveCreativeUp(screenIndex: number, rowIndex: number): void {
     if (rowIndex === 0) return;
@@ -263,7 +263,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.patchScreenCreatives(screenIndex, creatives);
   }
 
-  // ── Validation ────────────────────────────────────────────────────
+  //  Validation 
 
   get readyScreenSlots(): MvScreenSlot[] {
     return this.screenSlots.filter((slot) => slot.playDate && slot.creatives.length > 0);
@@ -273,7 +273,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     return this.readyScreenSlots.length > 0 && !this.isSaving;
   }
 
-  // ── Save ──────────────────────────────────────────────────────────
+
 
   save(): void {
     if (!this.canSave) return;

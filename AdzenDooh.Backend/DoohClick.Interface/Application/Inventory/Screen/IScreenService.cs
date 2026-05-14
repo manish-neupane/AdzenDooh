@@ -18,7 +18,8 @@ namespace AdzenDooh.Interface.Application.Inventory.Screen
         Task<List<MvDropdown>?> ScreenDdl(MvScreenDdl param);
 
         Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param);
+        Task<MvScreenDetail?> GetDetail(MvScreenDetailParam param);
 
 
-     }
+    }
 }

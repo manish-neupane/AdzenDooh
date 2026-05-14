@@ -1,89 +1,103 @@
+<!-- grid.component.html -->
 <div class="grid-wrapper">
   <div class="grid-toolbar">
     <p-iconField>
       <p-inputIcon styleClass="pi pi-search" />
-     <input
-    pInputText
-    type="text"
-    placeholder="Search..."
-    [ngModel]="filterValue"
-    (ngModelChange)="onFilterChange($event)"
-    (keydown.escape)="onFilterClear()"
-    class="filter-input"
-/>
+      <input
+        pInputText
+        type="text"
+        placeholder="Search..."
+        [ngModel]="filterValue"
+        (ngModelChange)="onFilterChange($event)"
+        (keydown.escape)="onFilterClear()"
+        class="filter-input"
+      />
     </p-iconField>
   </div>
 
-  <div *ngIf="loading" class="state-message">
-    <i class="pi pi-spin pi-spinner"></i> Loading...
+  <!-- Loading overlay instead of hiding table -->
+  <div class="table-container" [class.table-loading]="loading">
+    <p-table
+      [value]="config.dataSource.data"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      [totalRecords]="config.dataSource.totalCount"
+      (onPage)="onPageChange($event)"
+      (onSort)="onSortChange($event)"
+      [sortField]="sortField"
+      [sortOrder]="sortOrder"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th
+            *ngFor="let col of config.columns"
+            [pSortableColumn]="col.sortable ? col.name.toString() : undefined"
+          >
+            {{ col.columnName }}
+            <p-sortIcon *ngIf="col.sortable" [field]="col.name.toString()" />
+          </th>
+          <th *ngIf="config.showActions" class="text-center">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td *ngFor="let col of config.columns">
+            <ng-container *ngIf="col.type === 'custom' && customCellTemplate; else defaultCell">
+              <ng-container 
+                *ngTemplateOutlet="customCellTemplate; context: { $implicit: row, col: col }">
+              </ng-container>
+            </ng-container>
+            <ng-template #defaultCell>
+              {{ getValue(row, col.name) }}
+            </ng-template>
+          </td>
+          
+          <td *ngIf="config.showActions" class="text-center">
+            <div class="action-buttons">
+              <p-button
+                *ngFor="let action of config.actions"
+                [icon]="action.icon"
+                [severity]="action.severity"
+                [text]="true"
+                [rounded]="true"
+                [pTooltip]="action.tooltip"
+                tooltipPosition="top"
+                (onClick)="action.handler(row)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="config.columns.length + (config.showActions ? 1 : 0)" class="text-center">
+            <div class="state-message">
+              <i class="pi pi-inbox"></i> No data found
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="loading-content">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Loading...</span>
+      </div>
+    </div>
   </div>
 
+  <!-- Error message (only show when not loading) -->
   <div *ngIf="error && !loading" class="error-message">
     <i class="pi pi-exclamation-circle"></i> {{ error }}
   </div>
-
-  <div *ngIf="!loading && !error && config.dataSource.data.length === 0" class="state-message">
-    <i class="pi pi-inbox"></i> No data found
-  </div>
-
-<p-table
-    *ngIf="!loading && !error && config.dataSource.data.length > 0"
-    [value]="config.dataSource.data"
-    [lazy]="true"
-    [paginator]="true"
-    [rows]="rows"
-    [first]="first"
-    [rowsPerPageOptions]="[5, 10, 25, 50]"
-    [totalRecords]="config.dataSource.totalCount"
-    (onPage)="onPageChange($event)"
-    (onSort)="onSortChange($event)"
-    [sortField]="sortField"
-    [sortOrder]="sortOrder"
-    [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines"
->
-    <ng-template pTemplate="header">
-      <tr>
-        <th
-          *ngFor="let col of config.columns"
-          [pSortableColumn]="col.sortable ? col.name.toString() : undefined"
-        >
-          {{ col.columnName }}
-          <p-sortIcon *ngIf="col.sortable" [field]="col.name.toString()" />
-        </th>
-        <th *ngIf="config.showActions" class="text-center">Actions</th>
-      </tr>
-    </ng-template>
-
-    <ng-template pTemplate="body" let-row>
-      <tr>
-        <td *ngFor="let col of config.columns">
-          <ng-container *ngIf="col.type === 'custom' && customCellTemplate; else defaultCell">
-            <ng-container 
-              *ngTemplateOutlet="customCellTemplate; context: { $implicit: row, col: col }">
-            </ng-container>
-          </ng-container>
-          <ng-template #defaultCell>
-            {{ getValue(row, col.name) }}
-          </ng-template>
-        </td>
-        
-        <td *ngIf="config.showActions" class="text-center">
-          <div class="action-buttons">
-            <p-button
-              *ngFor="let action of config.actions"
-              [icon]="action.icon"
-              [severity]="action.severity"
-              [text]="true"
-              [rounded]="true"
-              [pTooltip]="action.tooltip"
-              tooltipPosition="top"
-              (onClick)="action.handler(row)"
-            />
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
 </div>

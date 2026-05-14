@@ -5,6 +5,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  ViewChild,
 } from '@angular/core';
 import {
   FormArray,
@@ -25,22 +26,27 @@ import {
   DateRowValue,
   MvCampaign,
   MvCreateCampaign,
-  MvScreen,
+  MvScreenOption,
 } from '../../model/campaign.model';
 import { buildDatePayload, validateDateRanges } from './campaign-date-utils';
+
+import { ScreenDetailComponent } from '../../../inventory/screen/component/screen-detail/screen-detail.component';
+import { MvScreen } from '../../../inventory/screen/model/screen.model';
 
 @Component({
   selector: 'campaign-create-edit',
   standalone: true,
-  imports: [...sharedImports, StepsModule],
+  imports: [...sharedImports, StepsModule,ScreenDetailComponent],
   templateUrl: './campaign-create.component.html',
   styleUrl: './campaign-create.component.scss',
 })
 export class CampaignCreateComponent extends AppComponent implements OnDestroy {
 
-  @Input() availableScreens: MvScreen[] = [];
+  @Input() availableScreens: MvScreenOption[] = [];
   @Output() afterFormClosed = new EventEmitter<MvCampaign | null>();
 
+  @ViewChild('screenDetail') private _screenDetail!: ScreenDetailComponent;
+  
  
   protected isDialogOpen = false;
   protected isLoading = false;
@@ -107,7 +113,12 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
   private close(): void {
     this.isDialogOpen = false;
   }
+ 
 
+  openScreenDetail(event: Event, screen: MvScreenOption): void {
+  event.stopPropagation(); // prevent row checkbox toggle
+  this._screenDetail.open(screen.id);
+}
   nextStep(): void {
     if (!this.canAdvanceFrom(this.activeStep)) return;
     if (this.activeStep < this.steps.length - 1) this.activeStep++;

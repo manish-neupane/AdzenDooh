@@ -1,7 +1,7 @@
 // ── Filters ──────────────────────────────────────────────────────────
 
 export interface MvCampaignFilter {
-  search?: string;
+  searchText?: string;
 }
 
 // ── Nested / Joined Models ───────────────────────────────────────────
@@ -105,7 +105,7 @@ export interface MvCampaignDetail {
 
 // ── Lookup / Dropdown Models ─────────────────────────────────────────
 
-export interface MvScreen {
+export interface MvScreenOption {
   id:       number;
   name:     string;
   location: string;

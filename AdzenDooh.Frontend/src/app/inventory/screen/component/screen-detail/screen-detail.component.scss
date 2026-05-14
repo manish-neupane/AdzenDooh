@@ -1,0 +1,139 @@
+// screen-detail.component.scss
+
+// Variables
+$shadow-default: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+$shadow-hover: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
+$border-color: #e5e7eb;
+$bg-secondary: #f9fafb;
+
+// Dialog shadow
+:host ::ng-deep {
+  .p-dialog {
+    box-shadow: $shadow-default;
+    
+    .p-dialog-header {
+      border-bottom: 2px solid $border-color;
+      padding: 1.5rem;
+    }
+    
+    .p-dialog-content {
+      padding: 1.5rem;
+      min-height: 300px; // Ensures loading spinner has enough space
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+// Loading state - centered
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+// Sections with clear separation
+.detail-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid $border-color;
+  
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+// Section header
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+  }
+}
+
+// Grid with box shadow
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background: $bg-secondary;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  box-shadow: $shadow-default;
+  transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: $shadow-hover;
+  }
+  
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Detail items
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  .label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+  
+  .value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111827;
+  }
+}
+
+// Table with shadow
+:host ::ng-deep {
+  .p-table {
+    .p-datatable-wrapper {
+      border-radius: 0.5rem;
+      border: 1px solid $border-color;
+      overflow: hidden;
+      box-shadow: $shadow-default;
+    }
+    
+    .p-datatable-thead tr th {
+      background: $bg-secondary;
+      padding: 0.75rem;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #374151;
+      border-bottom: 1px solid $border-color;
+    }
+    
+    .p-datatable-tbody tr td {
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid $border-color;
+    }
+  }
+}
+
+// Operating hours section
+.text-color-secondary {
+  color: #6b7280;
+}
+
+.text-sm {
+  font-size: 0.75rem;
+}

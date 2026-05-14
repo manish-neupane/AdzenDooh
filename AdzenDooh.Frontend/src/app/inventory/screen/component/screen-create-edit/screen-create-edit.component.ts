@@ -5,7 +5,9 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
@@ -23,16 +25,14 @@ import { ApiResponse } from '../../../../shared/model/sharedModel';
   templateUrl: './screen-create-edit.component.html',
   styleUrl: './screen-create-edit.component.scss'
 })
-export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnDestroy {
-
+export class ScreenCreateEditComponent extends AppComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() screen!: MvScreen;
   @Output() afterFormClosed = new EventEmitter<MvScreen | null>();
 
- 
   protected formGroup!: FormGroup;
-  protected isOpen       = false;
-  protected isLoading    = false;
+  protected isOpen = false;
+  protected isLoading = false;
   protected errorMessage = '';
 
   private _unSubscribeAll$ = new Subject<void>();
@@ -41,7 +41,6 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     return !this.screen?.id;
   }
 
- 
   constructor(
     private injector: Injector,
     private formBuilder: FormBuilder,
@@ -50,37 +49,60 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     super(injector);
   }
 
- 
   ngOnInit(): void {
     this.initForm();
   }
 
-
-
-  
   private initForm(): void {
     this.formGroup = this.formBuilder.group({
-      name:        ['', Validators.required],
-      resolution:  ['', Validators.required],
+      name: ['', Validators.required],
+      resolution: ['', Validators.required],
       orientation: ['landscape', Validators.required],
-      macAddress:  ['', Validators.required],
-      location:    ['', Validators.required],
-       status:      ['active', Validators.required] ,
-      address:     ['']
+      macAddress: ['', Validators.required],
+      location: ['', Validators.required],
+      status: ['active', Validators.required],
+      address: ['']
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['screen'] && this.formGroup && this.screen) {
+      this.loadScreenData();
+    }
+  }
+
   open(): void {
-    this.formGroup.reset({
-      name:        this.screen?.name        ?? '',
-      resolution:  this.screen?.resolution  ?? '',
+    if (this.formGroup) {
+      if (this.isNewScreen) {
+        // Reset form for new screen
+        this.formGroup.reset({
+          name: '',
+          resolution: '',
+          orientation: 'landscape',
+          macAddress: '',
+          location: '',
+          address: '',
+          status: 'active'
+        });
+      } else {
+        // Load data for existing screen
+        this.loadScreenData();
+      }
+      this.errorMessage = '';
+      this.isOpen = true;
+    }
+  }
+
+  private loadScreenData(): void {
+    this.formGroup.patchValue({
+      name: this.screen?.name ?? '',
+      resolution: this.screen?.resolution ?? '',
       orientation: this.screen?.orientation ?? 'landscape',
-      macAddress:  this.screen?.macAddress  ?? '',
-      location:    this.screen?.location    ?? '',
-      address:     this.screen?.address     ?? ''
+      macAddress: this.screen?.macAddress ?? '',
+      location: this.screen?.location ?? '',
+      address: this.screen?.address ?? '',
+      status: this.screen?.status ?? 'active'
     });
-    this.errorMessage = '';
-    this.isOpen       = true;
   }
 
   protected onHide(): void {
@@ -96,12 +118,11 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
       this.formGroup.markAllAsTouched();
       return;
     }
-    this.isLoading    = true;
+    this.isLoading = true;
     this.errorMessage = '';
     this.saveScreen();
   }
 
-  
   private saveScreen(): void {
     const payload: MvUpsertScreen = {
       ...this.formGroup.value,
@@ -134,12 +155,11 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
       });
   }
 
-
   private close(): void {
     this.isOpen = false;
   }
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
   }

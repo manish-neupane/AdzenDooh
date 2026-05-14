@@ -20,15 +20,15 @@ export class ScreenOperatingHourService {
 
   constructor(private api: ApiService) {}
 
-  getSlots(param: MvScreenOperatingHourFilter): Observable<ApiResponse<MvScreenOperatingHour[]>> {
+  getOperatingHours(param: MvScreenOperatingHourFilter): Observable<ApiResponse<MvScreenOperatingHour[]>> {
     return this.api.get(`${this.base}/GetAll`, param);
   }
 
-  addSlots(payload: MvAddScreenOperatingHour[]): Observable<ApiResponse<MvScreenOperatingHour[]>> {
+  createOperatingHours(payload: MvAddScreenOperatingHour[]): Observable<ApiResponse<MvScreenOperatingHour[]>> {
     return this.api.post(`${this.base}/AddSlot`, payload);
   }
 
-  deleteSlot(payload: MvDeleteScreenOperatingHour): Observable<ApiResponse<null>> {
+  deleteOperatingHour(payload: MvDeleteScreenOperatingHour): Observable<ApiResponse<null>> {
     return this.api.delete(`${this.base}/DeleteSlot`, payload);
   }
 }

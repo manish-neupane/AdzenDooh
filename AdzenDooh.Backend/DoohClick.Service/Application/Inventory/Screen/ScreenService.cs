@@ -43,13 +43,8 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
             try
             {
                 string result = await _DataAccessService.ActionProcedure("inv.SpScreenTsk", JsonConvert.SerializeObject(param));
-
-                if (!result.TrimStart().StartsWith("["))
-                {
-                    var spError = JsonConvert.DeserializeObject<MvSpError>(result);
-                    throw new InvalidOperationException(spError?.Message ?? "An error occurred");
-                }
                 return JsonConvert.DeserializeObject<List<MvScreen>>(result);
+
             }
             catch (Exception)
             {
@@ -58,6 +53,17 @@ namespace AdzenDooh.Service.Application.Inventory.Screen
         }
 
 
+        public async Task<MvScreenDetail?> GetDetail(MvScreenDetailParam param)
+        {
+            try
+            {
+                string result = await _DataAccessService.RetrievalProcedure(
+                    "inv.SpScreenDtlSel", JsonConvert.SerializeObject(param));
+
+                return JsonConvert.DeserializeObject<MvScreenDetail>(result);
+            }
+            catch (Exception) { throw; }
+        }
 
 
         public async Task<List<MvScreen>?> DeleteScreen(MvDeleteScreen param)

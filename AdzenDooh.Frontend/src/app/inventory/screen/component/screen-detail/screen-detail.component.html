@@ -1,1 +1,110 @@
-<p>screen-detail works!</p>
+<p-dialog
+  [(visible)]="isOpen"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '720px' }"
+  header="Screen Detail">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+
+  <ng-container *ngIf="!isLoading && detail">
+
+    <!--  Screen Info  -->
+    <section class="detail-section">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Name</span>
+          <span class="value">{{ detail.name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Status</span>
+          <p-tag [value]="detail.status"
+                 [severity]="detail.status === 'Active' ? 'success' : 'danger'" />
+        </div>
+        <div class="detail-item">
+          <span class="label">Location</span>
+          <span class="value">{{ detail.location }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Address</span>
+          <span class="value">{{ detail.address ?? '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Orientation</span>
+          <span class="value">{{ detail.orientation }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Resolution</span>
+          <span class="value">{{ detail.resolution ?? '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">MAC Address</span>
+          <span class="value">{{ detail.macAddress }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Created At</span>
+          <span class="value">{{ detail.createdAt | date:'dd MMM yyyy' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!--  Campaigns  -->
+    <section class="detail-section">
+      <div class="section-header">
+        <h4>Campaigns</h4>
+      </div>
+
+      <p-table [value]="detail.campaigns" [tableStyle]="{ 'min-width': '100%' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-c>
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.status }}</td>
+            <td>{{ c.durationInDays }} days</td>
+            <td>{{ c.startDate | date:'dd MMM yyyy' }}</td>
+            <td>{{ c.endDate   | date:'dd MMM yyyy' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center text-color-secondary">
+              No campaigns assigned to this screen.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <!--  Operating Hours  -->
+    <section class="detail-section">
+      <div class="section-header">
+        <h4>Operating Hours</h4>
+        <p-button
+          label="View"
+          icon="pi pi-clock"
+          size="small"
+          severity="secondary"
+          (onClick)="openOperatingHours()" />
+      </div>
+      <p class="text-color-secondary text-sm">
+        {{ detail.operatingHours.length }} slot(s) configured.
+      </p>
+    </section>
+
+  </ng-container>
+
+</p-dialog>
+
+<!-- FIX: Add mode input -->
+<screen-operating-hour #screenOperatingHour [mode]="'view'" />

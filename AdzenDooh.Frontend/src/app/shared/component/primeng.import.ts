@@ -18,6 +18,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule }         from 'primeng/message';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
+import {TagModule} from 'primeng/tag';
+import {TableModule} from 'primeng/table';
 
 export { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -37,10 +39,12 @@ export const sharedImports = [
   IconFieldModule,
   InputIconModule,
   TooltipModule,
-   FileUploadModule,
-   SidebarModule,
-   ProgressSpinnerModule,
-   MessageModule,
-   CheckboxModule,
-   CalendarModule
+  FileUploadModule,
+  SidebarModule,
+  ProgressSpinnerModule,
+  MessageModule,
+  CheckboxModule,
+  CalendarModule,
+  TagModule,
+  TableModule
 ];

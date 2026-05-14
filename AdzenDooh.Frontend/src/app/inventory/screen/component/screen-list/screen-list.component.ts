@@ -10,7 +10,7 @@ import { ScreenOperatingHourComponent } from '../operating-hour/operating-hour.c
 
 import { sharedImports } from '../../../../shared/component/primeng.import';
 import { MvScreen, MvScreenFilter, MvDeleteScreen } from '../../model/screen.model';
-import { ApiResponse, GridResponse, ParamOption } from '../../../../shared/model/sharedModel';
+import {  ParamOption } from '../../../../shared/model/sharedModel';
 import { GridConfig } from '../../../../shared/model/grid-config.model';
 import { screenColumns } from './screen-list-columns';
 import { ScreenService } from '../../service/screen.service';
@@ -19,11 +19,12 @@ import { AppComponent } from '../../../../app.component';
 import { ScreenCreateEditComponent } from '../screen-create-edit/screen-create-edit.component';
 import { PageWrapperComponent } from '../../../../shared/component/page-wrapper/page-wrapper.component';
 import { RouterOutlet } from "@angular/router";
+import { ScreenDetailComponent } from '../screen-detail/screen-detail.component';
 
 @Component({
   selector: 'screen-list',
   standalone: true,
-  imports: [...sharedImports, GridComponent, ScreenCreateEditComponent, PageWrapperComponent, ScreenOperatingHourComponent, RouterOutlet],
+  imports: [...sharedImports, GridComponent, ScreenCreateEditComponent, PageWrapperComponent, ScreenOperatingHourComponent, RouterOutlet, ScreenDetailComponent],
   templateUrl: './screen-list.component.html',
   styleUrl: './screen-list.component.scss'
 })
@@ -31,8 +32,9 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
 
   @ViewChild('screenCreateEdit') screenCreateEdit!: ScreenCreateEditComponent;
   @ViewChild('screenOperatingHour') screenOperatingHour!: ScreenOperatingHourComponent;
+  @ViewChild('screenDetail') screenDetail!: ScreenDetailComponent;
 
-screenConfig: GridConfig<MvScreen> = {
+  screenConfig: GridConfig<MvScreen> = {
     columns: screenColumns,
     dataSource: { data: [], totalCount: 0 },
     showActions: true,
@@ -42,7 +44,7 @@ screenConfig: GridConfig<MvScreen> = {
         icon: 'pi pi-pencil',
         severity: 'info',
         tooltip: 'Edit',
-        handler: (row) => this.editScreen(row) // row is inferred as MvScreen
+        handler: (row) => this.editScreen(row)
       },
       {
         type: 'delete',
@@ -57,23 +59,30 @@ screenConfig: GridConfig<MvScreen> = {
         severity: 'info',
         tooltip: 'Operating Hours',
         handler: (row) => this.openOperatingHours(row)
+      },
+      {
+        type: 'info',
+        icon: 'pi pi-info-circle',
+        severity: 'info',
+        tooltip: 'Details',
+        handler: (row) => this.openDetail(row)
       }
     ]
   };
 
-param: ParamOption<MvScreenFilter> = {
+  param: ParamOption<MvScreenFilter> = {
     filter: {} as MvScreenFilter,
     offset: 0,
     pageSize: 10
   };
 
-  protected currentScreen  = {} as MvScreen;
-  protected isLoading      = false;
-  protected errorMessage   = '';
+  protected currentScreen = {} as MvScreen;
+  protected isLoading = false;
+  protected errorMessage = '';
   private _unSubscribeAll$ = new Subject<void>();
 
   constructor(
-    private screenService: ScreenService,
+    private _screenService: ScreenService,
     private injector: Injector
   ) {
     super(injector);
@@ -83,14 +92,18 @@ param: ParamOption<MvScreenFilter> = {
     this.loadScreens();
   }
 
-
-
- loadScreens(): void {
-    this.isLoading = true;
-    this.screenService.getAll(this.param)
+  loadScreens(showLoading:boolean = true): void {
+    if (showLoading) {
+      this.isLoading = true;
+    }
+    this._screenService.getAll(this.param)
       .pipe(
         takeUntil(this._unSubscribeAll$),
-        finalize(() => this.isLoading = false)
+        finalize(() => {
+          if (showLoading) {
+            this.isLoading = false;
+          }
+        })
       )
       .subscribe({
         next: (response) => {
@@ -108,13 +121,14 @@ param: ParamOption<MvScreenFilter> = {
       });
   }
 
-  // ── Grid event handlers ──────────────────────────────────────────────────
+  //  Grid event handlers 
 
-onPage(event: { first: number; rows: number }): void {
+  onPage(event: { first: number; rows: number }): void {
     this.param = { ...this.param, offset: event.first, pageSize: event.rows };
     this.loadScreens();
   }
-onSort(event: { field: string; order: number }): void {
+
+  onSort(event: { field: string; order: number }): void {
     this.param = {
       ...this.param,
       sortBy: event.field,
@@ -123,16 +137,16 @@ onSort(event: { field: string; order: number }): void {
     this.loadScreens();
   }
 
-onFilter(searchText: string): void {
+  onFilter(searchText: string): void {
     this.param = {
       ...this.param,
       offset: 0,
       filter: { ...this.param.filter, searchText }
     };
-    this.loadScreens();
+    this.loadScreens(false);
   }
 
-  // ── Dialog actions ───────────────────────────────────────────────────────
+  //  Dialog actions 
 
   openAddScreen(): void {
     this.currentScreen = { id: 0 } as MvScreen;
@@ -147,6 +161,11 @@ onFilter(searchText: string): void {
   openOperatingHours(screen: MvScreen): void {
     this.currentScreen = { ...screen };
     this.screenOperatingHour.open(screen);
+  }
+
+  openDetail(screen: MvScreen): void {
+    this.currentScreen = { ...screen };
+    this.screenDetail.open(screen);
   }
 
   afterFormClosed(screen: MvScreen | null): void {
@@ -166,8 +185,6 @@ onFilter(searchText: string): void {
     this.currentScreen = {} as MvScreen;
   }
 
- 
-
   deleteScreen(screen: MvScreen): void {
     this.confirmDialog(
       `Are you sure you want to delete "${screen.name}"?`,
@@ -177,26 +194,39 @@ onFilter(searchText: string): void {
     );
   }
 
-  private executeDelete(payload: MvDeleteScreen): void {
-    this.isLoading = true;
+private executeDelete(payload: MvDeleteScreen): void {
+  this.isLoading = true;
 
-    this.screenService.deleteScreen(payload)
-      .pipe(
-        takeUntil(this._unSubscribeAll$),
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe({
-        next: () => {
-          this.showMessage('success', 'Deleted', 'Screen deleted successfully');
-          this.loadScreens();
-        },
-        error: () => {
-          this.showMessage('error', 'Error', 'Failed to delete screen');
-        }
-      });
-  }
+  this._screenService.deleteScreen(payload)
+    .pipe(
+      takeUntil(this._unSubscribeAll$),
+      finalize(() => this.isLoading = false)
+    )
+    .subscribe({
+      next: () => {
+        // Manually remove from grid (like save does)
+        const updatedData = this.screenConfig.dataSource.data.filter(
+          screen => screen.id !== payload.id
+        );
+        
+        this.screenConfig = {
+          ...this.screenConfig,
+          dataSource: {
+            data: updatedData,
+            totalCount: this.screenConfig.dataSource.totalCount - 1
+          }
+        };
+        
+        this.showMessage('success', 'Deleted', 'Screen deleted successfully');
+        // Don't call loadScreens()
+      },
+      error: () => {
+        this.showMessage('error', 'Error', 'Failed to delete screen');
+      }
+    });
+}
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
   }

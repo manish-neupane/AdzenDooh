@@ -79,6 +79,19 @@
               <span class="screen-name">{{ screen.name }}</span>
               <span class="screen-location">{{ screen.location }}</span>
             </div>
+
+            <!-- inside .screen-row, after .screen-info div -->
+              <div class="screen-detail-btn">
+                <p-button
+                  icon="pi pi-info-circle"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="info"
+                  pTooltip="View screen details"
+                  tooltipPosition="left"
+                  (onClick)="openScreenDetail($event, screen)"
+                />
+              </div>
           </div>
 
           <div *ngIf="availableScreens.length === 0" class="no-screens">
@@ -206,5 +219,6 @@
 
     </div>
   </ng-template>
-
+ 
+  <screen-detail #screenDetail />
 </p-dialog>

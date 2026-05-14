@@ -57,9 +57,11 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
 
   //  Data 
 
-  loadCreatives(): void {
+  loadCreatives(showLoading: boolean = true): void {
 
-    this.isLoading = true;
+    if (showLoading) {
+      this.isLoading = true;
+    }
     this.creativeService.getGrid(this.param)
       .pipe(
         takeUntil(this._unSubscribeAll$),
@@ -116,7 +118,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
       offset: 0,
       filter: { ...this.param.filter, searchText } as MvCreativeFilter
     };
-    this.loadCreatives();
+    this.loadCreatives(false);
   }
 
 onTypeChange(type: string): void {
@@ -130,7 +132,7 @@ onTypeChange(type: string): void {
     offset: 0,
     filter: { ...this.param.filter, isVideo }
   };
-  this.loadCreatives();
+  this.loadCreatives(false);
 }
 
 previewItem: MvCreative | null = null;

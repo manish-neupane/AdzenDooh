@@ -47,3 +47,43 @@ export interface MvScreenDdl
       TenantId : number;  
     CampaignId? : number; 
 }
+
+
+  // screen Detail Models
+
+  export interface MvScreenDetail {
+  id: number;
+  name: string;
+  location: string;
+  address?: string | null;
+  status: string;
+  resolution?: string | null;
+  orientation: string;
+  macAddress: string;
+  createdAt: string;
+
+  campaigns: MvScreenDetailCampaign[];
+  operatingHours: MvScreenDetailOperatingHour[];
+}
+export interface MvScreenDetailCampaign {
+  id: number;
+  name: string;
+  status: number;
+  durationInDays: number;
+  remarks?: string | null;
+  createdAt: string;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+export interface MvScreenDetailOperatingHour {
+  id: number;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  averageAudienceCount?: number | null;
+}
+
+export interface MvScreenDetailParam {
+  screenId: number;
+  tenantId: number;
+}

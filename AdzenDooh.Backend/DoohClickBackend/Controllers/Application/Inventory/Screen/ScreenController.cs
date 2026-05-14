@@ -23,6 +23,24 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDetail([FromQuery] MvScreenDetailParam param)
+        {
+            try
+            {
+                var response = await screenService.GetDetail(param);
+                return Ok(ApiResult.Success(response));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResult.Fail<object>(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> GetDdl([FromBody] MvScreenDdl param)

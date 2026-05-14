@@ -3,6 +3,7 @@ using AdzenDooh.Interface.Application.Cms.Creative;
 using AdzenDooh.Model.Application.Cms.Creative;
 using AdzenDooh.Model.Shared.Param;
 using AdzenDooh.Model.Shared.Response;
+using AdzenDooh.Service.Application.Cms.Creative;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +64,20 @@ namespace AdzenDooh.Api.Controllers.Application.Cms.Creative
             {
                 var response = await _CreativeService.CreativeDdl(param);
                 return Ok(ApiResult.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult.Fail<object>(ex.Message));
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] MvDeleteCreative param)
+        {
+            try
+            {
+                await _CreativeService.DeleteCreative(param);
+                return Ok(ApiResult.Success("Creative deleted successfully"));
             }
             catch (Exception ex)
             {

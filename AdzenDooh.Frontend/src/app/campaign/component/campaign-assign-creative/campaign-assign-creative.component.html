@@ -3,7 +3,7 @@
   header="Assign Creatives to Screens"
   [(visible)]="isOpen"
   [modal]="true"
-  [style]="{ width: '880px', maxWidth: '96vw' }"
+  [style]="{ width: '1000px', maxWidth: '100vw',height: '80vh' }"
   [contentStyle]="{ padding: '0' }"
   [draggable]="false"
   [resizable]="false"
@@ -20,9 +20,9 @@
 
     <p-tabView [(activeIndex)]="activeTabIndex">
 
-      <!-- ══════════════════════════════════════════
+      <!--
            TAB 1 — Assign
-           ══════════════════════════════════════════ -->
+         -->
       <p-tabPanel header="Assign Creatives">
 
         <!-- No screens -->
@@ -170,9 +170,9 @@
 
       </p-tabPanel>
 
-      <!-- ══════════════════════════════════════════
+      <!-- 
            TAB 2 — Details
-           ══════════════════════════════════════════ -->
+            -->
       <p-tabPanel header="Details">
 
         <div *ngIf="creativesGroupedByScreen.length === 0" class="am-empty">
@@ -252,14 +252,14 @@
 <!-- Picker dialog unchanged -->
 
 
-<!-- ╔══════════════════════════════════════════════════════════════════╗
-     ║  CREATIVE PICKER DIALOG                                         ║
-     ╚══════════════════════════════════════════════════════════════════╝ -->
+<!-- 
+      CREATIVE PICKER DIALOG                                       
+      -->
 <p-dialog
   header="Add Creative"
   [(visible)]="isCreativePickerOpen"
   [modal]="true"
-  [style]="{ width: '420px', 'background-color': 'blue' }"
+  [style]="{ width: '1000px', 'background-color': 'blue' }"
   [draggable]="false"
   [resizable]="false"
 >

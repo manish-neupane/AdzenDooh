@@ -169,7 +169,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.activeTabIndex = 0;
   }
 
-  //   call from parent
+ 
 
   open(campaignId: number): void {
     this.campaignId = campaignId;

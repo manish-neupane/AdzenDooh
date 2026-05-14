@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../app/shared/service/api.service';
 import { ApiResponse, GridResponse, ParamOption } from '../../../app/shared/model/sharedModel';
-import { MvScreen, MvCampaign, MvCreateCampaign, MvCampaignFilter, MvCampaignDetail, MvSaveCampaignCreative } from '../model/campaign.model';
+import {  MvCampaign, MvCreateCampaign, MvCampaignFilter, MvCampaignDetail, MvSaveCampaignCreative } from '../model/campaign.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })

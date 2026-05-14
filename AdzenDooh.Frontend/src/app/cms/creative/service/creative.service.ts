@@ -35,7 +35,9 @@ export class CreativeService {
   }
  
   deleteCreative(payload: MvDeleteCreative): Observable<ApiResponse<MvCreative>> {
-    return this.api.delete<ApiResponse<MvCreative>>(`${this.base}/DeleteCreative`, payload);
+    return this.api.delete<ApiResponse<MvCreative>>(`${this.base}/Delete`, payload);
   }
 
 }
+
+

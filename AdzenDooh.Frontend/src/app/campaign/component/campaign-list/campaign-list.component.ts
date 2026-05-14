@@ -9,7 +9,7 @@ import { GridComponent } from '../../../shared/component/grid/grid.component';
 import { PageWrapperComponent } from '../../../shared/component/page-wrapper/page-wrapper.component';
 import { CampaignService } from '../../service/campaign.service';
 import { CampaignCreateComponent } from '../campaign-create/campaign-create.component';
-import { MvCampaign, MvCampaignFilter, MvScreen } from '../../model/campaign.model';
+import { MvCampaign, MvCampaignFilter, MvScreenOption } from '../../model/campaign.model';
 import { campaignColumns } from './campaign-list-column';
 import { ScreenService } from '../../../inventory/screen/service/screen.service';
 import { AuthService } from '../../../shared/service/auth.service';
@@ -59,27 +59,29 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     dataSource: { data: [], totalCount: 0 },
     showActions: true,
     actions: [
-      {
-        type: 'info',
-        icon: 'pi pi-eye',
-        severity: 'info',
-        tooltip: 'View Details',
-        handler: (row: MvCampaign) => this.onViewDetail(row),
-      },
-      {
+        {
         type: 'edit',
-        icon: 'pi pi-images',          // distinct icon — assign media
+        icon: 'pi pi-upload',          
         severity: 'info',
         tooltip: 'Assign Creative',
         handler: (row: MvCampaign) => this.onAddCampaignCreative(row),
       },
+      
+      {
+        type: 'info',
+        icon: 'pi pi-info-circle',
+        severity: 'info',
+        tooltip: 'View Details',
+        handler: (row: MvCampaign) => this.onViewDetail(row),
+      },
+    
     ],
   };
 
   //  State 
   isLoading    = false;
   errorMessage = '';
-  screenDdl: MvScreen[] = [];
+  screenDdl: MvScreenOption[] = [];
 
   param: ParamOption<MvCampaignFilter> = {
     tenantId: 1,
@@ -189,12 +191,12 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     };
   }
 
-  /** Called by assign-creative after save — just refresh the grid */
+
   public afterAssignCreativeClosed(): void {
     this.loadCampaigns();
   }
 
-  //  Grid event handlers ───────────────────────────────────────────────
+  //  Grid event handlers 
 
   onPage(event: { first: number; rows: number }): void {
     this.param = { ...this.param, offset: event.first, pageSize: event.rows };

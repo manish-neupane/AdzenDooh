@@ -98,25 +98,42 @@
     MAC Address is required.
   </small>
 </div>
-      <!-- Location -->
-      <div class="field">
-        <label for="location">Location <span class="required">*</span></label>
-        <input
-          id="location"
-          type="text"
-          pInputText
-          formControlName="location"
-        />
-        <small
-          *ngIf="
-            formGroup.get('location')?.invalid &&
-            formGroup.get('location')?.touched
-          "
-          class="p-error"
-        >
-          Location is required.
-        </small>
-      </div>
+  <!-- Location -->
+<div class="field">
+  <label for="location">
+    Location <span class="required">*</span>
+  </label>
+
+  <div class="location-wrapper">
+
+    <input
+      id="location"
+      type="text"
+      pInputText
+      formControlName="location"
+      placeholder=" Enter coordinates (e.g. 27.7172, 85.3240)"
+    />
+
+    <p-button
+      icon="pi pi-map-marker"
+      label="Map"
+      severity="secondary"
+      type="button"
+      (onClick)="openMapPicker()"
+    />
+
+  </div>
+
+  <small
+    *ngIf="
+      formGroup.get('location')?.invalid &&
+      formGroup.get('location')?.touched
+    "
+    class="p-error"
+  >
+    Location is required.
+  </small>
+</div>
 
       <!-- Address (optional) -->
       <div class="field">
@@ -159,4 +176,99 @@
       [loading]="isLoading"
     />
   </ng-template>
+</p-dialog>
+
+
+
+<!-- ─────────────────────────────────────────────── -->
+<!-- MAP PICKER DIALOG -->
+<!-- ─────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="isMapDialogOpen"
+  header="Select Location"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '900px', height: '700px' }"
+  appendTo="body"
+>
+
+  <div class="map-dialog-body">
+
+    <!-- Search -->
+    <div class="map-toolbar">
+
+      <input
+        type="text"
+        pInputText
+        placeholder="Search location..."
+        [(ngModel)]="mapSearchText"
+      />
+
+      <p-button
+        icon="pi pi-search"
+        label="Search"
+        severity="secondary"
+        type="button"
+      />
+
+      <p-button
+        icon="pi pi-crosshairs"
+        label="Use Current Location"
+        severity="contrast"
+        type="button"
+      />
+
+    </div>
+
+    <!-- Selected Coordinates -->
+    <div class="map-coordinates">
+
+      <div class="coord-box">
+        <label>Latitude</label>
+        <input
+          type="text"
+          pInputText
+          [value]="selectedLatitude"
+          readonly
+        />
+      </div>
+
+      <div class="coord-box">
+        <label>Longitude</label>
+        <input
+          type="text"
+          pInputText
+          [value]="selectedLongitude"
+          readonly
+        />
+      </div>
+
+    </div>
+
+    <!-- Actual Map -->
+    <div id="screen-map"></div>
+
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      type="button"
+      (onClick)="isMapDialogOpen = false"
+    />
+
+    <p-button
+      label="Use This Location"
+      icon="pi pi-check"
+      type="button"
+      (onClick)="confirmMapLocation()"
+    />
+
+  </ng-template>
+
 </p-dialog>

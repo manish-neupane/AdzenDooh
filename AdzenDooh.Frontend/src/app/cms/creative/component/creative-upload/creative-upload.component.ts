@@ -1,11 +1,10 @@
-import { Component, EventEmitter, Injector, Output } from '@angular/core';
+import { Component, EventEmitter, Injector, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../../app.component';
 import { sharedImports } from '../../../../shared/component/primeng.import';
 import { CreativeService } from '../../service/creative.service';
 import { FileUploadModule } from 'primeng/fileupload';
-import { inject } from '@angular/core';
 import { AuthService } from '../../../../shared/service/auth.service';
 @Component({
   selector: 'creative-upload',
@@ -13,7 +12,7 @@ import { AuthService } from '../../../../shared/service/auth.service';
   imports: [...sharedImports,FileUploadModule],
   templateUrl: './creative-upload.component.html'
 })
-export class CreativeUploadComponent extends AppComponent {
+export class CreativeUploadComponent extends AppComponent implements OnInit, OnDestroy {
   @Output() afterUploadClosed = new EventEmitter<boolean>();
 
   formGroup!: FormGroup;
@@ -37,6 +36,11 @@ export class CreativeUploadComponent extends AppComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.formGroup = this.fb.group({
+      name: ['', Validators.required]
+    });
+  }
   open(): void {
     this.formGroup.reset();
     this.selectedFile = null;

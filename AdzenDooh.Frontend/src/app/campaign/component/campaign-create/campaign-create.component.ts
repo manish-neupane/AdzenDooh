@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Injector,
   Input,
+  OnInit,
   OnDestroy,
   Output,
   ViewChild,
@@ -30,22 +31,18 @@ import {
 } from '../../model/campaign.model';
 import { buildDatePayload, validateDateRanges } from './campaign-date-utils';
 
-import { ScreenDetailComponent } from '../../../inventory/screen/component/screen-detail/screen-detail.component';
-import { MvScreen } from '../../../inventory/screen/model/screen.model';
 
 @Component({
   selector: 'campaign-create-edit',
   standalone: true,
-  imports: [...sharedImports, StepsModule,ScreenDetailComponent],
+  imports: [...sharedImports, StepsModule],
   templateUrl: './campaign-create.component.html',
   styleUrl: './campaign-create.component.scss',
 })
-export class CampaignCreateComponent extends AppComponent implements OnDestroy {
+export class CampaignCreateComponent extends AppComponent implements OnInit, OnDestroy {
 
   @Input() availableScreens: MvScreenOption[] = [];
   @Output() afterFormClosed = new EventEmitter<MvCampaign | null>();
-
-  @ViewChild('screenDetail') private _screenDetail!: ScreenDetailComponent;
   
  
   protected isDialogOpen = false;
@@ -69,6 +66,11 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
     private _authService: AuthService,
   ) {
     super(injector);
+    this.initForm();
+  }
+
+
+  ngOnInit(): void {
     this.initForm();
   }
 
@@ -115,10 +117,7 @@ export class CampaignCreateComponent extends AppComponent implements OnDestroy {
   }
  
 
-  openScreenDetail(event: Event, screen: MvScreenOption): void {
-  event.stopPropagation(); // prevent row checkbox toggle
-  this._screenDetail.open(screen.id);
-}
+
   nextStep(): void {
     if (!this.canAdvanceFrom(this.activeStep)) return;
     if (this.activeStep < this.steps.length - 1) this.activeStep++;

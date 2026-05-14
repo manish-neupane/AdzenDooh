@@ -29,7 +29,6 @@ export interface MvAddCreative {
 
 export interface MvDeleteCreative {
   id: number;
-  tenantId: number;
   deletedBy: number;
 }
 export interface MvCreativeFilter {

@@ -36,6 +36,13 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
   protected errorMessage = '';
 
   private _unSubscribeAll$ = new Subject<void>();
+  
+// Map picker state
+  isMapDialogOpen = false;
+  mapSearchText = '';
+
+  selectedLatitude: number | null = null;
+  selectedLongitude: number | null = null;
 
   get isNewScreen(): boolean {
     return !this.screen?.id;
@@ -74,7 +81,6 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
   open(): void {
     if (this.formGroup) {
       if (this.isNewScreen) {
-        // Reset form for new screen
         this.formGroup.reset({
           name: '',
           resolution: '',
@@ -154,6 +160,27 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
         }
       });
   }
+
+  // Map picker methods
+openMapPicker(): void {
+  this.isMapDialogOpen = false;
+}
+confirmMapLocation(): void {
+
+  if (
+    this.selectedLatitude !== null &&
+    this.selectedLongitude !== null
+  ) {
+
+    this.formGroup.patchValue({
+      location: `${this.selectedLatitude}, ${this.selectedLongitude}`
+    });
+
+    this.isMapDialogOpen = false;
+  }
+}
+
+
 
   private close(): void {
     this.isOpen = false;

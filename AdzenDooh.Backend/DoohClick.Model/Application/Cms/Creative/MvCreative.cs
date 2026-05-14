@@ -41,7 +41,7 @@ namespace AdzenDooh.Model.Application.Cms.Creative
     public class MvDeleteCreative
     {
         public required int Id { get; set; }
-        public required int TenantId { get; set; }
+       
         public required int DeletedBy { get; set; }
     }
 
@@ -69,4 +69,6 @@ namespace AdzenDooh.Model.Application.Cms.Creative
         public string Url { get; set; } = string.Empty;
         public bool IsVideo { get; set; }
     }
+
+  
 }

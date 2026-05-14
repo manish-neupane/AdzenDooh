@@ -65,7 +65,7 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnInit
     this.formGroup = this._fb.group({
       startTime: this._fb.control<Date | null>(null, Validators.required),
       endTime: this._fb.control<Date | null>(null, Validators.required),
-      averageAudienceCount: this._fb.control<number | null>(null),
+      averageAudienceCount: this._fb.control<number | null>(null,Validators.required),
     });
   }
 

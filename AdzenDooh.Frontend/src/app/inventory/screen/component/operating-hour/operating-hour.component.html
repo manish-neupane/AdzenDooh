@@ -1,8 +1,4 @@
-<!-- ─── screen-operating-hour.component.html ─────────────────────────────────
-     Side overlay for managing operating hour slots of a single screen.
-     - Day dropdown: selects which day you're adding a slot to
-     - Slot list: always shows ALL slots, grouped by each day
-     ──────────────────────────────────────────────────────────────────────── -->
+
 
 <p-dialog
   [(visible)]="isOpen"
@@ -69,12 +65,12 @@
             styleClass="w-full"
           />
         </div>
-
+        
         <!-- Avg Audience -->
         <div class="soh-field">
           <label>
             Avg. Audience Count
-            <span class="soh-optional">(optional)</span>
+            <span class="soh-optional">(Mandatory)</span>
           </label>
           <p-inputNumber
             [formControl]="$any(formGroup.get('averageAudienceCount'))"

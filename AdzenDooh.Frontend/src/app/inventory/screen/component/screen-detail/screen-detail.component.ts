@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AppComponent } from '../../../../app.component';
@@ -15,7 +15,7 @@ import { AuthService } from '../../../../shared/service/auth.service';
   templateUrl: './screen-detail.component.html',
   styleUrl: './screen-detail.component.scss'
 })
-export class ScreenDetailComponent extends AppComponent implements OnDestroy {
+export class ScreenDetailComponent extends AppComponent implements OnInit, OnDestroy {
 
   @ViewChild('screenOperatingHour') screenOperatingHour!: ScreenOperatingHourComponent;
   
@@ -33,14 +33,17 @@ export class ScreenDetailComponent extends AppComponent implements OnDestroy {
     super(injector);
   }
 
-open(screenId: number): void {
-  this.currentScreen = { id: screenId } as MvScreen; 
+
+  ngOnInit(): void { }
+
+open(screen: MvScreen): void {
+  this.currentScreen = screen;
   this.isOpen = true;
   this.isLoading = true;
   this.detail = null;
 
   const param: MvScreenDetailParam = {
-    screenId,
+    screenId: screen.id,
     tenantId: this._authService.currentUser.tenantId
   };
 
@@ -57,7 +60,7 @@ open(screenId: number): void {
 
   openOperatingHours(): void {
     if (!this.currentScreen) return;
-    this.screenOperatingHour.open(this.currentScreen, 'edit');
+    this.screenOperatingHour.open(this.currentScreen, 'view');
   }
 
   ngOnDestroy(): void {

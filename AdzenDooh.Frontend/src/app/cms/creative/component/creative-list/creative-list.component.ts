@@ -1,11 +1,10 @@
-// ─── creative-list.component.ts ──────────────────────────────────────────
-// RESPONSIBILITY: Fetch creative grid, handle filters, and trigger upload.
+
 
 import { Component, OnInit, OnDestroy, Injector, inject, ViewChild } from '@angular/core';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
 import { sharedImports } from '../../../../shared/component/primeng.import';
-import { MvCreative, MvCreativeFilter } from '../../model/creative.model';
+import { MvCreative, MvCreativeFilter, MvDeleteCreative } from '../../model/creative.model';
 import { ApiResponse, GridResponse, ParamOption } from '../../../../shared/model/sharedModel';
 import { CreativeService } from '../../service/creative.service';
 import { AppComponent } from '../../../../app.component';
@@ -14,11 +13,12 @@ import { PageWrapperComponent } from "../../../../shared/component/page-wrapper/
 import { AuthService } from '../../../../shared/service/auth.service';
 import { environment } from '../../../../../environments/environment';
 import { PaginatorModule } from 'primeng/paginator';
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'creative-list',
   standalone: true,
-  imports: [...sharedImports, CreativeUploadComponent, PageWrapperComponent,PaginatorModule],
+  imports: [...sharedImports, CreativeUploadComponent, PageWrapperComponent, PaginatorModule, RouterOutlet],
   templateUrl: './creative-list.component.html',
   styleUrl: './creative-list.component.scss'
 })
@@ -43,6 +43,7 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
   };
 
   private _unSubscribeAll$ = new Subject<void>();
+  toast: any;
 
   constructor(private injector: Injector) {
     super(injector);
@@ -90,14 +91,34 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
 
   //  Delete 
 
-  deleteCreative(creative: MvCreative): void {
-    this.confirmDialog(
-      `Are you sure you want to delete "${creative.name}"?`,
-      'Confirm Delete',
-      'pi pi-exclamation-triangle',
-      () => { /* call service.delete */ }
-    );
-  }
+deleteCreative(creative: MvCreative): void {
+  console.log('delete clicked', creative);
+  this.confirmDialog(
+    `Deleting "${creative.name}" will remove it from all campaigns it is currently used in. This action cannot be undone. Are you sure?`,
+    'Delete Creative',
+    'pi pi-exclamation-triangle',
+    () => this.executeDelete({ id: creative.id, deletedBy: this.authService.currentUser.userId })
+  );
+}
+
+private executeDelete(payload: MvDeleteCreative): void {
+  this.isLoading = true;
+
+  this.creativeService.deleteCreative(payload)
+    .pipe(
+      takeUntil(this._unSubscribeAll$),
+      finalize(() => this.isLoading = false)
+    )
+    .subscribe({
+      next: () => {
+        this.showMessage('success', 'Deleted', 'Creative deleted successfully');
+        this.loadCreatives();
+      },
+      error: () => {
+        this.showMessage('error', 'Error', 'Failed to delete creative');
+      }
+    });
+}
 
   //  Pagination 
 

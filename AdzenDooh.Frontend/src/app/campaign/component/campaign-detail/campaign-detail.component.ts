@@ -2,6 +2,7 @@ import {
   Component,
   Injector,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { TagModule } from 'primeng/tag';
@@ -22,7 +23,7 @@ import {
   templateUrl: './campaign-detail.component.html',
   styleUrl: './campaign-detail.component.scss',
 })
-export class CampaignDetailComponent extends AppComponent implements OnDestroy {
+export class CampaignDetailComponent extends AppComponent implements OnInit, OnDestroy {
 
   protected isDialogOpen = false;
   protected isLoading = false;
@@ -38,6 +39,9 @@ export class CampaignDetailComponent extends AppComponent implements OnDestroy {
    }
 
   //  Open / close 
+
+
+  ngOnInit(): void {}
 
   open(campaignId: number): void {
     this.campaignDetail = null;

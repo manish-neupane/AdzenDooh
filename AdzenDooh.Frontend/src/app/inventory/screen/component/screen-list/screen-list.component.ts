@@ -39,34 +39,39 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
     dataSource: { data: [], totalCount: 0 },
     showActions: true,
     actions: [
-      {
+     
+
+       {
+        type: 'info',
+        icon: 'pi pi-info-circle',
+        severity: 'info',
+        tooltip: 'Details',
+        handler: (row) => this.openDetail(row)
+      },
+       {
         type: 'edit',
         icon: 'pi pi-pencil',
         severity: 'info',
         tooltip: 'Edit',
         handler: (row) => this.editScreen(row)
       },
-      {
+         {
+        type: 'info',
+        icon: 'pi pi-calendar-clock',
+        severity: 'info',
+        tooltip: 'Operating Hours',
+        handler: (row) => this.openOperatingHours(row)
+      },
+     
+   
+     
+       {
         type: 'delete',
         icon: 'pi pi-trash',
         severity: 'danger',
         tooltip: 'Delete',
         handler: (row) => this.deleteScreen(row)
       },
-      {
-        type: 'info',
-        icon: 'pi pi-clock',
-        severity: 'info',
-        tooltip: 'Operating Hours',
-        handler: (row) => this.openOperatingHours(row)
-      },
-      {
-        type: 'info',
-        icon: 'pi pi-info-circle',
-        severity: 'info',
-        tooltip: 'Details',
-        handler: (row) => this.openDetail(row)
-      }
     ]
   };
 
@@ -160,7 +165,7 @@ export class ScreenComponent extends AppComponent implements OnInit, OnDestroy {
 
   openOperatingHours(screen: MvScreen): void {
     this.currentScreen = { ...screen };
-    this.screenOperatingHour.open(screen);
+    this.screenOperatingHour.open(screen, 'edit');
   }
 
   openDetail(screen: MvScreen): void {

@@ -27,16 +27,7 @@ export function buildDatePayload(
 
 // ── Date Validation ───────────────────────────────────────────────────────────
 
-/**
- * Validates an array of date ranges against the following rules:
- *  1. Both dates must exist (safety net — form validators catch this first)
- *  2. Both dates must be valid Date values
- *  3. Start and end cannot be in the past
- *  4. End date must be strictly after start date
- *  5. No two ranges may overlap
- *
- * Returns an error message string if invalid, or null if all ranges are valid.
- */
+
 export function validateDateRanges(ranges: DateRowValue[]): string | null {
   const today = startOfDay(new Date());
   const validated: { start: Date; end: Date; index: number }[] = [];

@@ -25,10 +25,10 @@ export class ScreenOperatingHourService {
   }
 
   createOperatingHours(payload: MvAddScreenOperatingHour[]): Observable<ApiResponse<MvScreenOperatingHour[]>> {
-    return this.api.post(`${this.base}/AddSlot`, payload);
+    return this.api.post(`${this.base}/Add`, payload);
   }
 
   deleteOperatingHour(payload: MvDeleteScreenOperatingHour): Observable<ApiResponse<null>> {
-    return this.api.delete(`${this.base}/DeleteSlot`, payload);
+    return this.api.delete(`${this.base}/Delete`, payload);
   }
 }

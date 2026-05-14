@@ -95,8 +95,16 @@ namespace AdzenDooh.Service.Application.Cms.Creative
             catch { throw; }
         }
 
-      
-        public Task<List<MvCreative>?> DeleteCreative(MvDeleteCreative param)
-            => throw new NotImplementedException();
+
+        public async Task<List<MvCreative>?> DeleteCreative(MvDeleteCreative param)
+        {
+            try
+            {
+                await _DataAccessService.ActionProcedure(
+                    "dbo.SpCreativeDel", JsonConvert.SerializeObject(param));
+                return null;
+            }
+            catch { throw; }
+        }
     }
 }

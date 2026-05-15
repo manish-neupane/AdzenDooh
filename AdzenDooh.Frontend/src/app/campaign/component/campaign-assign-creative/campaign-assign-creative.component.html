@@ -130,10 +130,10 @@
                       <div class="row-actions">
                         <p-button icon="pi pi-arrow-up" [text]="true" [rounded]="true"
                           severity="secondary" size="small" pTooltip="Move up" tooltipPosition="top"
-                          [disabled]="ri === 0" (onClick)="moveCreativeUp(si, ri)" />
+                          [disabled]="ri === 0" (onClick)="shiftCreativeUp(si, ri)" />
                         <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
                           severity="secondary" size="small" pTooltip="Move down" tooltipPosition="top"
-                          [disabled]="last" (onClick)="moveCreativeDown(si, ri)" />
+                          [disabled]="last" (onClick)="shiftCreativeDown(si, ri)" />
                         <p-button icon="pi pi-trash" [text]="true" [rounded]="true"
                           severity="danger" size="small" pTooltip="Remove" tooltipPosition="top"
                           (onClick)="removeCreative(si, ri)" />

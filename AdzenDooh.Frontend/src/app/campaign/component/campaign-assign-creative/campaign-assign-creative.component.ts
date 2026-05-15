@@ -62,13 +62,13 @@ import {
 export class AssignCreativeComponent extends AppComponent implements OnInit, OnDestroy {
   @Output() afterFormClosed = new EventEmitter<void>();
 
-  //  Dialog / loading state 
+  // DIALOG STATE
   protected isOpen = false;
   protected isCreativePickerOpen = false;
   protected isLoading = false;
   protected isSaving = false;
 
-  //  Campaign state 
+  // CAMPAIGN STATE
   protected campaignId = 0;
   protected campaign: MvCampaignDetail | null = null;
   protected minDate: Date | null = null;
@@ -76,12 +76,12 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
   protected screenSlots: MvScreenSlot[] = [];
   protected activeTabIndex = 0;
 
-  //  Creative picker state 
+  // CREATIVE PICKER STATE
   protected creatives: MvCreativeDdl[] = [];
-  formGroup!: FormGroup;
+  public formGroup!: FormGroup;
 
-  //  Utility 
-  readonly getFileIcon = getFileIcon;
+  // UTILITY
+  public readonly getFileIcon = getFileIcon;
 
   private activeScreenIndex = -1;
   private readonly __unSubscribeAll$ = new Subject<void>();
@@ -91,21 +91,18 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     private readonly _campaignService: CampaignService,
     private readonly _creativeService: CreativeService,
     private readonly _authService: AuthService,
-    injector: Injector,
+    private readonly injector: Injector,
   ) {
     super(injector);
   }
 
-
-
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.initForm();
     this.loadCreativeDdl();
     this.loadCampaignDetails();
   }
 
-  
-
+  // FORM 
   private initForm(): void {
     this.formGroup = this._fb.group({
       creativeId:   [null, Validators.required],
@@ -154,14 +151,14 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
       });
   }
 
+  // UPDATE SCREEN CREATIVES
   private patchScreenCreatives(screenIndex: number, creatives: MvCreativeRow[]): void {
     this.screenSlots = this.screenSlots.map((slot, i) =>
       i === screenIndex ? { ...slot, creatives } : slot,
     );
   }
 
-  
-    private resetState(): void {
+  private resetState(): void {
     this.screenSlots = [];
     this.minDate = null;
     this.maxDate = null;
@@ -169,22 +166,16 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.activeTabIndex = 0;
   }
 
- 
-
-  open(campaignId: number): void {
+  //  DIALOG
+  public open(campaignId: number): void {
     this.campaignId = campaignId;
     this.resetState();
     this.isOpen = true;
     this.loadCampaignDetails();
   }
 
-
-
- 
-
-  //  Details tab 
-
-  get creativesGroupedByScreen(): MvCreativeGroupedByScreen[] {
+  // DETAILS TAB - GROUP CREATIVES BY SCREEN
+  public get creativesGroupedByScreen(): MvCreativeGroupedByScreen[] {
     return this.screenSlots.map((slot) => ({
       screenName: slot.screenName,
       creatives: (this.campaign?.creatives ?? [])
@@ -193,23 +184,19 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     }));
   }
 
-  //  Play-date 
-
-  applyDateToAll(date: Date | null): void {
+  public applyDateToAll(date: Date | null): void {
     if (!date) return;
     this.screenSlots = this.screenSlots.map((slot) => ({ ...slot, playDate: date }));
   }
 
-  //  Creative picker 
-
-  openCreativePickerForScreen(screenIndex: number): void {
+  public openCreativePickerForScreen(screenIndex: number): void {
     this.activeScreenIndex = screenIndex;
     const nextSequence = this.screenSlots[screenIndex].creatives.length + 1;
     this.formGroup.reset({ creativeId: null, playSequence: nextSequence });
     this.isCreativePickerOpen = true;
   }
 
-  confirmAddCreative(): void {
+  public confirmAddCreative(): void {
     if (this.formGroup.invalid) {
       this.formGroup.markAllAsTouched();
       return;
@@ -238,9 +225,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.isCreativePickerOpen = false;
   }
 
-  //  Reorder / remove 
-
-  moveCreativeUp(screenIndex: number, rowIndex: number): void {
+  public shiftCreativeUp(screenIndex: number, rowIndex: number): void {
     if (rowIndex === 0) return;
     const creatives = [...this.screenSlots[screenIndex].creatives];
     [creatives[rowIndex - 1], creatives[rowIndex]] = [creatives[rowIndex], creatives[rowIndex - 1]];
@@ -248,7 +233,7 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.patchScreenCreatives(screenIndex, creatives);
   }
 
-  moveCreativeDown(screenIndex: number, rowIndex: number): void {
+  public shiftCreativeDown(screenIndex: number, rowIndex: number): void {
     const creatives = [...this.screenSlots[screenIndex].creatives];
     if (rowIndex >= creatives.length - 1) return;
     [creatives[rowIndex], creatives[rowIndex + 1]] = [creatives[rowIndex + 1], creatives[rowIndex]];
@@ -256,26 +241,24 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
     this.patchScreenCreatives(screenIndex, creatives);
   }
 
-  removeCreative(screenIndex: number, rowIndex: number): void {
+  public removeCreative(screenIndex: number, rowIndex: number): void {
     const creatives = [...this.screenSlots[screenIndex].creatives];
     creatives.splice(rowIndex, 1);
     renumberSequences(creatives);
     this.patchScreenCreatives(screenIndex, creatives);
   }
 
-  //  Validation 
-
-  get readyScreenSlots(): MvScreenSlot[] {
+  // VALIDATION - READY SCREEN SLOTS
+  public get readyScreenSlots(): MvScreenSlot[] {
     return this.screenSlots.filter((slot) => slot.playDate && slot.creatives.length > 0);
   }
 
-  get canSave(): boolean {
+  // VALIDATION - CAN SAVE
+  public get canSave(): boolean {
     return this.readyScreenSlots.length > 0 && !this.isSaving;
   }
 
-
-
-  save(): void {
+  public save(): void {
     if (!this.canSave) return;
     this.isSaving = true;
 
@@ -314,11 +297,11 @@ export class AssignCreativeComponent extends AppComponent implements OnInit, OnD
       });
   }
 
-  close(): void {
+  public close(): void {
     this.isOpen = false;
   }
 
-   ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

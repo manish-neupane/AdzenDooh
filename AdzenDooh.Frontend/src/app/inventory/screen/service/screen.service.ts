@@ -22,15 +22,15 @@ export class ScreenService {
   getDetail(param: MvScreenDetailParam): Observable<ApiResponse<MvScreenDetail>> {
   return this.api.get(`${this.base}/GetDetail`,  param);
 }
-  saveScreen(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
-    return this.api.post(`${this.base}/SaveScreen`, payload);
+  save(payload: MvUpsertScreen): Observable<ApiResponse<MvScreen[]>> {
+    return this.api.post(`${this.base}/Save`, payload);
   }
 
   getDdl(param: MvScreenDdl): Observable<ApiResponse<MvScreen[]>> {
     return this.api.post(`${this.base}/GetDdl`, param);
   }
 
-  deleteScreen(payload: MvDeleteScreen): Observable<ApiResponse<MvScreen>> {
-    return this.api.delete(`${this.base}/DeleteScreen`, payload);
+  delete(payload: MvDeleteScreen): Observable<ApiResponse<MvScreen>> {
+    return this.api.delete(`${this.base}/Delete`, payload);
   }
 }

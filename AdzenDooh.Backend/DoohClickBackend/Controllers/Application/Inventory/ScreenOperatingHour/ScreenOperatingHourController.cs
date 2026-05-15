@@ -28,7 +28,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
 
 
         [HttpPost]
-        public async Task<IActionResult> Add(
+        public async Task<IActionResult> Create(
             [FromBody] List<MvAddScreenOperatingHour> param)
         {
             try

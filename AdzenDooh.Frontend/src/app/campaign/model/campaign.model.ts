@@ -1,11 +1,9 @@
-// ── Filters ──────────────────────────────────────────────────────────
-
+// Filters
 export interface MvCampaignFilter {
   searchText?: string;
 }
 
-// ── Nested / Joined Models ───────────────────────────────────────────
-
+// Nested / Joined Models
 export interface MvCampaignScreen {
   id:         number;
   campaignId: number;
@@ -33,8 +31,7 @@ export interface MvCampaignCreative {
   isVideo:      boolean;
 }
 
-// ── Reference Types (for POST bodies) ───────────────────────────────
-
+// Reference Types (for POST bodies)
 export interface MvCampaignScreenRef {
   screenId: number;
 }
@@ -44,8 +41,7 @@ export interface MvCampaignDateRef {
   endDate:   string;
 }
 
-// ── POST Bodies ──────────────────────────────────────────────────────
-
+// POST Bodies
 export interface MvCreateCampaign {
   tenantId:       number;
   createdBy:      number;
@@ -74,9 +70,7 @@ export interface MvCreativeItem {
   playSequence: number;
 }
 
-// ── GET Responses ────────────────────────────────────────────────────
-
-/** Lightweight model used in list/grid views. */
+// GET Responses
 export interface MvCampaign {
   id:             number;
   tenantId:       number;
@@ -89,7 +83,6 @@ export interface MvCampaign {
   dates:          MvCampaignDate[];
 }
 
-/** Full detail model used in campaign overview and creative assignment. */
 export interface MvCampaignDetail {
   id:             number;
   tenantId:       number;
@@ -103,8 +96,7 @@ export interface MvCampaignDetail {
   creatives:      MvCampaignCreative[];
 }
 
-// ── Lookup / Dropdown Models ─────────────────────────────────────────
-
+// Lookup / Dropdown Models
 export interface MvScreenOption {
   id:       number;
   name:     string;
@@ -120,8 +112,7 @@ export interface MvCreative {
   orientation:    string;
 }
 
-// ── Form Value Shapes (component-only) ──────────────────────────────
-
+// Form Value Shapes (component-only)
 export interface CampaignFormValue {
   name:             string;
   remarks:          string;
@@ -135,8 +126,7 @@ export interface DateRowValue {
   endDate:   Date | null;
 }
 
-// ── Assign-Creative UI State ─────────────────────────────────────────
-
+// Assign-Creative UI State
 export interface MvScreenSlot {
   screenId:   number;
   screenName: string;

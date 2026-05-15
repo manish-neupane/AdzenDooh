@@ -57,7 +57,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveScreen([FromBody] MvUpsertScreen param)
+        public async Task<IActionResult> Save([FromBody] MvUpsertScreen param)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteScreen([FromBody] MvDeleteScreen param)
+        public async Task<IActionResult> Delete([FromBody] MvDeleteScreen param)
         {
             try
             {

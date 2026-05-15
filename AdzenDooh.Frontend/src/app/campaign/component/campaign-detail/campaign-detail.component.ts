@@ -36,25 +36,18 @@ export class CampaignDetailComponent extends AppComponent implements OnInit, OnD
     private injector: Injector,
   ) {
     super(injector);
-   }
+  }
 
-  //  Open / close 
+  public ngOnInit(): void {}
 
-
-  ngOnInit(): void {}
-
-  open(campaignId: number): void {
+  //  DIALOG
+  public open(campaignId: number): void {
     this.campaignDetail = null;
     this.isDialogOpen = true;
     this.loadCampaignDetail(campaignId);
   }
 
-  close(): void {
-    this.isDialogOpen = false;
-  }
-
-  //  Data loading 
-
+  // LOAD CAMPAIGN FROM API
   private loadCampaignDetail(campaignId: number): void {
     this.isLoading = true;
 
@@ -78,8 +71,7 @@ export class CampaignDetailComponent extends AppComponent implements OnInit, OnD
       });
   }
 
-  //   helper
-
+  // FORMAT DATE FOR DISPLAY
   protected formatDate(dateStr: string): string {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleDateString([], {
@@ -93,17 +85,17 @@ export class CampaignDetailComponent extends AppComponent implements OnInit, OnD
     const map: Record<number, string> = {
       0: 'Draft',
       1: 'Active',
-      2: 'Paused',
-      3: 'Completed',
+      2: 'Completed',
+      3: 'Inactive',
     };
     return map[status] ?? 'Unknown';
   }
 
+  public close(): void {
+    this.isDialogOpen = false;
+  }
 
-
-
-
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

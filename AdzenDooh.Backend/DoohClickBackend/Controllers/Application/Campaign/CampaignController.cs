@@ -32,7 +32,7 @@ namespace AdzenDooh.Api.Controllers.Application.Campaign
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCampaignDetail([FromQuery] MvCampaignDetailRequest param)
+        public async Task<IActionResult> GetDetail([FromQuery] MvCampaignDetailRequest param)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace AdzenDooh.Api.Controllers.Application.Campaign
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCampaignCreatives([FromQuery] MvCampaignCreativeGridRequest param)
+        public async Task<IActionResult> GetCreatives([FromQuery] MvCampaignCreativeGridRequest param)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace AdzenDooh.Api.Controllers.Application.Campaign
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCampaign([FromBody] MvCreateCampaign param)
+        public async Task<IActionResult> Create([FromBody] MvCreateCampaign param)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace AdzenDooh.Api.Controllers.Application.Campaign
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCampaignCreative([FromBody] MvSaveCampaignCreative param)
+        public async Task<IActionResult> CreateCampaignCreative([FromBody] MvSaveCampaignCreative param)
         {
             try
             {

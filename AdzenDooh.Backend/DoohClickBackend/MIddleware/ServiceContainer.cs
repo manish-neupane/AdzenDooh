@@ -6,25 +6,29 @@ using AdzenDooh.Service.Application.Campaign;
 using AdzenDooh.Service.Application.Cms.Creative;
 using AdzenDooh.Service.Application.Inventory.Screen;
 using AdzenDooh.Service.Application.Inventory.ScreenOperatingHour;
+using AdzenDooh.Service.Infrastructure.AdzenDooh.Service.Infrastructure;
 using DoohClick.DataAccess;
 
 namespace AdzenDooh.Api.DependencyInjection
 
 
 {
-    public static class ServiceContainer
+public static class ServiceContainer
+{
+    public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
-        public static IServiceCollection AddCoreServices(this IServiceCollection services)
-        {
-            services.AddScoped<IDataAccessService, DataAccessService>();
-            services.AddScoped<IScreenService, ScreenService>();
-            services.AddScoped<ICreativeService, CreativeService>();
-            services.AddScoped<IFileMetadataService, FileMetadataService>();
-            services.AddScoped<IScreenOperatingHourService, ScreenOperatingHourService>();
-            services.AddScoped<ICampaignService, CampaignService>();
+        services.AddScoped<IDataAccessService, DataAccessService>();
+        services.AddScoped<IScreenService, ScreenService>();
+        services.AddScoped<ICreativeService, CreativeService>();
+        services.AddScoped<IFileMetadataService, FileMetadataService>();
+        services.AddScoped<IScreenOperatingHourService, ScreenOperatingHourService>();
+        services.AddScoped<ICampaignService, CampaignService>();
 
+        //  background worker
+        services.AddHostedService<CampaignStatusWorker>();
 
-            return services;
-        }
+        return services;
     }
+}
+
 }

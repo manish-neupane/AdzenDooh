@@ -162,20 +162,20 @@ All routes follow the convention `api/[Controller]/[Action]`.
 | `Screen` | `GetAll` | GET | Paginated screen grid |
 | `Screen` | `GetDetail` | GET | Single screen detail |
 | `Screen` | `GetDdl` | POST | Screen dropdown list |
-| `Screen` | `SaveScreen` | POST | Create or update screen |
-| `Screen` | `DeleteScreen` | DELETE | Soft-delete screen |
-| `ScreenOperatingHour` | `GetHours` | GET | Operating hours by screen |
-| `ScreenOperatingHour` | `AddHours` | POST | Bulk add time slots |
-| `ScreenOperatingHour` | `DeleteHour` | DELETE | Remove a time slot |
+| `Screen` | `Save` | POST | Create or update screen |
+| `Screen` | `Delete` | DELETE | Soft-delete screen |
+| `ScreenOperatingHour` | `GetAll` | GET | Operating hours by screen |
+| `ScreenOperatingHour` | `Create` | POST | Bulk add time slots |
+| `ScreenOperatingHour` | `Delete` | DELETE | Remove a time slot |
 | `Creative` | `Upload` | POST | Upload image or video |
 | `Creative` | `GetAll` | GET | Paginated creatives grid |
 | `Creative` | `GetDdl` | GET | Creative dropdown list |
 | `Creative` | `Delete` | DELETE | Soft-delete creative |
 | `Campaign` | `GetAll` | GET | Paginated campaigns grid |
-| `Campaign` | `GetCampaignDetail` | GET | Campaign detail view |
-| `Campaign` | `GetCampaignCreatives` | GET | Creatives assigned to campaign |
-| `Campaign` | `AddCampaign` | POST | Create new campaign |
-| `Campaign` | `AddCampaignCreative` | POST | Assign creative to campaign |
+| `Campaign` | `GetDetail` | GET | Campaign detail view |
+| `Campaign` | `GetCreatives` | GET | Creatives assigned to campaign |
+| `Campaign` | `Create` | POST | Create new campaign |
+| `Campaign` | `CreateCampaignCreative` | POST | Assign creative to campaign |
 
 ---
 
@@ -192,4 +192,3 @@ All routes follow the convention `api/[Controller]/[Action]`.
 ## Authors
 
 - **Manish Neupane** — Backend / Database
-

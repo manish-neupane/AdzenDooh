@@ -3,7 +3,7 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/component/primeng.import';
-import { ApiResponse, GridResponse, ParamOption } from '../../../shared/model/sharedModel';
+import { ParamOption } from '../../../shared/model/sharedModel';
 import { GridConfig } from '../../../shared/model/grid-config.model';
 import { GridComponent } from '../../../shared/component/grid/grid.component';
 import { PageWrapperComponent } from '../../../shared/component/page-wrapper/page-wrapper.component';
@@ -34,39 +34,23 @@ import { AssignCreativeComponent } from '../campaign-assign-creative/campaign-as
 })
 export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
 
-  @ViewChild('campaignCreateEdit')    campaignCreateEdit!:    CampaignCreateComponent;
-  @ViewChild('campaignDetail')        campaignDetail!:        CampaignDetailComponent;
-  @ViewChild('campaignAssignCreative') campaignAssignCreative!: AssignCreativeComponent;
+  @ViewChild('campaignCreateEdit') private campaignCreateEdit!: CampaignCreateComponent;
+  @ViewChild('campaignDetail') private campaignDetail!: CampaignDetailComponent;
+  @ViewChild('campaignAssignCreative') private campaignAssignCreative!: AssignCreativeComponent;
 
-  //  Status helpers 
-  protected getStatusText(status: number): string {
-    const map: Record<number, string> = { 0: 'Draft', 1: 'Active', 2: 'Inactive' };
-    return map[status] ?? 'Unknown';
-  }
-
-  protected getStatusClass(status: number): string {
-    switch (status) {
-      case 0:  return 'status-draft';
-      case 1:  return 'status-active';
-      case 2:  return 'status-inactive';  
-      default: return '';
-    }
-  }
-
-  //  Grid config 
-  campaignConfig: GridConfig<MvCampaign> = {
+  // GRID CONFIG
+  public campaignConfig: GridConfig<MvCampaign> = {
     columns: campaignColumns,
     dataSource: { data: [], totalCount: 0 },
     showActions: true,
     actions: [
-        {
+      {
         type: 'edit',
         icon: 'pi pi-upload',          
         severity: 'info',
         tooltip: 'Assign Creative',
-        handler: (row: MvCampaign) => this.onAddCampaignCreative(row),
+        handler: (row: MvCampaign) => this.onAssignCreative(row),
       },
-      
       {
         type: 'info',
         icon: 'pi pi-info-circle',
@@ -74,16 +58,15 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
         tooltip: 'View Details',
         handler: (row: MvCampaign) => this.onViewDetail(row),
       },
-    
     ],
   };
 
-  //  State 
-  isLoading    = false;
-  errorMessage = '';
-  screenDdl: MvScreenOption[] = [];
+  // STATE
+  public isLoading = false;
+  public errorMessage = '';
+  public screenDdl: MvScreenOption[] = [];
 
-  param: ParamOption<MvCampaignFilter> = {
+  public param: ParamOption<MvCampaignFilter> = {
     tenantId: 1,
     filter:   { search: '' } as MvCampaignFilter,
     offset:   0,
@@ -92,24 +75,34 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
 
   private readonly _unSubscribeAll$ = new Subject<void>();
 
-  constructor(
-    private readonly authService:    AuthService,
-    private readonly campaignService: CampaignService,
-    private readonly screenService:   ScreenService,
+  public constructor(
+    private readonly _authService:    AuthService,
+    private readonly _campaignService: CampaignService,
+    private readonly _screenService:   ScreenService,
     private readonly injector:        Injector,
   ) {
     super(injector);
   }
 
-  //  Lifecycle 
-
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.loadScreenDdl();
     this.loadCampaigns();
   }
 
-
-  //  Data loading 
+  private loadScreenDdl(): void {
+    this._screenService.getDdl({ TenantId: this._authService.currentUser.tenantId })
+      .pipe(takeUntil(this._unSubscribeAll$))
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) this.screenDdl = res.data;
+        },
+        error: (err: unknown) => {
+          const msg = (err as { error?: { message?: string } })?.error?.message
+            ?? 'Failed to load screens';
+          this.showMessage('error', 'Error', msg);
+        },
+      });
+  }
 
   private loadCampaigns(showLoading: boolean = true): void {
     if (showLoading) {
@@ -117,7 +110,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
       this.errorMessage = '';
     }
 
-    this.campaignService.getCampaigns(this.param)
+    this._campaignService.getCampaigns(this.param)
       .pipe(
         takeUntil(this._unSubscribeAll$),
         finalize(() => (this.isLoading = false)),
@@ -145,37 +138,34 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
       });
   }
 
-  private loadScreenDdl( ): void {
-    this.screenService.getDdl({ TenantId: this.authService.currentUser.tenantId })
-      .pipe(takeUntil(this._unSubscribeAll$))
-      .subscribe({
-        next: (res) => {
-          if (res.success && res.data) this.screenDdl = res.data;
-        },
-        error: (err: unknown) => {
-          const msg = (err as { error?: { message?: string } })?.error?.message
-            ?? 'Failed to load screens';
-          this.showMessage('error', 'Error', msg);
-        },
-      });
+  protected getStatusText(status: number): string {
+    const map: Record<number, string> = { 0: 'Draft', 1: 'Active', 2: 'Inactive' };
+    return map[status] ?? 'Unknown';
   }
 
-  //  Dialog actions 
+  protected getStatusClass(status: number): string {
+    switch (status) {
+      case 0:  return 'status-draft';
+      case 1:  return 'status-active';
+      case 2:  return 'status-inactive';  
+      default: return '';
+    }
+  }
 
+  //  CREATE CAMPAIGN DIALOG
   protected addCampaign(): void {
     this.campaignCreateEdit.open();
   }
 
+  //  DETAIL DIALOG
   protected onViewDetail(campaign: MvCampaign): void {
     this.campaignDetail.open(campaign.id);
   }
 
-  protected onAddCampaignCreative(campaign: MvCampaign): void {
+  //  ASSIGN CREATIVE DIALOG
+  protected onAssignCreative(campaign: MvCampaign): void {
     this.campaignAssignCreative.open(campaign.id);
   }
-
-  //  Callbacks from child dialogs ──────────────────────────────────────
-
 
   public afterFormClosed(campaign: MvCampaign | null): void {
     if (!campaign) return;
@@ -191,19 +181,18 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     };
   }
 
-
+  // CALLBACK - AFTER ASSIGN CREATIVE CLOSED
   public afterAssignCreativeClosed(): void {
     this.loadCampaigns();
   }
 
-  //  Grid event handlers 
-
-  onPage(event: { first: number; rows: number }): void {
+  // GRID 
+  public onPage(event: { first: number; rows: number }): void {
     this.param = { ...this.param, offset: event.first, pageSize: event.rows };
     this.loadCampaigns();
   }
 
-  onSort(event: { field: string; order: number }): void {
+  public onSort(event: { field: string; order: number }): void {
     this.param = {
       ...this.param,
       sortBy:    event.field,
@@ -212,19 +201,13 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     this.loadCampaigns();
   }
 
-  onFilter(search: string): void {
+  public onFilter(search: string): void {
     this.param = { ...this.param, offset: 0, filter: { ...this.param.filter, searchText: search } };
     this.loadCampaigns(false);
   }
 
-
-
-  
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
-
   }
-
-
 }

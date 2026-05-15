@@ -34,47 +34,53 @@ export class ScreenOperatingHourComponent extends AppComponent implements OnInit
   @Input() screen: MvScreen | null = null;
   @Input() mode: 'edit' | 'view' = 'edit';
 
+  // DIALOG STATE
   protected isOpen = false;
-  protected dayOptions = DayOption;
-  protected selectedDay: DayOfWeek | null = null;
-  protected operatingHours: MvScreenOperatingHour[] = [];
-  protected operatingHoursByDay: Record<string, MvScreenOperatingHour[]> = {};
   protected isLoading = false;
   protected isCreating = false;
   protected isDeletingId: number | null = null;
   protected errorMessage = '';
 
-  formGroup!: FormGroup;
+  // OPERATING HOURS STATE
+  protected dayOptions = DayOption;
+  protected selectedDay: DayOfWeek | null = null;
+  protected operatingHours: MvScreenOperatingHour[] = [];
+  protected operatingHoursByDay: Record<string, MvScreenOperatingHour[]> = {};
+
+  
+  public formGroup!: FormGroup;
 
   private readonly __unSubscribeAll$ = new Subject<void>();
 
   constructor(
     private injector: Injector,
     private _fb: FormBuilder,
-    private readonly _sohService: ScreenOperatingHourService,
+    private readonly _screenOperatingHourService: ScreenOperatingHourService,
     private readonly _authService: AuthService
   ) {
     super(injector);
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.initForm();
   }
 
+  // FORM 
   private initForm(): void {
     this.formGroup = this._fb.group({
       startTime: this._fb.control<Date | null>(null, Validators.required),
       endTime: this._fb.control<Date | null>(null, Validators.required),
-      averageAudienceCount: this._fb.control<number | null>(null,Validators.required),
+      averageAudienceCount: this._fb.control<number | null>(null, Validators.required),
     });
   }
 
-  
-protected get isViewMode(): boolean {
-  return this.mode === 'view';
-}
+  // CHECK IF VIEW MODE
+  protected get isViewMode(): boolean {
+    return this.mode === 'view';
+  }
 
-  open(screen: MvScreen,mode: 'edit' | 'view' = 'edit'): void {
+  //  DIALOG
+  public open(screen: MvScreen, mode: 'edit' | 'view' = 'edit'): void {
     this.isOpen = true;
     this.screen = screen;
     this.mode = mode;
@@ -82,19 +88,22 @@ protected get isViewMode(): boolean {
     this.operatingHours = [];
     this.operatingHoursByDay = {};
     this.errorMessage = '';
+    
     if (this.mode === 'edit') {
       this.initForm();
     }
+    
     this.loadOperatingHours();
   }
 
+  // LOAD OPERATING HOURS FROM API
   private loadOperatingHours(): void {
     if (!this.screen) return;
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this._sohService.getOperatingHours({ screenId: this.screen.id })
+    this._screenOperatingHourService.getHours({ screenId: this.screen.id })
       .pipe(
         takeUntil(this.__unSubscribeAll$),
         finalize(() => this.isLoading = false)
@@ -112,24 +121,29 @@ protected get isViewMode(): boolean {
       });
   }
 
+  //  HOURS GROUPED BY DAY
   private rebuildOperatingHoursByDay(): void {
     const map: Record<string, MvScreenOperatingHour[]> = {};
+    
     for (const day of DayOption) {
       map[day.value] = [];
     }
+    
     for (const hour of this.operatingHours) {
       if (map[hour.dayOfWeek] !== undefined) {
         map[hour.dayOfWeek].push(hour);
       }
     }
+    
     this.operatingHoursByDay = map;
   }
 
-  onDayChange(): void {
+  // HANDLE DAY SELECTION CHANGE
+  public onDayChange(): void {
     this.initForm();
   }
 
-  createOperatingHour(): void {
+  public createOperatingHour(): void {
     if (this.formGroup.invalid || this.selectedDay === null || !this.screen) return;
 
     const { startTime, endTime, averageAudienceCount } = this.formGroup.getRawValue();
@@ -155,7 +169,7 @@ protected get isViewMode(): boolean {
 
     this.isCreating = true;
 
-    this._sohService.createOperatingHours(payload)
+    this._screenOperatingHourService.create(payload)
       .pipe(
         takeUntil(this.__unSubscribeAll$),
         finalize(() => this.isCreating = false)
@@ -176,7 +190,7 @@ protected get isViewMode(): boolean {
       });
   }
 
-  deleteOperatingHour(operatingHour: MvScreenOperatingHour): void {
+  public deleteOperatingHour(operatingHour: MvScreenOperatingHour): void {
     this.confirmDialog(
       `Delete operating hour ${this.formatTime(operatingHour.startTime)} – ${this.formatTime(operatingHour.endTime)}?`,
       'Confirm Delete',
@@ -193,7 +207,7 @@ protected get isViewMode(): boolean {
       deletedBy: this._authService.currentUser.userId,
     };
 
-    this._sohService.deleteOperatingHour(payload)
+    this._screenOperatingHourService.delete(payload)
       .pipe(
         takeUntil(this.__unSubscribeAll$),
         finalize(() => this.isDeletingId = null)
@@ -210,13 +224,13 @@ protected get isViewMode(): boolean {
       });
   }
 
-  formatTime(isoString: string | null | undefined): string {
+  public formatTime(isoString: string | null | undefined): string {
     if (!isoString) return '';
     const d = new Date(isoString);
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

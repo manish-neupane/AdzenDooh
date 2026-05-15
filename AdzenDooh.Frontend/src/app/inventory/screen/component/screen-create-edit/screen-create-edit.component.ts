@@ -30,36 +30,38 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
   @Input() screen!: MvScreen;
   @Output() afterFormClosed = new EventEmitter<MvScreen | null>();
 
+  // DIALOG STATE
   protected formGroup!: FormGroup;
   protected isOpen = false;
   protected isLoading = false;
   protected errorMessage = '';
 
+  // MAP PICKER STATE
+  protected isMapDialogOpen = false;
+  protected mapSearchText = '';
+  protected selectedLatitude: number | null = null;
+  protected selectedLongitude: number | null = null;
+
   private _unSubscribeAll$ = new Subject<void>();
-  
-// Map picker state
-  isMapDialogOpen = false;
-  mapSearchText = '';
 
-  selectedLatitude: number | null = null;
-  selectedLongitude: number | null = null;
-
-  get isNewScreen(): boolean {
+  // GETTER
+  public get isNewScreen(): boolean {
     return !this.screen?.id;
   }
 
   constructor(
     private injector: Injector,
     private formBuilder: FormBuilder,
-    private screenService: ScreenService
+    private _screenService: ScreenService
   ) {
     super(injector);
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.initForm();
   }
 
+  // FORM 
   private initForm(): void {
     this.formGroup = this.formBuilder.group({
       name: ['', Validators.required],
@@ -72,13 +74,27 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  public ngOnChanges(changes: SimpleChanges): void {
     if (changes['screen'] && this.formGroup && this.screen) {
       this.loadScreenData();
     }
   }
 
-  open(): void {
+  // LOAD SCREEN DATA INTO FORM
+  private loadScreenData(): void {
+    this.formGroup.patchValue({
+      name: this.screen?.name ?? '',
+      resolution: this.screen?.resolution ?? '',
+      orientation: this.screen?.orientation ?? 'landscape',
+      macAddress: this.screen?.macAddress ?? '',
+      location: this.screen?.location ?? '',
+      address: this.screen?.address ?? '',
+      status: this.screen?.status ?? 'active'
+    });
+  }
+
+  //  DIALOG
+  public open(): void {
     if (this.formGroup) {
       if (this.isNewScreen) {
         this.formGroup.reset({
@@ -91,24 +107,11 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
           status: 'active'
         });
       } else {
-        // Load data for existing screen
         this.loadScreenData();
       }
       this.errorMessage = '';
       this.isOpen = true;
     }
-  }
-
-  private loadScreenData(): void {
-    this.formGroup.patchValue({
-      name: this.screen?.name ?? '',
-      resolution: this.screen?.resolution ?? '',
-      orientation: this.screen?.orientation ?? 'landscape',
-      macAddress: this.screen?.macAddress ?? '',
-      location: this.screen?.location ?? '',
-      address: this.screen?.address ?? '',
-      status: this.screen?.status ?? 'active'
-    });
   }
 
   protected onHide(): void {
@@ -129,6 +132,7 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
     this.saveScreen();
   }
 
+  // SAVE SCREEN TO API
   private saveScreen(): void {
     const payload: MvUpsertScreen = {
       ...this.formGroup.value,
@@ -137,7 +141,7 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
       ...(this.isNewScreen ? {} : { id: this.screen.id })
     };
 
-    this.screenService.saveScreen(payload)
+    this._screenService.save(payload)
       .pipe(
         takeUntil(this._unSubscribeAll$),
         finalize(() => this.isLoading = false)
@@ -161,32 +165,25 @@ export class ScreenCreateEditComponent extends AppComponent implements OnInit, O
       });
   }
 
-  // Map picker methods
-openMapPicker(): void {
-  this.isMapDialogOpen = false;
-}
-confirmMapLocation(): void {
-
-  if (
-    this.selectedLatitude !== null &&
-    this.selectedLongitude !== null
-  ) {
-
-    this.formGroup.patchValue({
-      location: `${this.selectedLatitude}, ${this.selectedLongitude}`
-    });
-
+  //  MAP 
+  protected openMapPicker(): void {
     this.isMapDialogOpen = false;
   }
-}
 
-
+  protected confirmMapLocation(): void {
+    if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
+      this.formGroup.patchValue({
+        location: `${this.selectedLatitude}, ${this.selectedLongitude}`
+      });
+      this.isMapDialogOpen = false;
+    }
+  }
 
   private close(): void {
     this.isOpen = false;
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
   }

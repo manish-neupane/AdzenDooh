@@ -6,7 +6,6 @@ import {
   OnInit,
   OnDestroy,
   Output,
-  ViewChild,
 } from '@angular/core';
 import {
   FormArray,
@@ -31,7 +30,6 @@ import {
 } from '../../model/campaign.model';
 import { buildDatePayload, validateDateRanges } from './campaign-date-utils';
 
-
 @Component({
   selector: 'campaign-create-edit',
   standalone: true,
@@ -44,7 +42,6 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
   @Input() availableScreens: MvScreenOption[] = [];
   @Output() afterFormClosed = new EventEmitter<MvCampaign | null>();
   
- 
   protected isDialogOpen = false;
   protected isLoading = false;
   protected activeStep = 0;
@@ -53,13 +50,13 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
 
   private readonly __unSubscribeAll$ = new Subject<void>();
 
-  readonly steps = [
+  public readonly steps = [
     { label: 'Details' },
     { label: 'Screens' },
     { label: 'Dates' },
   ];
 
-  constructor(
+  public constructor(
     private injector: Injector,
     private _fb: FormBuilder,
     private _campaignService: CampaignService,
@@ -69,11 +66,11 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
     this.initForm();
   }
 
-
-  ngOnInit(): void {
-    this.initForm();
+  public ngOnInit(): void {
+    
   }
 
+  // FORM SETUP
   private initForm(): void {
     this.formGroup = this._fb.group({
       name: this._fb.control('', Validators.required),
@@ -84,15 +81,8 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
     });
   }
 
-  get screenSelections(): FormArray {
-    return this.formGroup.get('screenSelections') as FormArray;
-  }
-
-  get dates(): FormArray {
-    return this.formGroup.get('dates') as FormArray;
-  }
-
-  open(): void {
+  //  DIALOG
+  public open(): void {
     this.activeStep = 0;
     this.today = new Date();
 
@@ -103,47 +93,38 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
     this.isDialogOpen = true;
   }
 
-  onHide(): void {
-    this.cancel();
+  //  CHECKBOXES
+  private buildScreenCheckboxes(): FormArray {
+    const controls = this.availableScreens.map(() =>
+      this._fb.control(false)
+    );
+    return this._fb.array(controls);
   }
 
-  cancel(): void {
-    this.afterFormClosed.emit(null);
-    this.close();
+  // FORM GETTERS
+  public get screenSelections(): FormArray {
+    return this.formGroup.get('screenSelections') as FormArray;
   }
 
-  private close(): void {
-    this.isDialogOpen = false;
+  public get dates(): FormArray {
+    return this.formGroup.get('dates') as FormArray;
   }
- 
 
-
-  nextStep(): void {
+  //  NAVIGATION
+  public nextStep(): void {
     if (!this.canAdvanceFrom(this.activeStep)) return;
     if (this.activeStep < this.steps.length - 1) this.activeStep++;
   }
 
-  prevStep(): void {
+  public prevStep(): void {
     if (this.activeStep > 0) this.activeStep--;
   }
 
+  // STEP VALIDATION
   private canAdvanceFrom(step: number): boolean {
     if (step === 0) return this.validateName();
     if (step === 1) return this.validateScreens();
     return true;
-  }
-
-  addDateRow(): void {
-    this.dates.push(
-      this._fb.group({
-        startDate: this._fb.control(null, Validators.required),
-        endDate: this._fb.control(null, Validators.required),
-      })
-    );
-  }
-
-  removeDateRow(index: number): void {
-    this.dates.removeAt(index);
   }
 
   private validateName(): boolean {
@@ -159,6 +140,20 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
     const hasSelection = this.getSelectedScreens().length > 0;
     if (!hasSelection) this.showMessage('warn', 'Validation', 'Select at least one screen.');
     return hasSelection;
+  }
+
+  // DATE RANGE 
+  public addDateRow(): void {
+    this.dates.push(
+      this._fb.group({
+        startDate: this._fb.control(null, Validators.required),
+        endDate: this._fb.control(null, Validators.required),
+      })
+    );
+  }
+
+  public removeDateRow(index: number): void {
+    this.dates.removeAt(index);
   }
 
   private validateDates(): boolean {
@@ -178,7 +173,7 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
     return true;
   }
 
-  onSubmit(): void {
+  public onSubmit(): void {
     if (!this.validateDates()) return;
     this.isLoading = true;
 
@@ -203,13 +198,7 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
       });
   }
 
-  private buildScreenCheckboxes(): FormArray {
-    const controls = this.availableScreens.map(() =>
-      this._fb.control(false)
-    );
-    return this._fb.array(controls);
-  }
-
+  //  API PAYLOAD
   private buildPayload(): MvCreateCampaign {
     const raw = this.formGroup.getRawValue();
     const { tenantId, userId: createdBy } = this._authService.currentUser;
@@ -233,7 +222,20 @@ export class CampaignCreateComponent extends AppComponent implements OnInit, OnD
       .map(x => ({ screenId: x.screen.id }));
   }
 
-  ngOnDestroy(): void {
+  private close(): void {
+    this.isDialogOpen = false;
+  }
+
+  public cancel(): void {
+    this.afterFormClosed.emit(null);
+    this.close();
+  }
+
+  public onHide(): void {
+    this.cancel();
+  }
+
+  public ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

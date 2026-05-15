@@ -6,22 +6,21 @@ import { sharedImports } from '../../../../shared/component/primeng.import';
 import { CreativeService } from '../../service/creative.service';
 import { FileUploadModule } from 'primeng/fileupload';
 import { AuthService } from '../../../../shared/service/auth.service';
+
 @Component({
   selector: 'creative-upload',
   standalone: true,
-  imports: [...sharedImports,FileUploadModule],
+  imports: [...sharedImports, FileUploadModule],
   templateUrl: './creative-upload.component.html'
 })
 export class CreativeUploadComponent extends AppComponent implements OnInit, OnDestroy {
   @Output() afterUploadClosed = new EventEmitter<boolean>();
 
-  formGroup!: FormGroup;
-  isOpen = false;
-  isLoading = false;
-  selectedFile: File | null = null;
+  protected formGroup!: FormGroup;
+  protected isOpen = false;
+  protected isLoading = false;
+  protected selectedFile: File | null = null;
 
-
-   
   private _unSubscribeAll$ = new Subject<void>();
 
   constructor(
@@ -31,27 +30,29 @@ export class CreativeUploadComponent extends AppComponent implements OnInit, OnD
     private creativeService: CreativeService
   ) {
     super(injector);
+  }
+
+
+  public ngOnInit(): void {
     this.formGroup = this.fb.group({
       name: ['', Validators.required]
     });
   }
 
-  ngOnInit(): void {
-    this.formGroup = this.fb.group({
-      name: ['', Validators.required]
-    });
-  }
-  open(): void {
+  //  dialog
+  public open(): void {
     this.formGroup.reset();
     this.selectedFile = null;
     this.isOpen = true;
   }
 
-  onFileSelect(event: any): void {
+  // File selection
+  public onFileSelect(event: any): void {
     this.selectedFile = event.files[0];
   }
 
-  onSubmit(): void {
+  //  upload
+  public onSubmit(): void {
     if (this.formGroup.invalid || !this.selectedFile) {
       this.showMessage('warn', 'Validation', 'Please provide a name and a file');
       return;
@@ -64,8 +65,8 @@ export class CreativeUploadComponent extends AppComponent implements OnInit, OnD
       createdBy: this.authService.currentUser.userId
     };
 
-    this.creativeService.upload( this.selectedFile!,payload)
-      .pipe( takeUntil(this._unSubscribeAll$),finalize(() => this.isLoading = false))
+    this.creativeService.upload(this.selectedFile, payload)
+      .pipe(takeUntil(this._unSubscribeAll$), finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
           this.showMessage('success', 'Success', 'Media uploaded successfully');
@@ -76,7 +77,7 @@ export class CreativeUploadComponent extends AppComponent implements OnInit, OnD
       });
   }
 
-  ngOnDestroy(): void{
+  public ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
   }

@@ -1,5 +1,3 @@
-
-
 import { Component, OnInit, OnDestroy, Injector, inject, ViewChild } from '@angular/core';
 import { Subject, takeUntil, finalize } from 'rxjs';
 
@@ -24,42 +22,37 @@ import { RouterOutlet } from "@angular/router";
 })
 export class CreativeListComponent extends AppComponent implements OnInit, OnDestroy {
 
-  @ViewChild('creativeUpload') creativeUpload!: CreativeUploadComponent;
+  @ViewChild('creativeUpload') private creativeUpload!: CreativeUploadComponent;
 
   private creativeService = inject(CreativeService);
-  private authService    = inject(AuthService);
+  private authService = inject(AuthService);
 
-  apiUrl      = environment.apiUrl.replace('/api', '');
-  creatives:  MvCreative[] = [];
-  totalCount  = 0;
-  isLoading   = false;
-  errorMessage = '';
+  protected apiUrl = environment.apiUrl.replace('/api', '');
+  protected creatives: MvCreative[] = [];
+  protected totalCount = 0;
+  protected isLoading = false;
+  protected errorMessage = '';
+  protected previewItem: MvCreative | null = null;
+  protected previewVisible = false;
 
-  param: ParamOption<MvCreativeFilter> = {
+  protected param: ParamOption<MvCreativeFilter> = {
     tenantId: this.authService.currentUser.tenantId,
-    filter:   {} as MvCreativeFilter,
-    offset:   0,
+    filter: {} as MvCreativeFilter,
+    offset: 0,
     pageSize: 10
   };
 
   private _unSubscribeAll$ = new Subject<void>();
-  toast: any;
 
   constructor(private injector: Injector) {
     super(injector);
   }
 
-  ngOnInit(): void {
-    
+  public ngOnInit(): void {
     this.loadCreatives();
   }
 
- 
-
-  //  Data 
-
-  loadCreatives(showLoading: boolean = true): void {
-
+  protected loadCreatives(showLoading: boolean = true): void {
     if (showLoading) {
       this.isLoading = true;
     }
@@ -71,69 +64,60 @@ export class CreativeListComponent extends AppComponent implements OnInit, OnDes
       .subscribe({
         next: (response: ApiResponse<GridResponse<MvCreative>>) => {
           if (response.success && response.data) {
-            this.creatives   = response.data.data;
-            this.totalCount  = response.data.totalCount;
+            this.creatives = response.data.data;
+            this.totalCount = response.data.totalCount;
           }
         },
         error: () => this.errorMessage = 'Failed to load media'
       });
   }
 
-  //  Upload 
-
-  openUpload(): void {
+  protected openUpload(): void {
     this.creativeUpload.open();
   }
 
-  onUploadClosed(success: boolean): void {
+  protected onUploadClosed(success: boolean): void {
     if (success) this.loadCreatives();
   }
 
-  //  Delete 
+  protected deleteCreative(creative: MvCreative): void {
+    this.confirmDialog(
+      `Deleting "${creative.name}" will remove it from all campaigns it is currently used in. This action cannot be undone. Are you sure?`,
+      'Delete Creative',
+      'pi pi-exclamation-triangle',
+      () => this.executeDelete({ id: creative.id, deletedBy: this.authService.currentUser.userId })
+    );
+  }
 
-deleteCreative(creative: MvCreative): void {
-  console.log('delete clicked', creative);
-  this.confirmDialog(
-    `Deleting "${creative.name}" will remove it from all campaigns it is currently used in. This action cannot be undone. Are you sure?`,
-    'Delete Creative',
-    'pi pi-exclamation-triangle',
-    () => this.executeDelete({ id: creative.id, deletedBy: this.authService.currentUser.userId })
-  );
-}
+  private executeDelete(payload: MvDeleteCreative): void {
+    this.isLoading = true;
 
-private executeDelete(payload: MvDeleteCreative): void {
-  this.isLoading = true;
+    this.creativeService.deleteCreative(payload)
+      .pipe(
+        takeUntil(this._unSubscribeAll$),
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
+        next: () => {
+          this.showMessage('success', 'Deleted', 'Creative deleted successfully');
+          this.loadCreatives();
+        },
+        error: () => {
+          this.showMessage('error', 'Error', 'Failed to delete creative');
+        }
+      });
+  }
 
-  this.creativeService.deleteCreative(payload)
-    .pipe(
-      takeUntil(this._unSubscribeAll$),
-      finalize(() => this.isLoading = false)
-    )
-    .subscribe({
-      next: () => {
-        this.showMessage('success', 'Deleted', 'Creative deleted successfully');
-        this.loadCreatives();
-      },
-      error: () => {
-        this.showMessage('error', 'Error', 'Failed to delete creative');
-      }
-    });
-}
+  protected onPage(event: { first: number; rows: number }): void {
+    this.param = {
+      ...this.param,
+      offset: event.first ?? 0,
+      pageSize: event.rows ?? 10
+    };
+    this.loadCreatives();
+  }
 
-  //  Pagination 
-
- onPage(event: { first: number; rows: number }): void {
-  this.param = { 
-    ...this.param, 
-    offset: event.first ?? 0, 
-    pageSize: event.rows ?? 10 
-  };
-  this.loadCreatives();
-}
-
-  //  Filters 
-
-  onFilter(searchText: string): void {
+  protected onFilter(searchText: string): void {
     this.param = {
       ...this.param,
       offset: 0,
@@ -142,34 +126,31 @@ private executeDelete(payload: MvDeleteCreative): void {
     this.loadCreatives(false);
   }
 
-onTypeChange(type: string): void {
-  const isVideo: boolean | undefined =
-    type === 'video' ? true  :
-    type === 'image' ? false :
-    undefined;
+  protected onTypeChange(type: string): void {
+    const isVideo: boolean | undefined =
+      type === 'video' ? true :
+      type === 'image' ? false :
+      undefined;
 
-  this.param = {
-    ...this.param,
-    offset: 0,
-    filter: { ...this.param.filter, isVideo }
-  };
-  this.loadCreatives(false);
-}
+    this.param = {
+      ...this.param,
+      offset: 0,
+      filter: { ...this.param.filter, isVideo }
+    };
+    this.loadCreatives(false);
+  }
 
-previewItem: MvCreative | null = null;
-previewVisible = false;
+  protected openPreview(item: MvCreative): void {
+    this.previewItem = item;
+    this.previewVisible = true;
+  }
 
-openPreview(item: MvCreative): void {
-  this.previewItem  = item;
-  this.previewVisible = true;
-}
+  protected closePreview(): void {
+    this.previewItem = null;
+    this.previewVisible = false;
+  }
 
-closePreview(): void {
-  this.previewItem  = null;
-  this.previewVisible = false;
-}
-
- ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this._unSubscribeAll$.next();
     this._unSubscribeAll$.complete();
   }

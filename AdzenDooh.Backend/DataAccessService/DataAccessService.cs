@@ -1,69 +1,69 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿    using Dapper;
+    using Microsoft.Data.SqlClient;
+    using Microsoft.Extensions.Configuration;
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-namespace DoohClick.DataAccess
-{
-    public class DataAccessService : IDataAccessService
+    namespace DoohClick.DataAccess
     {
-        private readonly IConfiguration _configuration;
-
-        public DataAccessService(IConfiguration configuration)
+        public class DataAccessService : IDataAccessService
         {
-            _configuration = configuration;
-        }
+            private readonly IConfiguration _configuration;
 
-        public async Task<IDbConnection> GetConnection()
-        {
-            try
+            public DataAccessService(IConfiguration configuration)
             {
-                var connectionString = _configuration.GetConnectionString("DefaultConnection");
-                SqlConnection conn = new(connectionString);
-                conn.Open();
-                return conn;
+                _configuration = configuration;
             }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
-        public async Task<string> RetrievalProcedure(string storedProcedure, string json)
-        {
-            try
+            public async Task<IDbConnection> GetConnection()
             {
-                using IDbConnection conn = await GetConnection();
-                DynamicParameters param = new();
-                param.Add("Json", json, DbType.String);
-                string result = await conn.QueryFirstOrDefaultAsync<string>(storedProcedure, param, commandType: CommandType.StoredProcedure) ?? "";
-                return result ?? "{}";
+                try
+                {
+                    var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                    SqlConnection conn = new(connectionString);
+                    conn.Open();
+                    return conn;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
-        public async Task<string> ActionProcedure(string storedProcedure, string json)
-        {
-            try
+            public async Task<string> RetrievalProcedure(string storedProcedure, string json)
             {
-                using IDbConnection conn = await GetConnection();
-                DynamicParameters param = new();
-                param.Add("Json", json, DbType.String, direction: ParameterDirection.InputOutput, size: int.MaxValue);
-                int result = await conn.ExecuteAsync(storedProcedure, param, commandType: CommandType.StoredProcedure);
-                return param.Get<string>("Json") ?? "{}";
+                try
+                {
+                    using IDbConnection conn = await GetConnection();
+                    DynamicParameters param = new();
+                    param.Add("Json", json, DbType.String);
+                    string result = await conn.QueryFirstOrDefaultAsync<string>(storedProcedure, param, commandType: CommandType.StoredProcedure) ?? "";
+                    return result ?? "{}";
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
-            catch (Exception)
+
+            public async Task<string> ActionProcedure(string storedProcedure, string json)
             {
-                throw;
+                try
+                {
+                    using IDbConnection conn = await GetConnection();
+                    DynamicParameters param = new();
+                    param.Add("Json", json, DbType.String, direction: ParameterDirection.InputOutput, size: int.MaxValue);
+                    int result = await conn.ExecuteAsync(storedProcedure, param, commandType: CommandType.StoredProcedure);
+                    return param.Get<string>("Json") ?? "{}";
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
     }
-}

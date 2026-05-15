@@ -17,53 +17,64 @@ import { AuthService } from '../../../../shared/service/auth.service';
 })
 export class ScreenDetailComponent extends AppComponent implements OnInit, OnDestroy {
 
-  @ViewChild('screenOperatingHour') screenOperatingHour!: ScreenOperatingHourComponent;
+  @ViewChild('screenOperatingHour') private screenOperatingHour!: ScreenOperatingHourComponent;
   
-  isOpen = false;
-  isLoading = false;
-  detail: MvScreenDetail | null = null;
-  currentScreen: MvScreen | null = null;
-  private __unSubscribeAll$ = new Subject<void>();
+  // DIALOG STATE 
+  protected isOpen = false;
+  protected isLoading = false;
+  
+  // SCREEN DATA 
+  protected detail: MvScreenDetail | null = null;
+  protected currentScreen: MvScreen | null = null;
+  
+  private readonly __unSubscribeAll$ = new Subject<void>();
 
   constructor(
-    injector: Injector,
-    private _screenService: ScreenService,
-    private _authService: AuthService
+    private readonly injector: Injector,
+    private readonly _screenService: ScreenService,
+    private readonly _authService: AuthService
   ) {
     super(injector);
   }
 
+  public ngOnInit(): void { }
 
-  ngOnInit(): void { }
+  //  DIALOG
+  public open(screen: MvScreen): void {
+    this.currentScreen = screen;
+    this.isOpen = true;
+    this.isLoading = true;
+    this.detail = null;
 
-open(screen: MvScreen): void {
-  this.currentScreen = screen;
-  this.isOpen = true;
-  this.isLoading = true;
-  this.detail = null;
+    const param: MvScreenDetailParam = {
+      screenId: screen.id,
+      tenantId: this._authService.currentUser.tenantId
+    };
 
-  const param: MvScreenDetailParam = {
-    screenId: screen.id,
-    tenantId: this._authService.currentUser.tenantId
-  };
+    this.loadScreenDetail(param);
+  }
 
-  this._screenService.getDetail(param)
-    .pipe(
-      takeUntil(this.__unSubscribeAll$),
-      finalize(() => (this.isLoading = false))
-    )
-    .subscribe({
-      next: res => (this.detail = res?.data ?? null),
-      error: err => console.error(err),
-    });
-}
+  //  SCREEN DETAIL FROM API
+  private loadScreenDetail(param: MvScreenDetailParam): void {
+    this._screenService.getDetail(param)
+      .pipe(
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => (this.isLoading = false))
+      )
+      .subscribe({
+        next: (res) => (this.detail = res?.data ?? null),
+        error: (err) => console.error(err),
+      });
+  }
 
-  openOperatingHours(): void {
+  
+  protected openOperatingHours(): void {
     if (!this.currentScreen) return;
     this.screenOperatingHour.open(this.currentScreen, 'view');
   }
 
-  ngOnDestroy(): void {
+
+  public ngOnDestroy(): void {
     this.__unSubscribeAll$.next();
     this.__unSubscribeAll$.complete();
   }

@@ -9,11 +9,11 @@ namespace AdzenDooh.Service.Application.Cms.Creative
 {
     public class FileMetadata
     {
-        public string? Resolution    { get; set; }  
-        public string Orientation    { get; set; } = "landscape";
-        public int? DurationSecond   { get; set; }
-        public bool IsVideo          { get; set; }
-        public required string Extension      { get; set; } 
+        public string? Resolution { get; set; }
+        public string Orientation { get; set; } = "landscape";
+        public int? DurationSecond { get; set; }
+        public bool IsVideo { get; set; }
+        public required string Extension { get; set; }
     }
 
     public interface IFileMetadataService
@@ -43,94 +43,76 @@ namespace AdzenDooh.Service.Application.Cms.Creative
             return new FileMetadata { Extension = ext.TrimStart('.'), IsVideo = false };
         }
 
-        // ── IMAGE ─────────────────────────────────────────────────────────────
+        //  IMAGE 
         private FileMetadata ExtractImageMetadata(string filePath, string ext)
         {
             int width = 0, height = 0;
 
-            try
+            var directories = ImageMetadataReader.ReadMetadata(filePath);
+
+            // JPEG
+            var jpegDir = directories.OfType<JpegDirectory>().FirstOrDefault();
+            if (jpegDir != null)
             {
-                var directories = ImageMetadataReader.ReadMetadata(filePath);
+                width = jpegDir.GetImageWidth();
+                height = jpegDir.GetImageHeight();
+            }
 
-                // JPEG
-                var jpegDir = directories.OfType<JpegDirectory>().FirstOrDefault();
-                if (jpegDir != null)
+            // PNG
+            if (width == 0)
+            {
+                var pngDir = directories.OfType<PngDirectory>().FirstOrDefault();
+                if (pngDir != null)
                 {
-                    width = jpegDir.GetImageWidth();
-                    height = jpegDir.GetImageHeight();
-                }
-
-                // PNG
-                if (width == 0)
-                {
-                    var pngDir = directories.OfType<PngDirectory>().FirstOrDefault();
-                    if (pngDir != null)
-                    {
-                        pngDir.TryGetInt32(PngDirectory.TagImageWidth, out width);
-                        pngDir.TryGetInt32(PngDirectory.TagImageHeight, out height);
-                    }
-                }
-
-                // EXIF fallback
-                if (width == 0)
-                {
-                    var exifDir = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
-                    if (exifDir != null)
-                    {
-                        exifDir.TryGetInt32(ExifDirectoryBase.TagImageWidth, out width);
-                        exifDir.TryGetInt32(ExifDirectoryBase.TagImageHeight, out height);
-                    }
+                    pngDir.TryGetInt32(PngDirectory.TagImageWidth, out width);
+                    pngDir.TryGetInt32(PngDirectory.TagImageHeight, out height);
                 }
             }
-            catch
-            { }
 
-            string? resolution  = (width > 0 && height > 0) ? $"{width}x{height}" : null;
-            string orientation  = (height > width) ? "portrait" : "landscape";
+            // EXIF fallback
+            if (width == 0)
+            {
+                var exifDir = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
+                if (exifDir != null)
+                {
+                    exifDir.TryGetInt32(ExifDirectoryBase.TagImageWidth, out width);
+                    exifDir.TryGetInt32(ExifDirectoryBase.TagImageHeight, out height);
+                }
+            }
+
+            string? resolution = (width > 0 && height > 0) ? $"{width}x{height}" : null;
+            string orientation = (height > width) ? "portrait" : "landscape";
 
             return new FileMetadata
             {
-                Resolution     = resolution,
-                Orientation    = orientation,
-                IsVideo        = false,
-                Extension      = ext.TrimStart('.')
+                Resolution = resolution,
+                Orientation = orientation,
+                IsVideo = false,
+                Extension = ext.TrimStart('.')
             };
         }
 
-        // ── VIDEO ----------------------------------------------------
+        //  VIDEO 
         private async Task<FileMetadata> ExtractVideoMetadata(string filePath, string ext)
         {
-            try
+            var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
+
+            var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
+            int width = videoStream?.Width ?? 0;
+            int height = videoStream?.Height ?? 0;
+            int duration = (int)Math.Ceiling(mediaInfo.Duration.TotalSeconds);
+
+            string? resolution = (width > 0 && height > 0) ? $"{width}x{height}" : null;
+            string orientation = (height > width) ? "portrait" : "landscape";
+
+            return new FileMetadata
             {
-                var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
-
-                var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
-                int width       = videoStream?.Width  ?? 0;
-                int height      = videoStream?.Height ?? 0;
-                int duration    = (int)Math.Ceiling(mediaInfo.Duration.TotalSeconds);
-
-                string? resolution = (width > 0 && height > 0) ? $"{width}x{height}" : null;
-                string orientation = (height > width) ? "portrait" : "landscape";
-
-                return new FileMetadata
-                {
-                    Resolution     = resolution,
-                    Orientation    = orientation,
-                    DurationSecond = duration > 0 ? duration : null,
-                    IsVideo        = true,
-                    Extension      = ext.TrimStart('.')
-                };
-            }
-            catch
-            {
-                return new FileMetadata
-                {
-                    IsVideo   = true,
-                    Extension = ext.TrimStart('.')
-                };
-            }
+                Resolution = resolution,
+                Orientation = orientation,
+                DurationSecond = duration > 0 ? duration : null,
+                IsVideo = true,
+                Extension = ext.TrimStart('.')
+            };
         }
-
-      
     }
 }

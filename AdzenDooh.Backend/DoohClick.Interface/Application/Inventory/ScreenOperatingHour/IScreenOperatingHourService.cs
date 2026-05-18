@@ -9,8 +9,8 @@ namespace AdzenDooh.Interface.Application.Inventory.ScreenOperatingHour
 {
     public interface IScreenOperatingHourService
     {
-        Task<List<MvScreenOperatingHour>?> GetSlots(MvScreenOperatingHourFilter param);
-        Task<List<MvScreenOperatingHour>?> AddSlots(List<MvAddScreenOperatingHour> param);
-        Task DeleteSlot(MvDeleteScreenOperatingHour param);
+        Task<List<MvScreenOperatingHour>?> GetHours(MvScreenOperatingHourFilter param);
+        Task<List<MvScreenOperatingHour>?> AddHours(List<MvAddScreenOperatingHour> param);
+        Task DeleteHour(MvDeleteScreenOperatingHour param);
     }
 }

@@ -6,56 +6,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AdzenDooh.Api.Controllers.Application.Inventory.ScreenOperatingHour
 {
-    public class ScreenOperatingHourController(
-        IScreenOperatingHourService _ScreenOperatingHourService
-    ) : BaseController
+    public class ScreenOperatingHourController( IScreenOperatingHourService _ScreenOperatingHourService) : BaseController
     {
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] MvScreenOperatingHourFilter param)
+        public async Task<IActionResult> GetAll([FromQuery] MvScreenOperatingHourFilter param)
         {
-            try
-            {
-                var response = await _ScreenOperatingHourService.GetSlots(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await _ScreenOperatingHourService.GetHours(param);
+            return Ok(ApiResult.Success(response));
         }
-
 
         [HttpPost]
-        public async Task<IActionResult> Create(
-            [FromBody] List<MvAddScreenOperatingHour> param)
+         public async Task<IActionResult> Create([FromBody] List<MvAddScreenOperatingHour> param)
         {
-            try
-            {
-                var response = await _ScreenOperatingHourService.AddSlots(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await _ScreenOperatingHourService.AddHours(param);
+            return Ok(ApiResult.Success(response));
         }
 
-        
         [HttpDelete]
-        public async Task<IActionResult> Delete(
-            [FromBody] MvDeleteScreenOperatingHour param)
+        public async Task<IActionResult> Delete([FromBody] MvDeleteScreenOperatingHour param)
         {
-            try
-            {
-                await _ScreenOperatingHourService.DeleteSlot(param);
-                return Ok(ApiResult.Success("Slot deleted successfully"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            await _ScreenOperatingHourService.DeleteHour(param);
+            return Ok(ApiResult.Success("Hour deleted successfully"));
         }
     }
 }

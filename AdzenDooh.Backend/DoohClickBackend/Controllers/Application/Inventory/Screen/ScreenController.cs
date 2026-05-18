@@ -12,76 +12,36 @@ namespace AdzenDooh.Api.Controllers.Application.Inventory.Screen
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] MvParamOption<MvScreenFilter> param)
         {
-            try
-            {
-                var response = await screenService.GetGrid(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await screenService.GetGrid(param);
+            return Ok(ApiResult.Success(response));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDetail([FromQuery] MvScreenDetailParam param)
         {
-            try
-            {
-                var response = await screenService.GetDetail(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ApiResult.Fail<object>(ex.Message));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await screenService.GetDetail(param);
+            return Ok(ApiResult.Success(response));
         }
-
 
         [HttpPost]
         public async Task<IActionResult> GetDdl([FromBody] MvScreenDdl param)
         {
-            try
-            {
-                var response = await screenService.ScreenDdl(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await screenService.ScreenDdl(param);
+            return Ok(ApiResult.Success(response));
         }
 
         [HttpPost]
         public async Task<IActionResult> Save([FromBody] MvUpsertScreen param)
         {
-            try
-            {
-                var response = await screenService.SaveScreen(param);
-                return Ok(ApiResult.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            var response = await screenService.SaveScreen(param);
+            return Ok(ApiResult.Success(response));
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody] MvDeleteScreen param)
         {
-            try
-            {
-                await screenService.DeleteScreen(param);
-                return Ok(ApiResult.Success("Screen and its operating hours deleted successfully"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult.Fail<object>(ex.Message));
-            }
+            await screenService.DeleteScreen(param);
+            return Ok(ApiResult.Success("Screen and its operating hours deleted successfully"));
         }
     }
 }

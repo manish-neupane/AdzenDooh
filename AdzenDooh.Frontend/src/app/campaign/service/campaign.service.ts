@@ -26,6 +26,7 @@ export class CampaignService {
   }
 
   createCampaignCreative(payload: MvSaveCampaignCreative): Observable<ApiResponse<void>> {
-    return this.api.post(`${this.base}/CreateCreative`, payload);
+    return this.api.post(`${this.base}/AddCreative`, payload);
   }
+  
 }

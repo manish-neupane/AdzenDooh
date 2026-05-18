@@ -10,60 +10,33 @@ namespace AdzenDooh.Service.Application.Inventory.ScreenOperatingHour
         IDataAccessService _DataAccessService
     ) : IScreenOperatingHourService
     {
-        // ── GET SLOTS ----------------------------------------------
-        public async Task<List<MvScreenOperatingHour>?> GetSlots(
-            MvScreenOperatingHourFilter param)
+      
+        public async Task<List<MvScreenOperatingHour>?> GetHours(MvScreenOperatingHourFilter param)
         {
-            try
-            {
-                string result = await _DataAccessService.RetrievalProcedure(
-                    "inv.SpScreenOperatingHourSel", JsonConvert.SerializeObject(param));
+            string result = await _DataAccessService.RetrievalProcedure(
+                "inv.SpScreenOperatingHourSel", JsonConvert.SerializeObject(param));
 
-                if (!result.TrimStart().StartsWith('['))
-                {
-                    var spError = JsonConvert.DeserializeObject<MvSpError>(result);
-                    throw new InvalidOperationException(spError?.Message ?? "An error occurred");
-                }
-
-                return JsonConvert.DeserializeObject<List<MvScreenOperatingHour>>(result);
-            }
-            catch { throw; }
+            return JsonConvert.DeserializeObject<List<MvScreenOperatingHour>>(result);
         }
 
-        // ── ADD SLOTS -----------------------------------------------
-        public async Task<List<MvScreenOperatingHour>?> AddSlots(
-            List<MvAddScreenOperatingHour> param)
+        
+        public async Task<List<MvScreenOperatingHour>?> AddHours(List<MvAddScreenOperatingHour> param)
         {
-            try
-            {
-                string result = await _DataAccessService.ActionProcedure(
-                    "inv.SpScreenOperatingHourIns", JsonConvert.SerializeObject(param));
+            string result = await _DataAccessService.ActionProcedure(
+                "inv.SpScreenOperatingHourIns", JsonConvert.SerializeObject(param));
 
-                if (!result.TrimStart().StartsWith('['))
-                {
-                    var spError = JsonConvert.DeserializeObject<MvSpError>(result);
-                    throw new InvalidOperationException(spError?.Message ?? "An error occurred");
-                }
-
-                return JsonConvert.DeserializeObject<List<MvScreenOperatingHour>>(result);
-            }
-            catch { throw; }
+            return JsonConvert.DeserializeObject<List<MvScreenOperatingHour>>(result);
         }
 
-        // ── DELETE SLOT ------------------------------------------------
-        public async Task DeleteSlot(MvDeleteScreenOperatingHour param)
+        //  DELETE HOUR 
+        public async Task DeleteHour(MvDeleteScreenOperatingHour param)
         {
-            try
-            {
-                string result = await _DataAccessService.ActionProcedure(
-                    "inv.SpScreenOperatingHourDel", JsonConvert.SerializeObject(param));
+            string result = await _DataAccessService.ActionProcedure("inv.SpScreenOperatingHourDel", JsonConvert.SerializeObject(param));
 
-                var response = JsonConvert.DeserializeObject<MvSpError>(result);
+            var response = JsonConvert.DeserializeObject<MvSpError>(result);
 
-                if (response?.Type != "Success")
-                    throw new InvalidOperationException(response?.Message ?? "An error occurred");
-            }
-            catch { throw; }
+            if (response?.Type != "Success")
+                throw new InvalidOperationException(response?.Message ?? "An error occurred");
         }
     }
 }
